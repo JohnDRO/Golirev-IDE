@@ -14,3 +14,10 @@ What is not working / not done :
 * Parsing the Netlist from the JSON file
 * Generating the Netlist on the SVG element
 * ..
+
+## TODO
+
+I plan to work on these things : 
+* Finishing parsejson()
+* Generating the Netlist correctly
+* A good component placement
