@@ -109,6 +109,9 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 		case '$_OR_':
 			GateNumber = 5;
 		break;
+		case '$_XOR_':
+			GateNumber = 6;
+		break;
 	}
 	
 	return GateNumber;
@@ -134,7 +137,7 @@ function GenerateAllGates(SVG_Element) {
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a gate and return the svgjs element created.
 	var group = draw.group(), text, longeur = 0, rect;
 	
-	if (Gate_Type < 0 || Gate_Type > 5) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR
+	if (Gate_Type < 0 || Gate_Type > 6) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR
 		return -1;
 	
 	if (typeof Label == 'undefined')
@@ -219,6 +222,27 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 				
 				group.path('m -3.5,1 19.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -19.5,0 a 40,40 0 0 0 0,-46 z');
+				group.path('m -16,9 16,0');
+				group.path('m 47,25 16,0');
+				group.path('m -16,41 16,0');
+				group.add(text)
+			}
+			
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+		
+			/*
+			group.dragmove = function() {
+			  GenerateAllWires(draw, test1, test2);
+			}
+			*/
+		break;
+		case 6: // XOR
+			if (Gate_Norm == 0) {
+				text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
+				
+				group.path('m -3.5,1 a 40,40 0 0 1 0,46');
+				group.path('m 2.5,1 13.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -13.5,0 a 40,40 0 0 0 0,-46 z');
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
