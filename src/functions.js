@@ -1,13 +1,18 @@
 function DisplayResults() { // Fonctions utilisé pour tester mon resultat
-	var i = 0;
+	var i = 0, k = 0;
 	
 	for (i = 1; i <= Components[0]; i++) {
-		document.write(Components[i][0] + ':' + Components[i][1] + '<br />');
+		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
 	}
-	/*	
-	for (i = 1; i < nombre de connections; i++)
+	
+	for (i = 1, k = 0; i <= NetList[0]; i++) {
+		if (typeof NetList[i] != 'undefined') {
+			document.write(NetList[i] + ' : '+ k + ' <br />');
+			k++;
+		}
+	}
 		// On affiche
-	*/
+	document.write(k);
 	
 	
 	return 0;
@@ -19,9 +24,10 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	
 	var io_names, cells_name;
 	
-	var i = 0, n = 0; // counters
+	var i = 0, n = 0, k = 0; // counters
 	
-	Components[0] = 0; // Initialisation du nombre de composants à 0;
+	Components[0] = 0; // Init components to 0
+	NetList[0] = 0; // Init links to 0
 	// ---
 	
 	Circuit_Name = Object.keys(json_yosysJS.modules); // example : 'up3down5', 'DCF77_CIRCUIT', '4 BIT COUNTER', ..
@@ -41,6 +47,13 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	
 		// Netlist related : todo
 		// json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits
+		
+		if (typeof NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] === 'undefined') {
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] = 1;
+			NetList[0]++;
+		}
+		else 
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits]++;
 		// --
 	}
 	// ---
@@ -59,6 +72,18 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		// --
 	
 		// Netlist related : todo
+		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
+		
+		for (k in cell_io_name) {
+			// 
+			var meh = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections[cell_io_name[k]];
+			if (typeof NetList[meh] === 'undefined') {
+				NetList[meh] = 1;
+				NetList[0]++;
+			}
+			else 
+				NetList[meh]++;
+		}
 		// --
 	
 	
@@ -263,3 +288,5 @@ function RemoveAllGates() {
 			Components[i][6] = Components[i][6].remove();
 	}
 }
+
+
