@@ -5,18 +5,15 @@ function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
 	}
 	
+
 	for (i = 1; i <= NetList[0]; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			for (var l = 1; l <= NetList[i][0]; l++)
-				document.write(NetList[i][l] + ', ');
+				document.write(Components[NetList[i][l][0] + 1][0] + '.' + NetList[i][l][1] + ' === ');
 			
-			document.write('<br />');
+			document.write('<br /><br />');
 		}
 	}
-		// On affiche
-		
-	document.write(NetList[2][3]+' KK <br />');
-	document.write('nombre de connections : ' + NetList[0]);
 	
 	
 	return 0;
@@ -55,12 +52,18 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		if (typeof NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] === 'undefined') {
 			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] = new Array();
 			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0] = 1;
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1] = 'FirstGate';
+			
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1] = new Array();
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1][0] = 1 + parseInt(i);
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1][1] = 0;
 			NetList[0]++;
 		}
 		else {
 			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]++;
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]] = 'Ngate';
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]] = new Array();
+			
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]][0] = 1 + parseInt(i);
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]][1] = 0;
 		}
 		// --
 	}
@@ -88,12 +91,16 @@ function ParseJson(json_yosysJS) { // voir algo.js
 			if (typeof NetList[meh] === 'undefined') {
 				NetList[meh] = new Array();
 				NetList[meh][0] = 1;
-				NetList[meh][1] = 'FirstGate';
+				NetList[meh][1] = new Array();
+				NetList[meh][1][0] = 1 + parseInt(i)+ parseInt(k);
+				NetList[meh][1][1] = cell_io_name[k];
 				NetList[0]++;
 			}
 			else  {
 				NetList[meh][0]++;
-				NetList[meh][NetList[meh][0]] = 'Ngate';
+				NetList[meh][NetList[meh][0]] = new Array();
+				NetList[meh][NetList[meh][0]][0] = 1 + parseInt(i)+ parseInt(k);
+				NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
 			}
 		}
 		// --
