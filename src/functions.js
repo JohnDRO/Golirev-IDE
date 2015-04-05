@@ -5,14 +5,18 @@ function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
 	}
 	
-	for (i = 1, k = 0; i <= NetList[0]; i++) {
+	for (i = 1; i <= NetList[0]; i++) {
 		if (typeof NetList[i] != 'undefined') {
-			document.write(NetList[i] + ' : '+ k + ' <br />');
-			k++;
+			for (var l = 1; l <= NetList[i][0]; l++)
+				document.write(NetList[i][l] + ', ');
+			
+			document.write('<br />');
 		}
 	}
 		// On affiche
-	document.write(k);
+		
+	document.write(NetList[2][3]+' KK <br />');
+	document.write('nombre de connections : ' + NetList[0]);
 	
 	
 	return 0;
@@ -49,11 +53,15 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		// json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits
 		
 		if (typeof NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] === 'undefined') {
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] = 1;
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] = new Array();
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0] = 1;
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1] = 'FirstGate';
 			NetList[0]++;
 		}
-		else 
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits]++;
+		else {
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]++;
+			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]] = 'Ngate';
+		}
 		// --
 	}
 	// ---
@@ -78,11 +86,15 @@ function ParseJson(json_yosysJS) { // voir algo.js
 			// 
 			var meh = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections[cell_io_name[k]];
 			if (typeof NetList[meh] === 'undefined') {
-				NetList[meh] = 1;
+				NetList[meh] = new Array();
+				NetList[meh][0] = 1;
+				NetList[meh][1] = 'FirstGate';
 				NetList[0]++;
 			}
-			else 
-				NetList[meh]++;
+			else  {
+				NetList[meh][0]++;
+				NetList[meh][NetList[meh][0]] = 'Ngate';
+			}
 		}
 		// --
 	
