@@ -5,16 +5,19 @@ function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
 	}
 	
-
-	for (i = 1; i <= NetList[0]; i++) {
+	document.write('<hr>');
+	
+	for (i = 1, b = 0; b < NetList[0] && i < 300; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			for (var l = 1; l <= NetList[i][0]; l++)
-				document.write(Components[NetList[i][l][0] + 1][0] + '.' + NetList[i][l][1] + ' === ');
+				document.write(Components[NetList[i][l][0]][0] + '.' + NetList[i][l][1] + ' === ');
 			
-			document.write('<br /><br />');
+			document.write('<br />');
+			b++;
 		}
 	}
 	
+	document.write('<hr>');
 	
 	return 0;
 } 
@@ -45,30 +48,41 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		Components[Components[0]][1] = (json_yosysJS.modules[Circuit_Name].ports[io_names[i]].direction === 'input') ? 0 : 1;
 		Components[Components[0]][2] = 1; // Show label of I/O by default
 		// --
-	
+		
 		// Netlist related : todo
 		// json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits
 		
-		if (typeof NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] === 'undefined') {
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits] = new Array();
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0] = 1;
+		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
+		
+		if (typeof NetList[meh2] === 'undefined') {
+			NetList[meh2] = new Array();
+			NetList[meh2][0] = 1;
 			
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1] = new Array();
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1][0] = 1 + parseInt(i);
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][1][1] = 0;
+			NetList[meh2][1] = new Array();
+			NetList[meh2][1][0] = 1 + parseInt(i);
+			NetList[meh2][1][1] = 0;
+			
+			NetList[meh2][1][2] = 0; // x
+			NetList[meh2][1][3] = 0; // y
 			NetList[0]++;
 		}
 		else {
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]++;
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]] = new Array();
+			NetList[meh2][0]++;
+			NetList[meh2][NetList[meh2][0]] = new Array();
 			
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]][0] = 1 + parseInt(i);
-			NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][NetList[json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits][0]][1] = 0;
+			NetList[meh2][NetList[meh2][0]][0] = 1 + parseInt(i);
+			NetList[meh2][NetList[meh2][0]][1] = 0;
+			
+			NetList[meh2][NetList[meh2][0]][2] = 0; // x
+			NetList[meh2][NetList[meh2][0]][3] = 0; // y
 		}
+		
+		document.write('<br />kk : ' + meh2 + '<br />');
+		
 		// --
 	}
 	// ---
-	
+
 	// read cells (NOT, AND, OR, ..)
 	cells_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells);
 	
@@ -81,7 +95,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		Components[Components[0]][1] = GateToEqNumber(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].type);
 		Components[Components[0]][2] = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].hide_name;
 		// --
-	
+		
 		// Netlist related : todo
 		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
 		
@@ -92,22 +106,32 @@ function ParseJson(json_yosysJS) { // voir algo.js
 				NetList[meh] = new Array();
 				NetList[meh][0] = 1;
 				NetList[meh][1] = new Array();
-				NetList[meh][1][0] = 1 + parseInt(i)+ parseInt(k);
+				NetList[meh][1][0] = parseInt(i) + parseInt(k);
 				NetList[meh][1][1] = cell_io_name[k];
+				
+				NetList[meh][1][2] = 0; // x
+				NetList[meh][1][3] = 0; // y
 				NetList[0]++;
 			}
 			else  {
 				NetList[meh][0]++;
 				NetList[meh][NetList[meh][0]] = new Array();
-				NetList[meh][NetList[meh][0]][0] = 1 + parseInt(i)+ parseInt(k);
+				NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
 				NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
+				
+				NetList[meh][NetList[meh][0]][2] = 0; // x
+				NetList[meh][NetList[meh][0]][3] = 0; // y
+
 			}
+			
 		}
 		// --
-	
+		
 	
 		//Components[0]++;
 	}
+	
+	
 	// ---
 	
 	CircuitInfo[2] = Circuit_Name;
@@ -149,7 +173,7 @@ function GenerateAllGates(SVG_Element) {
 	
 	RemoveAllGates();
 	
-	for (i = 1; i < Components[0]; i++)
+	for (i = 1; i <= Components[0]; i++)
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0);
 }
 
@@ -178,6 +202,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			group.add(text)
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
 		break;
 		case 1: // Output
 			longeur = Label.length * 3 + 70;
@@ -191,6 +219,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			group.add(text)
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
 		break;
 		case 2: // YES group.add(rect)
 			if (Gate_Norm == 0) {
@@ -203,6 +235,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
 		break;
 		case 3: // NOT
 			if (Gate_Norm == 0) {
@@ -216,6 +252,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
 		break;			
 		case 4: // AND
 			if (Gate_Norm == 0) {
@@ -230,11 +270,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 		
-			/*
 			group.dragmove = function() {
-			  GenerateAllWires(draw, test1, test2);
+			  GenerateAllWires(draw);
 			}
-			*/
+			
 		break;		
 		case 5: // OR
 			if (Gate_Norm == 0) {
@@ -250,11 +289,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 		
-			/*
 			group.dragmove = function() {
-			  GenerateAllWires(draw, test1, test2);
+			  GenerateAllWires(draw);
 			}
-			*/
+			
 		break;
 		case 6: // XOR
 			if (Gate_Norm == 0) {
@@ -271,11 +309,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 		
-			/*
 			group.dragmove = function() {
-			  GenerateAllWires(draw, test1, test2);
+			  GenerateAllWires(draw);
 			}
-			*/
+			
 		break;
 		default: // Error
 			return -1;
@@ -285,8 +322,37 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 	return group;
 }
 
-function GenerateAllWires(draw, test1, test2) { // Fonction à excuter à chaque drag
-	var i = 0;
+function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
+	var i = 0, n = 0;
+	// --
+	// 1. Je supprime les anciens
+	for (i = 1; i <= Wires[0]; i++)
+		Wires[i].remove();
+	Wires[0] = 0;
+	for (i = 1, n = 1; i <= 90; i++) {
+		if (typeof NetList[i] != 'undefined') {
+			Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
+			Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
+
+			
+			xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
+			ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
+			xb = Components[NetList[i][2][0]][6].x() + Offset2[0];
+			yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
+			
+			Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+			
+			Wires[0]++;
+			n++;
+		}
+
+	}
+		
+		
+	
+	// 2. Je calcul les nouveaux points
+	// 3. Je refais les fils
+	// --
 	// 1. On supprime les anciens
 	/*
 	for (i = 1; i < blabla_write[0]; i++) // blabla_write global
@@ -332,4 +398,49 @@ function RemoveAllGates() {
 	}
 }
 
+function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rapport au centre de l'objet ..
+	var Varx = 0, Vary = 0;
+	
+	switch (Gate_Type) {
+		case 0:
+			Varx = 76;
+			Vary = 5;
+		break;
+		case 1:
+			Varx = -16;
+			Vary = 5;
+		break;
+		case 3:
+			if (IO_Name === 'A') {
+				Varx = -15;
+				Vary = 24;
+			}
+			else {
+				Varx = 52;
+				Vary = 24;	
+			}
+		break;
+		case 4:
+			if (IO_Name === 'A') {
+				Varx = -16;
+				Vary = 9;
+			}
+			else if (IO_Name === 'B') {
+				Varx = -16;
+				Vary = 41;	
+			}
+			else {
+				Varx = 62;
+				Vary = 25;	
+			}
+		break;
+		default:
+			Varx = 0;
+			Vary = 0;
+		break;
+	}
+	
 
+	
+	return [Varx, Vary];
+}
