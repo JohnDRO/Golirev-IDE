@@ -402,15 +402,15 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 	var Varx = 0, Vary = 0;
 	
 	switch (Gate_Type) {
-		case 0:
+		case 0: // Input
 			Varx = 76;
 			Vary = 5;
 		break;
-		case 1:
+		case 1: // Output
 			Varx = -16;
 			Vary = 5;
 		break;
-		case 3:
+		case 2: // Buf
 			if (IO_Name === 'A') {
 				Varx = -15;
 				Vary = 24;
@@ -420,7 +420,45 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 				Vary = 24;	
 			}
 		break;
-		case 4:
+		case 3: // Not
+			if (IO_Name === 'A') {
+				Varx = -15;
+				Vary = 24;
+			}
+			else {
+				Varx = 52;
+				Vary = 24;	
+			}
+		break;
+		case 4: // And
+			if (IO_Name === 'A') {
+				Varx = -16;
+				Vary = 9;
+			}
+			else if (IO_Name === 'B') {
+				Varx = -16;
+				Vary = 41;	
+			}
+			else {
+				Varx = 62;
+				Vary = 25;	
+			}
+		break;
+		case 5: // OR
+			if (IO_Name === 'A') {
+				Varx = -16;
+				Vary = 9;
+			}
+			else if (IO_Name === 'B') {
+				Varx = -16;
+				Vary = 41;	
+			}
+			else {
+				Varx = 62;
+				Vary = 25;	
+			}
+		break;
+		case 6: // XOR
 			if (IO_Name === 'A') {
 				Varx = -16;
 				Vary = 9;
