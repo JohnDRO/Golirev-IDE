@@ -30,11 +30,13 @@ NetList[n][0] = Number of elements on that connection;
 NetList[n][1] = Array (First Object)
 		[n][1][0] = ID on the component var;
 		[n][1][1] = Name of the Output;
-		[n][1][2] = ;
+		[n][1][2] = OffsetX;
+		[n][1][3] = OffsetY;
 NetList[n][2] = Array (Second Object)
-
-
 */
+
+var Wires = new Array();
+Wires[0] = 0;
 
 </script>
 </head>
@@ -52,15 +54,60 @@ NetList[n][2] = Array (Second Object)
   </script>
 
 <script type="text/javascript">
-var json_yosysJS = { "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc -Os)", "modules": { "up3down5": { "ports": { "in1": { "direction": "input", "bits": [ 2 ] }, "in2": { "direction": "input", "bits": [ 3 ] }, "in3": { "direction": "input", "bits": [ 4 ] }, "out": { "direction": "output", "bits": [ 5 ] } }, "cells": { "$auto$simplemap.cc:228:simplemap_logbin$600": { "hide_name": 1, "type": "$_OR_", "parameters": { }, "attributes": { }, "connections": { "A": [ 3 ], "B": [ 6 ], "Y": [ 7 ] } }, "$auto$simplemap.cc:228:simplemap_logbin$602": { "hide_name": 1, "type": "$_AND_", "parameters": { }, "attributes": { }, "connections": { "A": [ 4 ], "B": [ 8 ], "Y": [ 9 ] } }, "$auto$simplemap.cc:37:simplemap_not$598": { "hide_name": 1, "type": "$_NOT_", "parameters": { }, "attributes": { }, "connections": { "A": [ 9 ], "Y": [ 5 ] } }, "$auto$simplemap.cc:37:simplemap_not$599": { "hide_name": 1, "type": "$_NOT_", "parameters": { }, "attributes": { }, "connections": { "A": [ 7 ], "Y": [ 8 ] } }, "$auto$simplemap.cc:37:simplemap_not$601": { "hide_name": 1, "type": "$_NOT_", "parameters": { }, "attributes": { }, "connections": { "A": [ 2 ], "Y": [ 6 ] } } }, "netnames": { "$logic_and$input.v:13$551_Y": { "hide_name": 1, "bits": [ 9 ], "attributes": { "src": "input.v:13" } }, "$logic_or$input.v:13$549_Y": { "hide_name": 1, "bits": [ 7 ], "attributes": { "src": "input.v:13" } }, "$not$input.v:13$548_Y": { "hide_name": 1, "bits": [ 6 ], "attributes": { "src": "input.v:13" } }, "$not$input.v:13$550_Y": { "hide_name": 1, "bits": [ 8 ], "attributes": { "src": "input.v:13" } }, "in1": { "hide_name": 0, "bits": [ 2 ], "attributes": { "src": "input.v:5" } }, "in2": { "hide_name": 0, "bits": [ 3 ], "attributes": { "src": "input.v:5" } }, "in3": { "hide_name": 0, "bits": [ 4 ], "attributes": { "src": "input.v:5" } }, "out": { "hide_name": 0, "bits": [ 5 ], "attributes": { "src": "input.v:7" } } } } } };
+var json_yosysJS = {
+  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+  "modules": {
+    "andgate": {
+      "ports": {
+        "IN1": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "OUT1": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$simplemap.cc:37:simplemap_not$186": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "IN1": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "input.v:3"
+          }
+        },
+        "OUT1": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "input.v:5"
+          }
+        }
+      }
+    }
+  }
+};
 
 ParseJson(json_yosysJS);
 
 GenerateAllGates(draw);
-/*
-PlaceComponents();
-GeneratePath();
-*/
+/* PlaceComponents(); 
+GeneratePath(); */
+GenerateAllWires(); 
 DisplayResults();
 </script>
 </body>
