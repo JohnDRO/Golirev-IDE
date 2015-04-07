@@ -130,7 +130,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	}
 	// ---
 	
-	CircuitInfo[2] = Circuit_Name;
+	CircuitInfo[2] = String(Circuit_Name);
 	CircuitInfo[3] = json_yosysJS.creator;
 	return 0;
 }
@@ -171,6 +171,8 @@ function GenerateAllGates(SVG_Element) {
 	
 	for (i = 1; i <= Components[0]; i++)
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0);
+	
+	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 });
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a gate and return the svgjs element created.

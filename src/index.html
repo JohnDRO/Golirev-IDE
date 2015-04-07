@@ -8,6 +8,7 @@ CircuitInfo[0] = rect x of the svg element
 CircuitInfo[1] = rect y of the svg element
 CircuitInfo[2] = name of the circuit
 CircuitInfo[3] = "Creator"
+CircuitInfo[4] = Text svg element.
 */
 var Components = new Array(); // variable globale
 /*
@@ -57,44 +58,87 @@ Wires[0] = 0;
 var json_yosysJS = {
   "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
-    "andgate": {
+    "andgatdde": {
       "ports": {
-        "IN1": {
+        "a": {
           "direction": "input",
           "bits": [ 2 ]
         },
+        "b": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "c": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
         "OUT1": {
           "direction": "output",
-          "bits": [ 3 ]
+          "bits": [ 5 ]
         }
       },
       "cells": {
-        "$auto$simplemap.cc:37:simplemap_not$186": {
+        "AND1": {
           "hide_name": 1,
-          "type": "$_NOT_",
+          "type": "$_AND_",
           "parameters": {
           },
           "attributes": {
           },
           "connections": {
             "A": [ 2 ],
-            "Y": [ 3 ]
+            "B": [ 3 ],
+            "Y": [ 6 ]
+          }
+        },
+        "OR1": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 4 ],
+            "Y": [ 5 ]
           }
         }
       },
       "netnames": {
-        "IN1": {
+        "$logic_and$input.v:7$324_Y": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "input.v:7"
+          }
+        },
+        "OUT1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "input.v:5"
+          }
+        },
+        "a": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
             "src": "input.v:3"
           }
         },
-        "OUT1": {
+        "b": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "input.v:5"
+            "src": "input.v:3"
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "input.v:3"
           }
         }
       }
