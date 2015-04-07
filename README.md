@@ -21,3 +21,4 @@ I plan to work on these things :
 * Finishing parsejson()
 * Generating the Netlist correctly
 * A good component placement
+* Add constants
