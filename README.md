@@ -22,5 +22,4 @@ I plan to work on these things :
 * Generating the Netlist correctly
 * A good component placement
 * Add constants
-* Add DFF
 * Add European symbols

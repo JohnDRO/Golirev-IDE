@@ -151,6 +151,9 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 		case '$_XOR_':
 			GateNumber = 6;
 		break;
+		case '$_DFF_P_':
+			GateNumber = 7;
+		break;
 	}
 	
 	return GateNumber;
@@ -176,9 +179,9 @@ function GenerateAllGates(SVG_Element) {
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a gate and return the svgjs element created.
-	var group = draw.group(), text, longeur = 0, rect;
+	var group = draw.group(), text, text1, text2, text3, longeur = 0, rect;
 	
-	if (Gate_Type < 0 || Gate_Type > 6) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR
+	if (Gate_Type < 0 || Gate_Type > 7) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF
 		return -1;
 	
 	if (typeof Label == 'undefined')
@@ -304,6 +307,30 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.add(text)
 			}
 			
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+		
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
+			
+		break;
+		case 7: // DFF
+			if (Gate_Norm == 0) {
+				text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000'); 
+				text1 = SVG_Element.plain('D').center(10, 15).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Q').center(50, 15).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('CLK').center(15, 60).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.rect(60, 80); // The main rect
+				group.path('m -16,15 16,0'); // symboles de connections (D)
+				group.path('m -16,60 16,0'); // (clk)
+				group.path('m 60,15 16,0'); // (Q)
+				group.add(text);
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 		
@@ -471,6 +498,20 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 			else {
 				Varx = 62;
 				Vary = 25;	
+			}
+		break;
+		case 7: // DFF
+			if (IO_Name === 'C') { // clock
+				Varx = -16;
+				Vary = 60;
+			}
+			else if (IO_Name === 'D') { // D
+				Varx = -16;
+				Vary = 15;	
+			}
+			else { // Q
+				Varx = 76;
+				Vary = 15;	
 			}
 		break;
 		default:
