@@ -106,7 +106,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 				NetList[meh] = new Array();
 				NetList[meh][0] = 1;
 				NetList[meh][1] = new Array();
-				NetList[meh][1][0] = parseInt(i) + parseInt(k);
+				NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
 				NetList[meh][1][1] = cell_io_name[k];
 				
 				NetList[meh][1][2] = 0; // x
@@ -121,17 +121,13 @@ function ParseJson(json_yosysJS) { // voir algo.js
 				
 				NetList[meh][NetList[meh][0]][2] = 0; // x
 				NetList[meh][NetList[meh][0]][3] = 0; // y
-
 			}
 			
 		}
 		// --
 		
-	
 		//Components[0]++;
 	}
-	
-	
 	// ---
 	
 	CircuitInfo[2] = Circuit_Name;
@@ -330,20 +326,23 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 		Wires[i].remove();
 	Wires[0] = 0;
 	for (i = 1, n = 1; i <= 90; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
-			Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
+		if (typeof NetList[i] != 'undefined') { // A modifier, la situation n'est pas plus simple que ça. Il peut y avoir plus de trois connections.
+			if (NetList[i][0] == 2) {
+				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
+				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
 
-			
-			xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
-			ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
-			xb = Components[NetList[i][2][0]][6].x() + Offset2[0];
-			yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
-			
-			Wires[n] = GenerateOneWire(xa, xb, ya, yb);
-			
-			Wires[0]++;
-			n++;
+				
+				xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
+				ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
+				xb = Components[NetList[i][2][0]][6].x() + Offset2[0];
+				yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
+				
+				Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+				
+				Wires[0]++;
+				n++;
+			}
+			// else voir le nombre et etudier les cas
 		}
 
 	}
@@ -477,8 +476,6 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 			Vary = 0;
 		break;
 	}
-	
 
-	
 	return [Varx, Vary];
 }
