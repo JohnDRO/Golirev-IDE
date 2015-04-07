@@ -18,7 +18,9 @@ What is not working / not done :
 ## TODO
 
 I plan to work on these things : 
-* Finishing parsejson()
+* Finishing parsejson() (registers are not ok atm.)
 * Generating the Netlist correctly
 * A good component placement
 * Add constants
+* Add DFF
+* Add European symbols
