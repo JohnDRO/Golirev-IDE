@@ -172,7 +172,7 @@ function GenerateAllGates(SVG_Element) {
 	
 	RemoveAllGates();
 	
-	for (i = 1; i <= Components[0]; i++)
+	for (i = 1; i <= Components[0]; i++) 
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0);
 	
 	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 });
@@ -344,6 +344,8 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 		break;
 	} 
 	
+	group.style('cursor', 'move');
+	
 	return group;
 }
 
@@ -371,6 +373,8 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 				Wires[0]++;
 				n++;
 			}
+			
+			// else ;
 			// else voir le nombre et etudier les cas
 		}
 
