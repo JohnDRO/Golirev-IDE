@@ -97,7 +97,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		Components[Components[0]][2] = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].hide_name;
 		// --
 		
-		// Netlist related : todo
+		// Netlist related : ok
 		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
 		
 		for (k in cell_io_name) {
@@ -175,12 +175,12 @@ function GenerateAllGates(SVG_Element) {
 	RemoveAllGates();
 	
 	for (i = 1; i <= Components[0]; i++) 
-		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0);
+		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0, Components[i][2]);
 	
 	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 });
 }
 
-function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a gate and return the svgjs element created.
+function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
 	var group = draw.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	
 	if (Gate_Type < 0 || Gate_Type > 8) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF, 8 == MUX
@@ -202,7 +202,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			group.path('m 60,5 16,0');
 			
 			group.add(rect);
-			group.add(text)
+			group.add(text);
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 			
@@ -218,8 +218,8 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 			
 			group.path('m -16,5 16,0');
 			
-			group.add(rect);
-			group.add(text)
+			group.add(rect);	
+			group.add(text);
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
 			
@@ -234,7 +234,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m 32,24 -31,-15 0,30 z');
 				group.path('m -15,23.9 16,0');
 				group.path('m 31,23.9 16,0');
-				group.add(text)
+			
+				if(!hide_label)
+					group.add(text);
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
@@ -251,7 +253,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m 32,24 -31,-15 0,30 z');
 				group.path('m -15,23.9 16,0');
 				group.path('m 40,23.9 12,0');
-				group.add(text)
+				
+				if(!hide_label)
+					group.add(text);
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
@@ -268,7 +272,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
-				group.add(text)
+				
+				if(!hide_label)
+					group.add(text);
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
@@ -286,7 +292,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
-				group.add(text)
+			
+				if(!hide_label)
+					group.add(text);
 			}
 			
 			
@@ -306,7 +314,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
-				group.add(text)
+			
+				if(!hide_label)
+					group.add(text);
 			}
 			
 			
@@ -328,7 +338,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m -16,15 16,0'); // symboles de connections (D)
 				group.path('m -16,60 16,0'); // (clk)
 				group.path('m 60,15 16,0'); // (Q)
-				group.add(text);
+				
+				if(!hide_label)		
+					group.add(text);
+				
 				group.add(text1);
 				group.add(text2);
 				group.add(text3);
@@ -354,7 +367,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.path('m -16,50 16,0'); // (B)
 				group.path('m 30,37 16,0'); // (Y)
 				group.path('m 16,69 0,16'); // (S)
-				group.add(text);
+				
+				if(!hide_label)
+					group.add(text);
+			
 				group.add(text1);
 				group.add(text2);
 				group.add(text3);
