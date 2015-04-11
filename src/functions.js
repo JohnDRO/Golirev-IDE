@@ -7,7 +7,7 @@ function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 	
 	document.write('<hr>');
 	
-	for (i = 1, b = 0; b < NetList[0] && i < 300; i++) {
+	for (i = 1, b = 0; b <= NetList[0]; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			for (var l = 1; l <= NetList[i][0]; l++)
 				document.write(Components[NetList[i][l][0]][0] + '.' + NetList[i][l][1] + ' === ');
@@ -350,14 +350,19 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 }
 
 function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
-	var i = 0, n = 0;
+	var i = 0, n = 0, k = 0, v = 0;
+	
+	var Offset1 = 0;
+	var Offset2 = 0;
 	// --
 	// 1. Je supprime les anciens
 	for (i = 1; i <= Wires[0]; i++)
 		Wires[i].remove();
+	
 	Wires[0] = 0;
-	for (i = 1, n = 1; i <= 90; i++) {
-		if (typeof NetList[i] != 'undefined') { // A modifier, la situation n'est pas plus simple que ça. Il peut y avoir plus de trois connections.
+	
+	for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) { 
+		if (typeof NetList[i] != 'undefined') {
 			if (NetList[i][0] == 2) {
 				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
 				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
@@ -373,9 +378,82 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 				Wires[0]++;
 				n++;
 			}
+				
+			else {
+				var input_circuit_number = 0;
+				var output_circuit_number = 0;
+				var output_cell_number = 0;
+				
+				var result = 0;
+				
+				var index1 = 0;
+				var index2 = 0;
+				var index3 = 0;
+				
+				var xa = 0;
+				var ya = 0;
+				var xb = 0;
+				var yb = 0;
+				
+				var id1 = 0;
+				var id2 = 0;
+				//blabla je compte le nombre d'input, d'output circuit, output cell		
+				for (k = 1; k <= NetList[i][0]; k++) {
+					result = GetConnectionType(NetList[i][k][0]);
+					if (result == 1) { // input circuit
+						input_circuit_number++;
+						index1 = k;
+					}
+					else if (result == 2) { // output circuit 
+						output_circuit_number++;
+						index2 = k;
+					}
+					else if (result == 3) { // output cell
+						output_cell_number++;
+						index3 = k;
+					}
+				}
+				
+				if (input_circuit_number >= 1) {
+					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the input to the other elements
+						if (m != index1) {
+							id1 = NetList[i][m][0];
+							id2 = NetList[i][index1][0];
+							
+							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1]);
+							Offset2 = GetOffset(Components[id2][1], NetList[i][index1][1]);
+							
+							xa = Components[id1][6].x() + Offset1[0];
+							ya = Components[id1][6].y() + Offset1[1];
+
+							xb = Components[id2][6].x() + Offset2[0];
+							yb = Components[id2][6].y() + Offset2[1];
+							
+							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							Wires[0]++;
+							n++;
+							v++;
+						}
+					}
+				}
+				
+				else if (output_circuit_number >= 1) {
+					// blabla je connect output to le reste
+				}
+				
+				else if (output_cell_number >= 1) {
+					// blabla je connect output cell to le reste
+				}
+				
+				else { // Cas normalement impossible
+					;
+				}
+				
+			}
 			
 			// else ;
 			// else voir le nombre et etudier les cas
+			
 		}
 
 	}
@@ -525,4 +603,23 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 	}
 
 	return [Varx, Vary];
+}
+
+function GetConnectionType(Component_ID) {
+	var type = 0;
+	var k = 0;
+	
+	if (Components[Component_ID][1] == 0 || Components[Component_ID][1] == 1) {
+		type = (Components[Component_ID][1] == 0) ? 1 : 2;
+	}
+	
+	else if (k == 0)
+		type = 3;
+	
+	// 1. On check le type, input/output
+	// 2. Si cell, on check si c'est une output
+	// 3. Else c'est une input de cell, 
+	return type;
+	
+	
 }
