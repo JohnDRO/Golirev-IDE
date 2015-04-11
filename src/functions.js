@@ -153,6 +153,9 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 		case '$_DFF_P_':
 			GateNumber = 7;
 		break;
+		case '$_MUX_':
+			GateNumber = 8;
+		break;
 	}
 	
 	return GateNumber;
@@ -178,9 +181,9 @@ function GenerateAllGates(SVG_Element) {
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a gate and return the svgjs element created.
-	var group = draw.group(), text, text1, text2, text3, longeur = 0, rect;
+	var group = draw.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	
-	if (Gate_Type < 0 || Gate_Type > 7) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF
+	if (Gate_Type < 0 || Gate_Type > 8) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF, 8 == MUX
 		return -1;
 	
 	if (typeof Label == 'undefined')
@@ -329,6 +332,33 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 				group.add(text1);
 				group.add(text2);
 				group.add(text3);
+			}
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+		
+			group.dragmove = function() {
+			  GenerateAllWires(draw);
+			}
+			
+		break;
+		case 8: // MUX
+			if (Gate_Norm == 0) {
+				text = SVG_Element.plain(Label).center(20, -10).stroke({ width: 0.1 }).fill('#000'); 
+				text1 = SVG_Element.plain('A').center(10, 25).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Y').center(22, 37).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('B').center(10, 50).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = SVG_Element.plain('S').center(16, 60).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.path('M 0 0 L 30 20 L 30 60 L 0 80 L 0 0Z');
+				group.path('m -16,25 16,0'); // symboles de connections (A)
+				group.path('m -16,50 16,0'); // (B)
+				group.path('m 30,37 16,0'); // (Y)
+				group.path('m 16,69 0,16'); // (S)
+				group.add(text);
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+				group.add(text4);
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
@@ -592,6 +622,24 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 			else { // Q
 				Varx = 76;
 				Vary = 15;	
+			}
+		break;
+		case 8: // DFF
+			if (IO_Name === 'A') { // A
+				Varx = -16;
+				Vary = 25;
+			}
+			else if (IO_Name === 'B') { // B
+				Varx = -16;
+				Vary = 50;	
+			}
+			else if (IO_Name === 'Y') { // Y
+				Varx = 46;
+				Vary = 37;	
+			}
+			else { // S
+				Varx = 16;
+				Vary = 85;	
 			}
 		break;
 		default:
