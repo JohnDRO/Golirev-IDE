@@ -461,7 +461,26 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 				}
 				
 				else if (output_cell_number >= 1) {
-					// blabla je connect output cell to le reste
+					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the output to the other elements
+						if (m != index3) {
+							id1 = NetList[i][m][0];
+							id2 = NetList[i][index3][0];
+							
+							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1]);
+							Offset2 = GetOffset(Components[id2][1], NetList[i][index3][1]);
+							
+							xa = Components[id1][6].x() + Offset1[0];
+							ya = Components[id1][6].y() + Offset1[1];
+
+							xb = Components[id2][6].x() + Offset2[0];
+							yb = Components[id2][6].y() + Offset2[1];
+							
+							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							Wires[0]++;
+							n++;
+							v++;
+						}
+					}
 				}
 				
 				else { // Cas normalement impossible
@@ -632,7 +651,7 @@ function GetConnectionType(Component_ID) {
 		type = (Components[Component_ID][1] == 0) ? 1 : 2;
 	}
 	
-	else if (k == 0)
+	else
 		type = 3;
 	
 	// 1. On check le type, input/output
