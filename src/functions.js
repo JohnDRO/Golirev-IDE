@@ -349,56 +349,55 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm) { // Generate a 
 	return group;
 }
 
-function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
-	var i = 0, n = 0, k = 0, v = 0;
+function GenerateAllWires(draw) { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
+	var i = 0, n = 0, k = 0, v = 0; // loops index
 	
-	var Offset1 = 0;
-	var Offset2 = 0;
-	// --
-	// 1. Je supprime les anciens
+	var xa = 0, ya = 0, xb = 0, yb = 0; // Lines points.
+	var Offset1 = 0, Offset2 = 0; // Points offset (see function GetOffset)
+
+	// 1. Removing "old" wires
 	for (i = 1; i <= Wires[0]; i++)
 		Wires[i].remove();
 	
 	Wires[0] = 0;
 	
-	for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) { 
+	// 2. Making new wires
+	for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) {
 		if (typeof NetList[i] != 'undefined') {
-			if (NetList[i][0] == 2) {
+			if (NetList[i][0] == 2) { // Only two components on the same line.
 				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
 				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
 
-				
 				xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
 				ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
 				xb = Components[NetList[i][2][0]][6].x() + Offset2[0];
 				yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
 				
-				Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+				Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
 				
 				Wires[0]++;
 				n++;
 			}
 				
-			else {
+			else { // More than 2 components on the same line.
+				// There is 3 mains cases :
+				// Case 1 : One circuit input and the rest is circuit output / cell input
+				// Case 2 : One circuit output and the rest is circuit output / cell input
+				// Case 3 : One cell output and the rest is cell input
+				
+				// The first step is to count the number of each elements and then connect them.
+				
 				var input_circuit_number = 0;
 				var output_circuit_number = 0;
 				var output_cell_number = 0;
 				
 				var result = 0;
 				
-				var index1 = 0;
-				var index2 = 0;
-				var index3 = 0;
+				var index1 = 0, index2 = 0, index3 = 0;
 				
-				var xa = 0;
-				var ya = 0;
-				var xb = 0;
-				var yb = 0;
-				
-				var id1 = 0;
-				var id2 = 0;
-				//blabla je compte le nombre d'input, d'output circuit, output cell		
-				for (k = 1; k <= NetList[i][0]; k++) {
+				var id1 = 0, id2 = 0;
+
+				for (k = 1; k <= NetList[i][0]; k++) { // I count the number of circuit input, circuit output and cell output
 					result = GetConnectionType(NetList[i][k][0]);
 					if (result == 1) { // input circuit
 						input_circuit_number++;
@@ -414,8 +413,8 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 					}
 				}
 				
-				if (input_circuit_number >= 1) {
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the input to the other elements
+				if (input_circuit_number >= 1) { // case 1
+					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the circuit input to the other elements
 						if (m != index1) {
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index1][0];
@@ -437,8 +436,8 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 					}
 				}
 				
-				else if (output_circuit_number >= 1) {
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the output to the other elements
+				else if (output_circuit_number >= 1) { // case 2
+					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the circuit output to the other elements
 						if (m != index2) {
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index2][0];
@@ -460,8 +459,8 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 					}
 				}
 				
-				else if (output_cell_number >= 1) {
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the output to the other elements
+				else if (output_cell_number >= 1) { // case 3
+					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the cell output to the other elements
 						if (m != index3) {
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index3][0];
@@ -483,50 +482,12 @@ function GenerateAllWires(draw) { // Fonction à excuter à chaque drag
 					}
 				}
 				
-				else { // Cas normalement impossible
+				else { // Impossible case
 					;
 				}
-				
 			}
-			
-			// else ;
-			// else voir le nombre et etudier les cas
-			
 		}
-
 	}
-		
-		
-	
-	// 2. Je calcul les nouveaux points
-	// 3. Je refais les fils
-	// --
-	// 1. On supprime les anciens
-	/*
-	for (i = 1; i < blabla_write[0]; i++) // blabla_write global
-		blabla_write[i].remove();
-	// --
-	
-	// 2. Je calcul le nouveau de point à faire ( Normalement c'est le même ? A voir s'il n'y a pas besoin de tout refaire)
-	// On suppose qu'on le connait, ne surtout pas relire le json. Il faut utiliser ma propre variable
-	// --
-	
-	// 3. Je calcul les nouveaux xa, xb, ya, yb et je les met dans un tableau.
-	//--
-	
-	// 4. Je fais les fils
-	for (i = 1; i < NOMBRE_DE_FIL A FAIRE; i++) {
-		// Il faut faire le calcul de xa, xb, .. Voir comment les liaisons seront sauvegardées.
-		blabla_write[i] = GenerateOneWire(xa, xb, ya, yb);
-	}
-		/*
-		x1 = test1.x();
-		y1 = test1.y();
-		
-		x2 = test2.x();
-		y2 = test2.y();
-		
-		*/
 }
 
 function GenerateOneWire(xa, xb, ya, yb) {
@@ -644,20 +605,14 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 }
 
 function GetConnectionType(Component_ID) {
-	var type = 0;
-	var k = 0;
+	var type = 0, k = 0;
 	
-	if (Components[Component_ID][1] == 0 || Components[Component_ID][1] == 1) {
+	if (Components[Component_ID][1] == 0 || Components[Component_ID][1] == 1) { // Is it an input / output ?
 		type = (Components[Component_ID][1] == 0) ? 1 : 2;
 	}
 	
-	else
+	else // Else it's a cell.
 		type = 3;
-	
-	// 1. On check le type, input/output
-	// 2. Si cell, on check si c'est une output
-	// 3. Else c'est une input de cell, 
+		
 	return type;
-	
-	
 }
