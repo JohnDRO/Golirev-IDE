@@ -28,7 +28,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	
 	var io_names, cells_name;
 	
-	var i = 0, n = 0, k = 0; // counters
+	var i = 0, n = 0, k = 0, l = 0; // loops counters
 	
 	Components[0] = 0; // Init components to 0
 	NetList[0] = 0; // Init links to 0
@@ -54,31 +54,32 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		
 		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
 		
-		if (typeof NetList[meh2] === 'undefined') {
-			NetList[meh2] = new Array();
-			NetList[meh2][0] = 1;
+		for (l = 0; l <= meh2.length - 1; l++) { // bus loop
+			if (typeof NetList[meh2[l]] === 'undefined') {
+				NetList[meh2[l]] = new Array();
+				NetList[meh2[l]][0] = 1;
+				
+				NetList[meh2[l]][1] = new Array();
+				NetList[meh2[l]][1][0] = 1 + parseInt(i);
+				NetList[meh2[l]][1][1] = 0;
+				
+				NetList[meh2[l]][1][2] = 0; // x
+				NetList[meh2[l]][1][3] = 0; // y
+				NetList[0]++;
+			}
 			
-			NetList[meh2][1] = new Array();
-			NetList[meh2][1][0] = 1 + parseInt(i);
-			NetList[meh2][1][1] = 0;
+			else {
+				NetList[meh2[l]][0]++;
+				NetList[meh2[l]][NetList[meh2[l]][0]] = new Array();
+				
+				NetList[meh2[l]][NetList[meh2[l]][0]][0] = 1 + parseInt(i);
+				NetList[meh2[l]][NetList[meh2[l]][0]][1] = 0;
+				
+				NetList[meh2[l]][NetList[meh2[l]][0]][2] = 0; // x
+				NetList[meh2[l]][NetList[meh2[l]][0]][3] = 0; // y
+			}
 			
-			NetList[meh2][1][2] = 0; // x
-			NetList[meh2][1][3] = 0; // y
-			NetList[0]++;
 		}
-		else {
-			NetList[meh2][0]++;
-			NetList[meh2][NetList[meh2][0]] = new Array();
-			
-			NetList[meh2][NetList[meh2][0]][0] = 1 + parseInt(i);
-			NetList[meh2][NetList[meh2][0]][1] = 0;
-			
-			NetList[meh2][NetList[meh2][0]][2] = 0; // x
-			NetList[meh2][NetList[meh2][0]][3] = 0; // y
-		}
-		
-		document.write('<br />kk : ' + meh2 + '<br />');
-		
 		// --
 	}
 	// ---
@@ -113,6 +114,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 				NetList[meh][1][3] = 0; // y
 				NetList[0]++;
 			}
+			
 			else  {
 				NetList[meh][0]++;
 				NetList[meh][NetList[meh][0]] = new Array();
@@ -124,9 +126,6 @@ function ParseJson(json_yosysJS) { // voir algo.js
 			}
 			
 		}
-		// --
-		
-		//Components[0]++;
 	}
 	// ---
 	
