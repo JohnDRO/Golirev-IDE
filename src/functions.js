@@ -32,6 +32,7 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	
 	Components[0] = 0; // Init components to 0
 	NetList[0] = 0; // Init links to 0
+	Constants[0] = 0;
 	// ---
 	
 	Circuit_Name = Object.keys(json_yosysJS.modules); // example : 'up3down5', 'DCF77_CIRCUIT', '4 BIT COUNTER', ..
@@ -55,30 +56,40 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
 		
 		for (l = 0; l <= meh2.length - 1; l++) { // bus loop
-			if (typeof NetList[meh2[l]] === 'undefined') {
-				NetList[meh2[l]] = new Array();
-				NetList[meh2[l]][0] = 1;
-				
-				NetList[meh2[l]][1] = new Array();
-				NetList[meh2[l]][1][0] = 1 + parseInt(i);
-				NetList[meh2[l]][1][1] = 0;
-				
-				NetList[meh2[l]][1][2] = 0; // x
-				NetList[meh2[l]][1][3] = 0; // y
-				NetList[0]++;
+			if (typeof meh2[l] == 'string') { // is it a constant ?
+				// On l'ajoute dans le tableau.
+				Constants[0]++;
+				Constants[Constants[0]] = new Array();
+				Constants[Constants[0]][0] = meh2[l]; // Value
+				Constants[Constants[0]][2] = 1 + parseInt(i); // Component id
+				Constants[Constants[0]][3] = 0; // Name of the gate
 			}
 			
 			else {
-				NetList[meh2[l]][0]++;
-				NetList[meh2[l]][NetList[meh2[l]][0]] = new Array();
+				if (typeof NetList[meh2[l]] === 'undefined') {
+					NetList[meh2[l]] = new Array();
+					NetList[meh2[l]][0] = 1;
+					
+					NetList[meh2[l]][1] = new Array();
+					NetList[meh2[l]][1][0] = 1 + parseInt(i);
+					NetList[meh2[l]][1][1] = 0;
+					
+					NetList[meh2[l]][1][2] = 0; // x
+					NetList[meh2[l]][1][3] = 0; // y
+					NetList[0]++;
+				}
 				
-				NetList[meh2[l]][NetList[meh2[l]][0]][0] = 1 + parseInt(i);
-				NetList[meh2[l]][NetList[meh2[l]][0]][1] = 0;
-				
-				NetList[meh2[l]][NetList[meh2[l]][0]][2] = 0; // x
-				NetList[meh2[l]][NetList[meh2[l]][0]][3] = 0; // y
+				else {
+					NetList[meh2[l]][0]++;
+					NetList[meh2[l]][NetList[meh2[l]][0]] = new Array();
+					
+					NetList[meh2[l]][NetList[meh2[l]][0]][0] = 1 + parseInt(i);
+					NetList[meh2[l]][NetList[meh2[l]][0]][1] = 0;
+					
+					NetList[meh2[l]][NetList[meh2[l]][0]][2] = 0; // x
+					NetList[meh2[l]][NetList[meh2[l]][0]][3] = 0; // y
+				}
 			}
-			
 		}
 		// --
 	}
@@ -99,32 +110,41 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		
 		// Netlist related : ok
 		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
-		
 		for (k in cell_io_name) {
-			// 
 			var meh = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections[cell_io_name[k]];
-			if (typeof NetList[meh] === 'undefined') {
-				NetList[meh] = new Array();
-				NetList[meh][0] = 1;
-				NetList[meh][1] = new Array();
-				NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
-				NetList[meh][1][1] = cell_io_name[k];
-				
-				NetList[meh][1][2] = 0; // x
-				NetList[meh][1][3] = 0; // y
-				NetList[0]++;
+			document.write(meh2[n] + '<br />');
+			
+			if (typeof meh[n] === 'string') { // is it a constant ?
+				Constants[0]++;
+				Constants[Constants[0]] = new Array();
+				Constants[Constants[0]][0] = meh[n]; // Value
+				Constants[Constants[0]][2] = 2 + parseInt(i) + parseInt(n); // Component id
+				Constants[Constants[0]][3] = cell_io_name[k]; // Name of the gate
 			}
 			
-			else  {
-				NetList[meh][0]++;
-				NetList[meh][NetList[meh][0]] = new Array();
-				NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
-				NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
+			else {
+				if (typeof NetList[meh] === 'undefined') {
+					NetList[meh] = new Array();
+					NetList[meh][0] = 1;
+					NetList[meh][1] = new Array();
+					NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
+					NetList[meh][1][1] = cell_io_name[k];
+					
+					NetList[meh][1][2] = 0; // x
+					NetList[meh][1][3] = 0; // y
+					NetList[0]++;
+				}
 				
-				NetList[meh][NetList[meh][0]][2] = 0; // x
-				NetList[meh][NetList[meh][0]][3] = 0; // y
+				else  {
+					NetList[meh][0]++;
+					NetList[meh][NetList[meh][0]] = new Array();
+					NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
+					NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
+					
+					NetList[meh][NetList[meh][0]][2] = 0; // x
+					NetList[meh][NetList[meh][0]][3] = 0; // y
+				}							
 			}
-			
 		}
 	}
 	// ---
@@ -174,9 +194,12 @@ function GenerateAllGates(SVG_Element) {
 	
 	RemoveAllGates();
 	
-	for (i = 1; i <= Components[0]; i++) 
+	for (i = 1; i <= Components[0]; i++) // IO + Cells
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0, Components[i][2]);
 	
+	for (i = 1; i <= Constants[0]; i++)// Constants
+		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
+		
 	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 });
 }
 
@@ -532,6 +555,23 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 				}
 			}
 		}
+	}
+
+	// 3. Constants
+	for (i = 1; i <= Constants[0]; i++) {
+		Offset1 = GetOffset(0, 0);
+		Offset2 = GetOffset(Components[Constants[i][2]][1], Constants[i][3]);
+
+		xa = Constants[i][1].x() + Offset1[0];
+		ya = Constants[i][1].y() + Offset1[1];
+		
+		xb = Components[Constants[i][2]][6].x() + Offset2[0];
+		yb = Components[Constants[i][2]][6].y() + Offset2[1];
+		
+		Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
+		
+		n++;
+		Wires[0]++;
 	}
 }
 
