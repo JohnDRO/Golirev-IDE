@@ -34,6 +34,17 @@ NetList[n][1] = Array (First Object)
 		[n][1][2] = OffsetX;
 		[n][1][3] = OffsetY;
 NetList[n][2] = Array (Second Object)
+NetList[n][y] = Array (ynd Object)
+*/
+
+var Constants = new Array();
+/*
+Details about Constants
+Constants[0] - Number of constants
+Constants[n][0] = valeur
+Constants[n][1] = elem svg
+Constants[n][2] = id du composant
+Constants[n][3] = nom de la porte (A/B/Y/S/..)
 */
 
 var Wires = new Array();
@@ -58,29 +69,21 @@ Wires[0] = 0;
 var json_yosysJS = {
   "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
-    "andgatdde": {
+    "parity_using_assign": {
       "ports": {
-        "a": {
+        "data_in": {
           "direction": "input",
-          "bits": [ 2 ]
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
         },
-        "b": {
-          "direction": "input",
-          "bits": [ 3 ]
-        },
-        "c": {
-          "direction": "input",
-          "bits": [ 4 ]
-        },
-        "OUT1": {
+        "parity_out": {
           "direction": "output",
-          "bits": [ 5 ]
+          "bits": [ 10 ]
         }
       },
       "cells": {
-        "AND1": {
+        "$auto$simplemap.cc:83:simplemap_bitop$53": {
           "hide_name": 1,
-          "type": "$_AND_",
+          "type": "$_XOR_",
           "parameters": {
           },
           "attributes": {
@@ -88,57 +91,143 @@ var json_yosysJS = {
           "connections": {
             "A": [ 2 ],
             "B": [ 3 ],
-            "Y": [ 6 ]
+            "Y": [ 11 ]
           }
         },
-        "OR1": {
+        "$auto$simplemap.cc:83:simplemap_bitop$54": {
           "hide_name": 1,
-          "type": "$_OR_",
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 5 ],
+            "Y": [ 12 ]
+          }
+        },
+        "$auto$simplemap.cc:83:simplemap_bitop$55": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ 12 ],
+            "Y": [ 13 ]
+          }
+        },
+        "$auto$simplemap.cc:83:simplemap_bitop$56": {
+          "hide_name": 1,
+          "type": "$_XOR_",
           "parameters": {
           },
           "attributes": {
           },
           "connections": {
             "A": [ 6 ],
-            "B": [ 4 ],
-            "Y": [ 5 ]
+            "B": [ 7 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$auto$simplemap.cc:83:simplemap_bitop$57": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ 14 ],
+            "Y": [ 15 ]
+          }
+        },
+        "$auto$simplemap.cc:83:simplemap_bitop$58": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 9 ],
+            "Y": [ 16 ]
+          }
+        },
+        "$auto$simplemap.cc:83:simplemap_bitop$59": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 15 ],
+            "B": [ 16 ],
+            "Y": [ 10 ]
           }
         }
       },
       "netnames": {
-        "$logic_and$input.v:7$324_Y": {
+        "$xor$input.v:16$1_Y": {
           "hide_name": 1,
-          "bits": [ 6 ],
+          "bits": [ 11 ],
           "attributes": {
-            "src": "input.v:7"
+            "src": "input.v:16"
           }
         },
-        "OUT1": {
-          "hide_name": 0,
-          "bits": [ 5 ],
+        "$xor$input.v:17$2_Y": {
+          "hide_name": 1,
+          "bits": [ 12 ],
           "attributes": {
-            "src": "input.v:5"
+            "src": "input.v:17"
           }
         },
-        "a": {
-          "hide_name": 0,
-          "bits": [ 2 ],
+        "$xor$input.v:17$3_Y": {
+          "hide_name": 1,
+          "bits": [ 13 ],
           "attributes": {
-            "src": "input.v:3"
+            "src": "input.v:17"
           }
         },
-        "b": {
-          "hide_name": 0,
-          "bits": [ 3 ],
+        "$xor$input.v:18$4_Y": {
+          "hide_name": 1,
+          "bits": [ 14 ],
           "attributes": {
-            "src": "input.v:3"
+            "src": "input.v:18"
           }
         },
-        "c": {
-          "hide_name": 0,
-          "bits": [ 4 ],
+        "$xor$input.v:18$5_Y": {
+          "hide_name": 1,
+          "bits": [ 15 ],
           "attributes": {
-            "src": "input.v:3"
+            "src": "input.v:18"
+          }
+        },
+        "$xor$input.v:19$6_Y": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "input.v:19"
+          }
+        },
+        "data_in": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "input.v:12"
+          }
+        },
+        "parity_out": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "input.v:11"
           }
         }
       }
@@ -146,13 +235,23 @@ var json_yosysJS = {
   }
 };
 
+
 ParseJson(json_yosysJS);
 
 GenerateAllGates(draw);
-/* PlaceComponents(); 
-GeneratePath(); */
-GenerateAllWires(); 
-DisplayResults();
+GenerateAllWires();  /*
+ PlaceComponents(); 
+GeneratePath(); 
+
+/*
+DisplayResults(); 
+GenerateGate(draw, 6, 'test dff gate', 0);
+GenerateGate(draw, 7, 'test', 0); 
+
+GenerateGate(draw, 7, 'test', 0); 
+GenerateGate(draw, 7, 'test', 0); 
+GenerateGate(draw, 8, 'test', 0); 
+GenerateGate(draw, 7, 'test', 0); */
 </script>
 </body>
 </html>

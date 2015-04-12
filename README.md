@@ -1,5 +1,5 @@
 # Golirev-IDE
-An online Verilog IDE based on [YosysJS](http://www.clifford.at/yosys/yosysjs.html).
+An online Verilog IDE based on [YosysJS](http://www.clifford.at/yosys/yosysjs.html) using [Svg.js](http://svgjs.com/) to create the svg element.
 
 ## Current state of the project
 
@@ -23,3 +23,7 @@ I plan to work on these things :
 * A good component placement
 * Add constants
 * Add European symbols
+* Read name of nets
+* Add Dlatch, DFF_PN0, .. (Chapter 5 yosys manual)
+
+--

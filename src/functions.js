@@ -176,6 +176,9 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 		case '$_MUX_':
 			GateNumber = 8;
 		break;
+		case '$_DLATCH_P_':
+			GateNumber = 9;
+		break;
 	}
 	
 	return GateNumber;
@@ -205,8 +208,9 @@ function GenerateAllGates(SVG_Element) {
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
 	var group = draw.group(), text, text1, text2, text3, text4, longeur = 0, rect;
+	var MAXX = 1000, MAXY = 500;
 	
-	if (Gate_Type < 0 || Gate_Type > 8) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF, 8 == MUX
+	if (Gate_Type < 0 || Gate_Type > 8) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF_P, 8 == MUX
 		return -1;
 	
 	if (typeof Label == 'undefined')
@@ -227,7 +231,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.add(rect);
 			group.add(text);
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -244,7 +248,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.add(rect);	
 			group.add(text);
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -262,7 +266,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 					group.add(text);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -281,7 +285,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 					group.add(text);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -300,7 +304,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 					group.add(text);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -321,7 +325,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 			
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -343,14 +347,14 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 			
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
 			}
 			
 		break;
-		case 7: // DFF
+		case 7: // DFF_P
 			if (Gate_Norm == 0) {
 				text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000'); 
 				text1 = SVG_Element.plain('D').center(10, 15).stroke({ width: 0.1 }).fill('#000'); 
@@ -370,7 +374,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text3);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -400,7 +404,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } })
+			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
 			  GenerateAllWires(draw);
@@ -666,7 +670,7 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 				Vary = 25;	
 			}
 		break;
-		case 7: // DFF
+		case 7: // DFF_P
 			if (IO_Name === 'C') { // clock
 				Varx = -16;
 				Vary = 60;
@@ -680,7 +684,7 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 				Vary = 15;	
 			}
 		break;
-		case 8: // DFF
+		case 8: // MUX
 			if (IO_Name === 'A') { // A
 				Varx = -16;
 				Vary = 25;
