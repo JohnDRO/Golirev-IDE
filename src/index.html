@@ -10,6 +10,7 @@ CircuitInfo[2] = name of the circuit
 CircuitInfo[3] = "Creator"
 CircuitInfo[4] = Text svg element.
 */
+
 var Components = new Array(); // variable globale
 /*
 Details about Components
@@ -23,7 +24,7 @@ Components[Components[0]][5] = Connections
 Components[Components[0]][6] = Svg element
 */
 
-var NetList = new Array();
+NetList = new Array();
 /*
 Details about NetList
 NetList[0] = Number of connections;
@@ -57,33 +58,29 @@ Wires[0] = 0;
 <script src="./svgjs/svg.js"></script>
 <script src="./svgjs/svg.draggable.js"></script>
 <script src="./functions.js"></script>
- 
- <script>
-    var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06');
-
-	// http://bretmulvey.com/VectorBlocks/
-    
-  </script>
-
-<script type="text/javascript">
-var json_yosysJS = {
+<hr>
+<textarea id="code" style="width: 50%; height: 50%;">{
   "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
-    "parity_using_assign": {
+    "counter_2bit": {
       "ports": {
-        "data_in": {
+        "a": {
           "direction": "input",
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+          "bits": [ 2 ]
         },
-        "parity_out": {
+        "b": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "c": {
           "direction": "output",
-          "bits": [ 10 ]
+          "bits": [ 4 ]
         }
       },
       "cells": {
-        "$auto$simplemap.cc:83:simplemap_bitop$53": {
+        "$auto$simplemap.cc:228:simplemap_logbin$2072": {
           "hide_name": 1,
-          "type": "$_XOR_",
+          "type": "$_AND_",
           "parameters": {
           },
           "attributes": {
@@ -91,155 +88,58 @@ var json_yosysJS = {
           "connections": {
             "A": [ 2 ],
             "B": [ 3 ],
-            "Y": [ 11 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$54": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 4 ],
-            "B": [ 5 ],
-            "Y": [ 12 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$55": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 11 ],
-            "B": [ 12 ],
-            "Y": [ 13 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$56": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 6 ],
-            "B": [ 7 ],
-            "Y": [ 14 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$57": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 13 ],
-            "B": [ 14 ],
-            "Y": [ 15 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$58": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 8 ],
-            "B": [ 9 ],
-            "Y": [ 16 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$59": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 15 ],
-            "B": [ 16 ],
-            "Y": [ 10 ]
+            "Y": [ 4 ]
           }
         }
       },
       "netnames": {
-        "$xor$input.v:16$1_Y": {
-          "hide_name": 1,
-          "bits": [ 11 ],
-          "attributes": {
-            "src": "input.v:16"
-          }
-        },
-        "$xor$input.v:17$2_Y": {
-          "hide_name": 1,
-          "bits": [ 12 ],
-          "attributes": {
-            "src": "input.v:17"
-          }
-        },
-        "$xor$input.v:17$3_Y": {
-          "hide_name": 1,
-          "bits": [ 13 ],
-          "attributes": {
-            "src": "input.v:17"
-          }
-        },
-        "$xor$input.v:18$4_Y": {
-          "hide_name": 1,
-          "bits": [ 14 ],
-          "attributes": {
-            "src": "input.v:18"
-          }
-        },
-        "$xor$input.v:18$5_Y": {
-          "hide_name": 1,
-          "bits": [ 15 ],
-          "attributes": {
-            "src": "input.v:18"
-          }
-        },
-        "$xor$input.v:19$6_Y": {
-          "hide_name": 1,
-          "bits": [ 16 ],
-          "attributes": {
-            "src": "input.v:19"
-          }
-        },
-        "data_in": {
+        "a": {
           "hide_name": 0,
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "bits": [ 2 ],
           "attributes": {
-            "src": "input.v:12"
+            "src": "input.v:2"
           }
         },
-        "parity_out": {
+        "b": {
           "hide_name": 0,
-          "bits": [ 10 ],
+          "bits": [ 3 ],
           "attributes": {
-            "src": "input.v:11"
+            "src": "input.v:2"
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "input.v:3"
           }
         }
       }
     }
   }
-};
+}</textarea>
+<button onclick="Func1()">Gimme your json data.</button>
+ <script>
+
+    var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06');
+
+	// http://bretmulvey.com/VectorBlocks/
+    
+  </script>
+
+<script type="text/javascript">
+function Func1() {
+	Reset();
+	json_yosysJS2 = document.getElementById('code').value;
+	json_yosysJS2 = JSON.parse(json_yosysJS2);
+	ParseJson(json_yosysJS2);
+	GenerateAllGates(draw);
+	GenerateAllWires();
+}
 
 
-ParseJson(json_yosysJS);
 
-GenerateAllGates(draw);
-GenerateAllWires();  /*
+  /*
  PlaceComponents(); 
 GeneratePath(); 
 
