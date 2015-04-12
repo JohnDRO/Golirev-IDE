@@ -156,9 +156,9 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	CircuitInfo[2] = String(Circuit_Name);
 	CircuitInfo[3] = json_yosysJS.creator;
 	
-	document.write('Nbr ' + Constants[0]);
+	//document.write('Nbr ' + Constants[0]);
 	
-	return 0;
+	return 1;
 }
 
 function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
@@ -209,10 +209,9 @@ function GenerateAllGates(SVG_Element) {
 	
 	for (i = 1; i <= Constants[0]; i++) { // Constants
 		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
-		document.write('<hr> OOOK' + Constants[i][0] + '<hr>');
 	}
 
-	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 }).center(100, 100);
+	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
@@ -446,7 +445,7 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 		Wires[i].remove();
 	
 	Wires[0] = 0;
-	
+
 	// 2. Making new wires
 	//for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) {
 	for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
@@ -605,10 +604,38 @@ function GenerateOneWire(xa, xb, ya, yb) {
 function RemoveAllGates() {
 	var i = 0;
 	
-	for (i = 1; i < Components[0]; i++) {
+	for (i = 1; i <= Components[0]; i++) { // Remove componants
 		if (typeof Components[i][6] != 'undefined')
 			Components[i][6] = Components[i][6].remove();
 	}
+
+
+}
+
+function Reset() {
+	// Reset CircuitInfo
+	CircuitInfo[2] = "Default Name"
+	CircuitInfo[3] = "Default Creator"
+	if (typeof CircuitInfo[4] != 'undefined')
+		CircuitInfo[4].remove();
+	
+	RemoveAllGates(); // OK
+	RemoveAllWires();
+	
+	// Remove Netlist
+	for (i = 1, n = 1; i <= 300 && i < 300; i++) {
+		if (typeof NetList[i] != 'undefined') {
+			delete NetList[i];
+		}
+	} 
+	
+	NetList[0] = 0;
+	
+	// Remove Constants
+	for (i = 1; i <= Constants[0]; i++) {
+		Constants[i][1].remove();
+	} 
+	
 }
 
 function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rapport au centre de l'objet ..
@@ -737,4 +764,13 @@ function GetConnectionType(Component_ID) {
 		type = 3;
 		
 	return type;
+}
+
+function RemoveAllWires() {
+	var i = 0;
+	
+	for (i = 1; i <= Wires[0]; i++)
+		Wires[i].remove();
+	
+	Wires[0] = 0;
 }
