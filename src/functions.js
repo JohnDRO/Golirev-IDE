@@ -1,3 +1,7 @@
+function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
+	    return Object.prototype.toString.apply(obj) === "[object Array]";
+}
+
 function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 	var i = 0, k = 0;
 	
@@ -107,50 +111,53 @@ function ParseJson(json_yosysJS) { // voir algo.js
 		Components[Components[0]][1] = GateToEqNumber(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].type);
 		Components[Components[0]][2] = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].hide_name;
 		// --
-		
 		// Netlist related : ok
 		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
+		var meh = 0;
 		for (k in cell_io_name) {
-			var meh = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections[cell_io_name[k]];
-			document.write(meh2[n] + '<br />');
-			
-			if (typeof meh[n] === 'string') { // is it a constant ?
+			meh = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections[cell_io_name[k]];
+			//document.write('<br /> -- ' + meh[0] + '<br />');
+			//document.write('<hr>' + typeof meh[0] + '<hr>');
+			if (typeof meh[0] === 'string') { // is it a constant ?
 				Constants[0]++;
 				Constants[Constants[0]] = new Array();
-				Constants[Constants[0]][0] = meh[n]; // Value
+				Constants[Constants[0]][0] = meh[0]; // Value
 				Constants[Constants[0]][2] = 2 + parseInt(i) + parseInt(n); // Component id
 				Constants[Constants[0]][3] = cell_io_name[k]; // Name of the gate
 			}
 			
-			else {
-				if (typeof NetList[meh] === 'undefined') {
-					NetList[meh] = new Array();
-					NetList[meh][0] = 1;
-					NetList[meh][1] = new Array();
-					NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
-					NetList[meh][1][1] = cell_io_name[k];
-					
-					NetList[meh][1][2] = 0; // x
-					NetList[meh][1][3] = 0; // y
-					NetList[0]++;
-				}
+			else if (!isArray(NetList[meh])) {
+				NetList[meh] = new Array();
+				NetList[meh][0] = 1;
+				NetList[meh][1] = new Array();
+				NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
+				NetList[meh][1][1] = cell_io_name[k];
 				
-				else  {
-					NetList[meh][0]++;
-					NetList[meh][NetList[meh][0]] = new Array();
-					NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
-					NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
-					
-					NetList[meh][NetList[meh][0]][2] = 0; // x
-					NetList[meh][NetList[meh][0]][3] = 0; // y
-				}							
+				NetList[meh][1][2] = 0; // x
+				NetList[meh][1][3] = 0; // y
+				NetList[0]++;
 			}
+		
+			else  {
+				NetList[meh][0]++;
+				NetList[meh][NetList[meh][0]] = new Array();
+				NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
+				NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
+				
+				NetList[meh][NetList[meh][0]][2] = 0; // x
+				NetList[meh][NetList[meh][0]][3] = 0; // y
+			}							
+		
+
 		}
 	}
 	// ---
 	
 	CircuitInfo[2] = String(Circuit_Name);
 	CircuitInfo[3] = json_yosysJS.creator;
+	
+	document.write('Nbr ' + Constants[0]);
+	
 	return 0;
 }
 
@@ -200,10 +207,12 @@ function GenerateAllGates(SVG_Element) {
 	for (i = 1; i <= Components[0]; i++) // IO + Cells
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0, Components[i][2]);
 	
-	for (i = 1; i <= Constants[0]; i++)// Constants
+	for (i = 1; i <= Constants[0]; i++) { // Constants
 		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
-		
-	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 });
+		document.write('<hr> OOOK' + Constants[i][0] + '<hr>');
+	}
+
+	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 }).center(100, 100);
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
@@ -214,7 +223,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		return -1;
 	
 	if (typeof Label == 'undefined')
-		Label = 'Gate';
+		Label = 'Default gate name';
 		
 	if (typeof Gate_Norm == 'undefined')
 		Gate_Norm = 0; // American Symbol by default
@@ -256,14 +265,15 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 2: // YES group.add(rect)
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(17, 0).stroke({ width: 0.1 }).fill('#000');
 			
 				group.path('m 32,24 -31,-15 0,30 z');
 				group.path('m -15,23.9 16,0');
 				group.path('m 31,23.9 16,0');
 			
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(17, 0).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
+				}
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
@@ -274,15 +284,16 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 3: // NOT
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(17, 0).stroke({ width: 0.1 }).fill('#000');
 				
 				group.circle(7).center(36, 23.9);
 				group.path('m 32,24 -31,-15 0,30 z');
 				group.path('m -15,23.9 16,0');
 				group.path('m 40,23.9 12,0');
 				
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(17, 0).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
+				}
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
@@ -293,15 +304,16 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;			
 		case 4: // AND
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 			
 				group.path('m 0,1 24,0 a 23,23 0 0 1 0,46 l -24,0 z');
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
 				
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
+				}
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
@@ -313,17 +325,17 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;		
 		case 5: // OR
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 				
 				group.path('m -3.5,1 19.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -19.5,0 a 40,40 0 0 0 0,-46 z');
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
 			
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
+				}
 			}
-			
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
@@ -334,7 +346,6 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 6: // XOR
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 				
 				group.path('m -3.5,1 a 40,40 0 0 1 0,46');
 				group.path('m 2.5,1 13.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -13.5,0 a 40,40 0 0 0 0,-46 z');
@@ -342,10 +353,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 47,25 16,0');
 				group.path('m -16,41 16,0');
 			
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
+				}
 			}
-			
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
@@ -356,7 +368,6 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 7: // DFF_P
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000'); 
 				text1 = SVG_Element.plain('D').center(10, 15).stroke({ width: 0.1 }).fill('#000'); 
 				text2 = SVG_Element.plain('Q').center(50, 15).stroke({ width: 0.1 }).fill('#000'); 
 				text3 = SVG_Element.plain('CLK').center(15, 60).stroke({ width: 0.1 }).fill('#000'); 
@@ -366,8 +377,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m -16,60 16,0'); // (clk)
 				group.path('m 60,15 16,0'); // (Q)
 				
-				if(!hide_label)		
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
+				}
 				
 				group.add(text1);
 				group.add(text2);
@@ -383,7 +396,6 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 8: // MUX
 			if (Gate_Norm == 0) {
-				text = SVG_Element.plain(Label).center(20, -10).stroke({ width: 0.1 }).fill('#000'); 
 				text1 = SVG_Element.plain('A').center(10, 25).stroke({ width: 0.1 }).fill('#000'); 
 				text2 = SVG_Element.plain('Y').center(22, 37).stroke({ width: 0.1 }).fill('#000'); 
 				text3 = SVG_Element.plain('B').center(10, 50).stroke({ width: 0.1 }).fill('#000'); 
@@ -395,8 +407,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 30,37 16,0'); // (Y)
 				group.path('m 16,69 0,16'); // (S)
 				
-				if(!hide_label)
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(20, -10).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
+				}
 			
 				group.add(text1);
 				group.add(text2);
@@ -434,7 +448,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 	Wires[0] = 0;
 	
 	// 2. Making new wires
-	for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) {
+	//for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) {
+	for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			if (NetList[i][0] == 2) { // Only two components on the same line.
 				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
