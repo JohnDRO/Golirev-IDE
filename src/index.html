@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>Golirev IDE</title>
 <script type="text/javascript">
 var CircuitInfo = new Array(); // Informations concerning the circuits
 /*
@@ -54,13 +55,26 @@ Wires[0] = 0;
 </script>
 </head>
 <body>
+Golirev IDE<hr>
+Schematic : <br />
 <div id="drawing"></div>
 <script src="./svgjs/svg.js"></script>
 <script src="./svgjs/svg.draggable.js"></script>
 <script src="./functions.js"></script>
+<script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
 <hr>
-<textarea id="code" style="width: 50%; height: 50%;">{
-  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+Verilog code and Json Output :<br />
+<textarea id="Verilog" style="width: 49%; height: 50%; position: left;">
+module counter_2bit ( a, b, c);
+input a, b;
+output c;
+
+assign c = a && b;
+
+endmodule
+</textarea>
+<textarea id="JSON" style="width: 49%; height: 50%; position: right;">{
+ "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
     "counter_2bit": {
       "ports": {
@@ -118,40 +132,48 @@ Wires[0] = 0;
     }
   }
 }</textarea>
-<button onclick="Func1()">Gimme your json data.</button>
+<button onclick="GenerateJSON()">Verilog to JSON.</button>
+<button onclick="GenerateSVG()">JSON to Schematic.</button>
  <script>
-
+	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '';
+	
     var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06');
+	var ys = YosysJS.create();
+	ys.verbose = false;
+	ys.logprint = false;
+	ys.echo = false;
 
-	// http://bretmulvey.com/VectorBlocks/
-    
-  </script>
+	// button functions
+	function GenerateJSON() { // Verilog -> JSON
+		current_code = document.getElementById('Verilog').value;
+		if (current_code != previous_code) {
+			ys.write_file("input.v", current_code);
+			ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;');
+			output = ys.run('write_json');
+			previous_code = current_code;
 
-<script type="text/javascript">
-function Func1() {
-	Reset();
-	json_yosysJS2 = document.getElementById('code').value;
-	json_yosysJS2 = JSON.parse(json_yosysJS2);
-	ParseJson(json_yosysJS2);
-	GenerateAllGates(draw);
-	GenerateAllWires();
-}
+			document.getElementById('JSON').value = output;
+		}
+	}
 
+	function GenerateSVG() { // JSON -> Verilog
+		current_JSON = document.getElementById('JSON').value;
+		if (current_JSON != previous_JSON) {
+			//Reset();
+			Init();
+			json_yosysJS2 = document.getElementById('JSON').value;
+			json_yosysJS2 = JSON.parse(json_yosysJS2);
+			ParseJson(json_yosysJS2);
+			GenerateAllGates(draw);
+			GenerateAllWires();
+			
+			previous_JSON = current_JSON;
+		}
+	}
 
-
-  /*
- PlaceComponents(); 
-GeneratePath(); 
-
-/*
-DisplayResults(); 
-GenerateGate(draw, 6, 'test dff gate', 0);
-GenerateGate(draw, 7, 'test', 0); 
-
-GenerateGate(draw, 7, 'test', 0); 
-GenerateGate(draw, 7, 'test', 0); 
-GenerateGate(draw, 8, 'test', 0); 
-GenerateGate(draw, 7, 'test', 0); */
 </script>
+<hr>
+Console output :<br />
+<textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
 </body>
 </html>

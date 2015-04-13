@@ -1,43 +1,50 @@
-function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
-	    return Object.prototype.toString.apply(obj) === "[object Array]";
+function Init() {
+	// Init CircuitInfo
+	CircuitInfo[0] = 0;
+	CircuitInfo[1] = 0;
+	CircuitInfo[2] = "Default Name"
+	CircuitInfo[3] = "Default Creator"
+	if (typeof CircuitInfo[4] != 'undefined')
+		CircuitInfo[4].remove();
+	// --
+	
+	RemoveAllGates();
+	RemoveAllWires();
+	
+	// Remove Netlist
+	for (i = 1, n = 1; n <= NetList[0]; i++) {
+		if (typeof NetList[i] != 'undefined') {
+			delete NetList[i];
+			n++;
+		}
+	} 
+	// --
+	
+	// Remove Constants
+	for (i = 1; i <= Constants[0]; i++) {
+		Constants[i][1].remove();
+	}
+	// --
+	
+	// Reset vars
+	Components[0] = 0; // Init components to 0
+	NetList[0] = 0; // Init links to 0
+	Constants[0] = 0;
+	// --
+	
+	return 1;
 }
 
-function DisplayResults() { // Fonctions utilisé pour tester mon resultat
-	var i = 0, k = 0;
-	
-	for (i = 1; i <= Components[0]; i++) {
-		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
-	}
-	
-	document.write('<hr>');
-	
-	for (i = 1, b = 0; b <= NetList[0]; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			for (var l = 1; l <= NetList[i][0]; l++)
-				document.write(Components[NetList[i][l][0]][0] + '.' + NetList[i][l][1] + ' === ');
-			
-			document.write('<br />');
-			b++;
-		}
-	}
-	
-	document.write('<hr>');
-	
-	return 0;
-} 
-
-function ParseJson(json_yosysJS) { // voir algo.js
+function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
 	// Définition et initialisation des variables
 	var Circuit_Name; // circuits related variables
 	
 	var io_names, cells_name;
 	
 	var i = 0, n = 0, k = 0, l = 0; // loops counters
-	
-	Components[0] = 0; // Init components to 0
-	NetList[0] = 0; // Init links to 0
-	Constants[0] = 0;
 	// ---
+	
+	Init();
 	
 	Circuit_Name = Object.keys(json_yosysJS.modules); // example : 'up3down5', 'DCF77_CIRCUIT', '4 BIT COUNTER', ..
 	
@@ -161,44 +168,6 @@ function ParseJson(json_yosysJS) { // voir algo.js
 	return 1;
 }
 
-function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
-	var GateNumber = -1; // -1 is undefined here
-	
-	switch (GateString) {
-		case '$_NOT_':
-			GateNumber = 3;
-		break;
-		case '$_AND_':
-			GateNumber = 4;
-		break;
-		case '$_OR_':
-			GateNumber = 5;
-		break;
-		case '$_XOR_':
-			GateNumber = 6;
-		break;
-		case '$_DFF_P_':
-			GateNumber = 7;
-		break;
-		case '$_MUX_':
-			GateNumber = 8;
-		break;
-		case '$_DLATCH_P_':
-			GateNumber = 9;
-		break;
-	}
-	
-	return GateNumber;
-}
-
-function MoveGateXY(gate, x, y) {
-	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
-	
-	gate.center(x, y);
-	
-	return 1;
-}
-
 function GenerateAllGates(SVG_Element) {
 	var i = 0;
 	
@@ -211,7 +180,7 @@ function GenerateAllGates(SVG_Element) {
 		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
 	}
 
-	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 300 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
+	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
@@ -447,8 +416,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 	Wires[0] = 0;
 
 	// 2. Making new wires
-	//for (i = 1, n = 1; (n - v) <= NetList[0] && i < 300; i++) {
-	for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
+	for (i = 1, n = 1; (n - v) <= NetList[0] && i <= 300; i++) {
+	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			if (NetList[i][0] == 2) { // Only two components on the same line.
 				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
@@ -601,6 +570,44 @@ function GenerateOneWire(xa, xb, ya, yb) {
 	return wire;
 }	
 
+function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
+	var GateNumber = -1; // -1 is undefined here
+	
+	switch (GateString) {
+		case '$_NOT_':
+			GateNumber = 3;
+		break;
+		case '$_AND_':
+			GateNumber = 4;
+		break;
+		case '$_OR_':
+			GateNumber = 5;
+		break;
+		case '$_XOR_':
+			GateNumber = 6;
+		break;
+		case '$_DFF_P_':
+			GateNumber = 7;
+		break;
+		case '$_MUX_':
+			GateNumber = 8;
+		break;
+		case '$_DLATCH_P_':
+			GateNumber = 9;
+		break;
+	}
+	
+	return GateNumber;
+}
+
+function MoveGateXY(gate, x, y) {
+	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
+	
+	gate.center(x, y);
+	
+	return 1;
+}
+
 function RemoveAllGates() {
 	var i = 0;
 	
@@ -610,32 +617,6 @@ function RemoveAllGates() {
 	}
 
 
-}
-
-function Reset() {
-	// Reset CircuitInfo
-	CircuitInfo[2] = "Default Name"
-	CircuitInfo[3] = "Default Creator"
-	if (typeof CircuitInfo[4] != 'undefined')
-		CircuitInfo[4].remove();
-	
-	RemoveAllGates(); // OK
-	RemoveAllWires();
-	
-	// Remove Netlist
-	for (i = 1, n = 1; i <= 300 && i < 300; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			delete NetList[i];
-		}
-	} 
-	
-	NetList[0] = 0;
-	
-	// Remove Constants
-	for (i = 1; i <= Constants[0]; i++) {
-		Constants[i][1].remove();
-	} 
-	
 }
 
 function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rapport au centre de l'objet ..
@@ -774,3 +755,31 @@ function RemoveAllWires() {
 	
 	Wires[0] = 0;
 }
+
+function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
+	return Object.prototype.toString.apply(obj) === "[object Array]";
+}
+
+function DisplayResults() { // Fonctions utilisé pour tester mon resultat
+	var i = 0, k = 0, b = 0;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
+	}
+	
+	document.write('<hr>');
+	
+	for (i = 1, b = 0; b <= NetList[0]; i++) {
+		if (typeof NetList[i] != 'undefined') {
+			for (var l = 1; l <= NetList[i][0]; l++)
+				document.write(Components[NetList[i][l][0]][0] + '.' + NetList[i][l][1] + ' === ');
+			
+			document.write('<br />');
+			b++;
+		}
+	}
+	
+	document.write('<hr>');
+	
+	return 0;
+} 
