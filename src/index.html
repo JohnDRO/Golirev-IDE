@@ -145,14 +145,18 @@ endmodule
 
 	// button functions
 	function GenerateJSON() { // Verilog -> JSON
+		var index = 0, output = '';
 		current_code = document.getElementById('Verilog').value;
 		if (current_code != previous_code) {
 			ys.write_file("input.v", current_code);
 			ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;');
 			output = ys.run('write_json');
-			previous_code = current_code;
-
+			
+			index = output.indexOf('{');
+			output = output.substring(index); 
 			document.getElementById('JSON').value = output;
+			
+			previous_code = current_code;
 		}
 	}
 
