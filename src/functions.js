@@ -760,6 +760,10 @@ function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/java
 	return Object.prototype.toString.apply(obj) === "[object Array]";
 }
 
+function log(str) {
+	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
+}
+
 function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 	var i = 0, k = 0, b = 0;
 	
