@@ -1,6 +1,8 @@
 # Golirev-IDE
 An online Verilog IDE based on [YosysJS](http://www.clifford.at/yosys/yosysjs.html) using [Svg.js](http://svgjs.com/) to create the svg element.
 
+Here is a demo of the project : http://johndro.github.io/
+
 ## Current state of the project
 
 This project is not finished at all.
