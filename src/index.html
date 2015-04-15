@@ -2,6 +2,7 @@
 <head>
 <title>Golirev IDE</title>
 <script type="text/javascript">
+
 var CircuitInfo = new Array(); // Informations concerning the circuits
 /*
 Details about Circuit Info
@@ -135,13 +136,19 @@ endmodule
 <form name="Settings">
 	<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()">
 	<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()">
-	Splinets -ports<input type="checkbox" name="splitnets">
+	Splinets -ports
+	<input type="checkbox" name="splitnets">
+	Gate Type 
+	<select name="Gate_Type" id="Gate_Type">
+           <option value="0" selected>Distinctive shape</option>
+           <option value="1">Rectangular shape</option>
+       </select>
 </form>
 <hr>
 Console output :<br />
 <textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
  <script>
-	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '';
+	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 	
     var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06');
 	var ys = YosysJS.create();
@@ -186,24 +193,24 @@ Console output :<br />
 
 	function GenerateSVG() { // JSON -> Verilog
 		current_JSON = document.getElementById('JSON').value;
-		if (current_JSON != previous_JSON) {
+		current_Type = document.getElementById("Gate_Type").value; 
+		if (current_JSON != previous_JSON || current_Type != previous_Type) {
 			log('[GOLIREV] Generating SVG file from the JSON file');
 			Init();
 			json_yosysJS2 = document.getElementById('JSON').value;
 			json_yosysJS2 = JSON.parse(json_yosysJS2);
 			ParseJson(json_yosysJS2);
-			GenerateAllGates(draw);
+			GenerateAllGates(draw, current_Type);
 			GenerateAllWires();
 			
 			previous_JSON = current_JSON;
+			previous_Type = current_Type;
 		}
 		
 		else {
 			log('[GOLIREV] No modifications to do.');
 		}
 	}
-
-	
 	
 </script>
 </body>

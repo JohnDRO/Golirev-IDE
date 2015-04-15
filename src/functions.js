@@ -1,4 +1,4 @@
-function Init() {
+ï»¿function Init() {
 	// Init CircuitInfo
 	CircuitInfo[0] = 0;
 	CircuitInfo[1] = 0;
@@ -168,13 +168,13 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	return 1;
 }
 
-function GenerateAllGates(SVG_Element) {
+function GenerateAllGates(SVG_Element, Gate_Type) {
 	var i = 0;
 	
 	RemoveAllGates();
 	
 	for (i = 1; i <= Components[0]; i++) // IO + Cells
-		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], 0, Components[i][2]);
+		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
 	
 	for (i = 1; i <= Constants[0]; i++) { // Constants
 		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
@@ -194,7 +194,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		Label = 'Default gate name';
 		
 	if (typeof Gate_Norm == 'undefined')
-		Gate_Norm = 0; // American Symbol by default
+		Gate_Norm = 0; // Distinctive shape by default
 
 	switch(Gate_Type) {
 		case 0: // Input
@@ -211,7 +211,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 		break;
 		case 1: // Output
@@ -228,7 +228,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 		break;
 		case 2: // YES group.add(rect)
@@ -244,15 +244,28 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				}
 			}
 			
+			else if (Gate_Norm == 1) {
+				group.rect(60, 60);
+				group.path('m 60,30 16,0');
+				group.path('m -16,30 16,0');
+				
+				text1 = SVG_Element.plain('1').center(12, 10).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				group.add(text1);
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000');
+					group.add(text);
+				}
+			}
+			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 		break;
 		case 3: // NOT
 			if (Gate_Norm == 0) {
-				
 				group.circle(7).center(36, 23.9);
 				group.path('m 32,24 -31,-15 0,30 z');
 				group.path('m -15,23.9 16,0');
@@ -264,15 +277,29 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				}
 			}
 			
+			else if (Gate_Norm == 1) {
+				group.rect(60, 60);
+				group.path('m 60,30 16,0');
+				group.path('m -16,30 16,0');
+				group.path('m 60,20 10,10');
+				
+				text1 = SVG_Element.plain('1').center(12, 10).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				group.add(text1);
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000');
+					group.add(text);
+				}
+			}
+			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 		break;			
 		case 4: // AND
 			if (Gate_Norm == 0) {
-			
 				group.path('m 0,1 24,0 a 23,23 0 0 1 0,46 l -24,0 z');
 				group.path('m -16,9 16,0');
 				group.path('m 47,25 16,0');
@@ -284,12 +311,26 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				}
 			}
 			
+			else if (Gate_Norm == 1) {
+				group.rect(60, 60);
+				group.path('m -16,14 16,0');
+				group.path('m 60,30 16,0');
+				group.path('m -16,46 16,0');
+				
+				text1 = SVG_Element.plain('&').center(12, 10).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				group.add(text1);
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000');
+					group.add(text);
+				}
+			}
+			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
-			}
-			
+				GenerateAllWires(draw, Gate_Norm);
+			}		
 		break;		
 		case 5: // OR
 			if (Gate_Norm == 0) {
@@ -305,10 +346,25 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				}
 			}
 			
+			else if (Gate_Norm == 1) {
+				group.rect(60, 60);
+				group.path('m -16,14 16,0');
+				group.path('m 60,30 16,0');
+				group.path('m -16,46 16,0');
+				
+				text1 = SVG_Element.plain('â‰¥1').center(12, 10).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				group.add(text1);
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000');
+					group.add(text);
+				}
+			}
+			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 			
 		break;
@@ -327,15 +383,30 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				}
 			}
 			
+			else if (Gate_Norm == 1) {
+				group.rect(60, 60);
+				group.path('m -16,14 16,0');
+				group.path('m 60,30 16,0');
+				group.path('m -16,46 16,0');
+				
+				text1 = SVG_Element.plain('=1').center(12, 10).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				group.add(text1);
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(30, -10).stroke({ width: 0.1 }).fill('#000');
+					group.add(text);
+				}
+			}
+			
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 			
 		break;
 		case 7: // DFF_P
-			if (Gate_Norm == 0) {
+			if (Gate_Norm == 0 || Gate_Norme == 1) {
 				text1 = SVG_Element.plain('D').center(10, 15).stroke({ width: 0.1 }).fill('#000'); 
 				text2 = SVG_Element.plain('Q').center(50, 15).stroke({ width: 0.1 }).fill('#000'); 
 				text3 = SVG_Element.plain('CLK').center(15, 60).stroke({ width: 0.1 }).fill('#000'); 
@@ -358,12 +429,12 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 			
 		break;
 		case 8: // MUX
-			if (Gate_Norm == 0) {
+			if (Gate_Norm == 0 || Gate_Norm == 1) {
 				text1 = SVG_Element.plain('A').center(10, 25).stroke({ width: 0.1 }).fill('#000'); 
 				text2 = SVG_Element.plain('Y').center(22, 37).stroke({ width: 0.1 }).fill('#000'); 
 				text3 = SVG_Element.plain('B').center(10, 50).stroke({ width: 0.1 }).fill('#000'); 
@@ -389,7 +460,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(900, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-			  GenerateAllWires(draw);
+				GenerateAllWires(draw, Gate_Norm);
 			}
 			
 		break;
@@ -403,7 +474,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 	return group;
 }
 
-function GenerateAllWires(draw) { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
+function GenerateAllWires(draw, Gate_Norme) { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
 	var i = 0, n = 0, k = 0, v = 0; // loops index
 	
 	var xa = 0, ya = 0, xb = 0, yb = 0; // Lines points.
@@ -420,8 +491,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof NetList[i] != 'undefined') {
 			if (NetList[i][0] == 2) { // Only two components on the same line.
-				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1]);
-				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1]);
+				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1], Gate_Norme);
+				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1], Gate_Norme);
 
 				xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
 				ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
@@ -474,8 +545,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index1][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1]);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index1][1]);
+							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(Components[id2][1], NetList[i][index1][1], Gate_Norme);
 							
 							xa = Components[id1][6].x() + Offset1[0];
 							ya = Components[id1][6].y() + Offset1[1];
@@ -497,8 +568,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index2][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1]);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index2][1]);
+							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(Components[id2][1], NetList[i][index2][1], Gate_Norme);
 							
 							xa = Components[id1][6].x() + Offset1[0];
 							ya = Components[id1][6].y() + Offset1[1];
@@ -520,8 +591,8 @@ function GenerateAllWires(draw) { // This function generates wires between eleme
 							id1 = NetList[i][m][0];
 							id2 = NetList[i][index3][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1]);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index3][1]);
+							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(Components[id2][1], NetList[i][index3][1], Gate_Norme);
 							
 							xa = Components[id1][6].x() + Offset1[0];
 							ya = Components[id1][6].y() + Offset1[1];
@@ -619,8 +690,11 @@ function RemoveAllGates() {
 
 }
 
-function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rapport au centre de l'objet ..
+function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Decallage du dÃ©part du fil par rapport au centre de l'objet ..
 	var Varx = 0, Vary = 0;
+
+	if (typeof Gate_Norme == 'undefined')
+		Gate_Norme = 0;
 	
 	switch (Gate_Type) {
 		case 0: // Input
@@ -632,65 +706,137 @@ function GetOffset(Gate_Type, IO_Name) { // Decallage du départ du fil par rappo
 			Vary = 5;
 		break;
 		case 2: // Buf
-			if (IO_Name === 'A') {
-				Varx = -15;
-				Vary = 24;
+			if (Gate_Norme == 0) {
+				if (IO_Name === 'A') {
+					Varx = -15;
+					Vary = 24;
+				}
+				else {
+					Varx = 52;
+					Vary = 24;	
+				}
 			}
-			else {
-				Varx = 52;
-				Vary = 24;	
+			else if (Gate_Norme == 1) {
+				if (IO_Name === 'A') {
+					Varx = -15;
+					Vary = 30;
+				}
+				else {
+					Varx = 76;
+					Vary = 30;	
+				}
 			}
 		break;
 		case 3: // Not
-			if (IO_Name === 'A') {
-				Varx = -15;
-				Vary = 24;
+			if (Gate_Norme == 0) {
+				if (IO_Name === 'A') {
+					Varx = -15;
+					Vary = 24;
+				}
+				else {
+					Varx = 52;
+					Vary = 24;	
+				}
 			}
-			else {
-				Varx = 52;
-				Vary = 24;	
+			else if (Gate_Norme == 1) {
+				if (IO_Name === 'A') {
+					Varx = -15;
+					Vary = 30;
+				}
+				else {
+					Varx = 76;
+					Vary = 30;	
+				}
 			}
 		break;
 		case 4: // And
-			if (IO_Name === 'A') {
-				Varx = -16;
-				Vary = 9;
+			if (Gate_Norme == 0) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 9;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 41;	
+				}
+				else {
+					Varx = 62;
+					Vary = 25;	
+				}
 			}
-			else if (IO_Name === 'B') {
-				Varx = -16;
-				Vary = 41;	
-			}
-			else {
-				Varx = 62;
-				Vary = 25;	
+			else if (Gate_Norme == 1) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 14;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 46;	
+				}
+				else {
+					Varx = 76;
+					Vary = 30;	
+				}
 			}
 		break;
 		case 5: // OR
-			if (IO_Name === 'A') {
-				Varx = -16;
-				Vary = 9;
+			if (Gate_Norme == 0) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 9;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 41;	
+				}
+				else {
+					Varx = 62;
+					Vary = 25;	
+				}
 			}
-			else if (IO_Name === 'B') {
-				Varx = -16;
-				Vary = 41;	
-			}
-			else {
-				Varx = 62;
-				Vary = 25;	
+			else if (Gate_Norme == 1) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 14;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 46;	
+				}
+				else {
+					Varx = 76;
+					Vary = 30;	
+				}
 			}
 		break;
 		case 6: // XOR
-			if (IO_Name === 'A') {
-				Varx = -16;
-				Vary = 9;
-			}
-			else if (IO_Name === 'B') {
-				Varx = -16;
-				Vary = 41;	
-			}
-			else {
-				Varx = 62;
-				Vary = 25;	
+			if (Gate_Norme == 0) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 9;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 41;	
+				}
+				else {
+					Varx = 62;
+					Vary = 25;	
+				}
+				}
+			else if (Gate_Norme == 1) {
+				if (IO_Name === 'A') {
+					Varx = -16;
+					Vary = 14;
+				}
+				else if (IO_Name === 'B') {
+					Varx = -16;
+					Vary = 46;	
+				}
+				else {
+					Varx = 76;
+					Vary = 30;	
+				}
 			}
 		break;
 		case 7: // DFF_P
@@ -764,7 +910,7 @@ function log(str) {
 	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
 }
 
-function DisplayResults() { // Fonctions utilisé pour tester mon resultat
+function DisplayResults() { // Fonctions utilisÃ© pour tester mon resultat
 	var i = 0, k = 0, b = 0;
 	
 	for (i = 1; i <= Components[0]; i++) {

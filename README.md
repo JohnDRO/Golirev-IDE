@@ -21,8 +21,6 @@ I plan to work on these things :
 * Finishing parsejson() (registers are not ok atm.)
 * Generating the Netlist correctly
 * A good component placement
-* Add constants
-* Add European symbols
 * Read name of nets
 * Add Dlatch, DFF_PN0, .. (Chapter 5 yosys manual)
 
