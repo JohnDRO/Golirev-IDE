@@ -933,3 +933,14 @@ function DisplayResults() { // Fonctions utilisé pour tester mon resultat
 	
 	return 0;
 } 
+
+function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
+	var i = 0;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		Components[i][6].remove();
+		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+	}
+	
+	GenerateAllWires(SVG_Element, Gate_Type);
+}

@@ -192,16 +192,23 @@ Console output :<br />
 	}
 
 	function GenerateSVG() { // JSON -> Verilog
+		var i;
 		current_JSON = document.getElementById('JSON').value;
 		current_Type = document.getElementById("Gate_Type").value; 
 		if (current_JSON != previous_JSON || current_Type != previous_Type) {
-			log('[GOLIREV] Generating SVG file from the JSON file');
-			Init();
-			json_yosysJS2 = document.getElementById('JSON').value;
-			json_yosysJS2 = JSON.parse(json_yosysJS2);
-			ParseJson(json_yosysJS2);
-			GenerateAllGates(draw, current_Type);
-			GenerateAllWires();
+			if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
+				log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
+				UpdateGateType(draw, Number(current_Type));
+			}
+			else {
+				log('[GOLIREV] Generating SVG file from the JSON file');
+				Init();
+				json_yosysJS2 = document.getElementById('JSON').value;
+				json_yosysJS2 = JSON.parse(json_yosysJS2);
+				ParseJson(json_yosysJS2);
+				GenerateAllGates(draw, current_Type);
+				GenerateAllWires(draw, current_Type);
+			}
 			
 			previous_JSON = current_JSON;
 			previous_Type = current_Type;
