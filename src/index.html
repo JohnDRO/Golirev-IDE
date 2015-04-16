@@ -53,12 +53,14 @@ Constants[n][3] = nom de la porte (A/B/Y/S/..)
 var Wires = new Array();
 Wires[0] = 0;
 
+var WireLength = new Array();
+
 </script>
 </head>
 <body>
 Golirev IDE<hr>
 Schematic : <br />
-<div id="drawing"></div>
+<div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
 <script src="./svgjs/svg.js"></script>
 <script src="./svgjs/svg.draggable.js"></script>
 <script src="./functions.js"></script>
@@ -191,7 +193,7 @@ Console output :<br />
 		}
 	}
 
-	function GenerateSVG() { // JSON -> Verilog
+	function GenerateSVG() { // JSON -> SVG element
 		var i;
 		current_JSON = document.getElementById('JSON').value;
 		current_Type = document.getElementById("Gate_Type").value; 

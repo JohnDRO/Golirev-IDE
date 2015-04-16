@@ -36,7 +36,7 @@
 }
 
 function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
-	// Définition et initialisation des variables
+	// DÃ©finition et initialisation des variables
 	var Circuit_Name; // circuits related variables
 	
 	var io_names, cells_name;
@@ -481,8 +481,10 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 	var Offset1 = 0, Offset2 = 0; // Points offset (see function GetOffset)
 
 	// 1. Removing "old" wires
-	for (i = 1; i <= Wires[0]; i++)
+	for (i = 1; i <= Wires[0]; i++) {
 		Wires[i].remove();
+		WireLength[i] = 0;
+	}
 	
 	Wires[0] = 0;
 
@@ -500,6 +502,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 				yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
 				
 				Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
+				WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 				
 				Wires[0]++;
 				n++;
@@ -555,6 +558,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							yb = Components[id2][6].y() + Offset2[1];
 							
 							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							
 							Wires[0]++;
 							n++;
 							v++;
@@ -578,6 +583,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							yb = Components[id2][6].y() + Offset2[1];
 							
 							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							
 							Wires[0]++;
 							n++;
 							v++;
@@ -601,6 +608,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							yb = Components[id2][6].y() + Offset2[1];
 							
 							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							
 							Wires[0]++;
 							n++;
 							v++;
@@ -627,6 +636,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 		yb = Components[Constants[i][2]][6].y() + Offset2[1];
 		
 		Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
+		WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 		
 		n++;
 		Wires[0]++;
@@ -943,4 +953,15 @@ function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e.
 	}
 	
 	GenerateAllWires(SVG_Element, Gate_Type);
+}
+
+function GetWiresLength() {
+	var i = 0;
+	var TotalLength = 0;
+	
+		
+	for (i = 1; i <= Wires[0]; i++)
+		TotalLength += WireLength[i];
+	
+	return TotalLength;
 }
