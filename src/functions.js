@@ -918,6 +918,9 @@ function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/java
 
 function log(str) {
 	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
+
+	var textarea = document.getElementById('console');
+	textarea.scrollTop = textarea.scrollHeight;
 }
 
 function DisplayResults() { // Fonctions utilisé pour tester mon resultat
