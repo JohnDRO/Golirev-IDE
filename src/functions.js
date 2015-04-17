@@ -181,7 +181,7 @@ function GenerateAllGates(SVG_Element, Gate_Type) {
 	}
 
 	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
-	nodes.add(CircuitInfo[4]);
+	nodes.add(CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
@@ -470,9 +470,9 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 	} 
 	
-	group.style('cursor', 'move');
+	group.style('cursor', 'move'); // Change the cursor style
 	
-	nodes.add(group);
+	nodes.add(group); // Span and zoom
 	
 	return group;
 }
@@ -708,7 +708,7 @@ function RemoveAllGates() {
 
 }
 
-function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Decallage du départ du fil par rapport au centre de l'objet ..
+function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the connection point
 	var Varx = 0, Vary = 0;
 
 	if (typeof Gate_Norme == 'undefined')
@@ -930,30 +930,6 @@ function log(str) {
 	var textarea = document.getElementById('console');
 	textarea.scrollTop = textarea.scrollHeight;
 }
-
-function DisplayResults() { // Fonctions utilisé pour tester mon resultat
-	var i = 0, k = 0, b = 0;
-	
-	for (i = 1; i <= Components[0]; i++) {
-		document.write(Components[i][0] + ':' + Components[i][1] + '<br /> *');
-	}
-	
-	document.write('<hr>');
-	
-	for (i = 1, b = 0; b <= NetList[0]; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			for (var l = 1; l <= NetList[i][0]; l++)
-				document.write(Components[NetList[i][l][0]][0] + '.' + NetList[i][l][1] + ' === ');
-			
-			document.write('<br />');
-			b++;
-		}
-	}
-	
-	document.write('<hr>');
-	
-	return 0;
-} 
 
 function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
 	var i = 0;
