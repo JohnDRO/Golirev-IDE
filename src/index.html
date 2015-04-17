@@ -63,6 +63,7 @@ Schematic : <br />
 <div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
 <script src="./svgjs/svg.js"></script>
 <script src="./svgjs/svg.draggable.js"></script>
+<script src="./svgjs/svg.pan-zoom.js"></script>
 <script src="./functions.js"></script>
 <script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
 <hr>
@@ -144,19 +145,26 @@ endmodule
 	<select name="Gate_Type" id="Gate_Type">
            <option value="0" selected>Distinctive shape</option>
            <option value="1">Rectangular shape</option>
-       </select>
+    </select>
 </form>
 <hr>
 Console output :<br />
-<textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
+<textarea readonly id="console" style="width: 100%; height: 30%; position: right;"></textarea>
  <script>
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 	
-    var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06');
+    var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');
 	var ys = YosysJS.create();
 	ys.verbose = false;
 	ys.logprint = false;
 	ys.echo = false;
+
+	// --
+    var nodes = draw.group();
+	nodes.panZoom();
+    // Make the group pannable and zoomable
+    
+	// --
 	
 	document.getElementById('console').value = '';
 	
