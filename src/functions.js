@@ -689,14 +689,6 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 	return GateNumber;
 }
 
-function MoveGateXY(gate, x, y) {
-	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
-	
-	gate.center(x, y);
-	
-	return 1;
-}
-
 function RemoveAllGates() {
 	var i = 0;
 	
@@ -951,4 +943,21 @@ function GetWiresLength() {
 		TotalLength += WireLength[i];
 	
 	return TotalLength;
+}
+
+function MoveGateXY(gate, x, y) {
+	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
+	
+	gate.x(x);
+	gate.y(y);
+	
+	return 1;
+}
+
+function MoveToGrid(gate, x, y) {
+	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
+	
+	MoveGateXY(gate, x * 100, y * 100);
+	
+	return 1;
 }

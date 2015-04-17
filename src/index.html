@@ -89,13 +89,17 @@ function GenerateJSON() { // Verilog -> JSON
 }
 
 function GenerateSVG() { // JSON -> SVG element
-	var i;
+	var i = 0;
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
 	if (current_JSON != previous_JSON || current_Type != previous_Type) {
 		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
 			UpdateGateType(draw, Number(current_Type));
+			for (i = 1; i <= Components[0]; i++)
+				MoveToGrid(Components[i][6], 3, 3);
+			
+			GenerateAllWires(draw, current_Type);
 		}
 		else {
 			log('[GOLIREV] Generating SVG file from the JSON file');
@@ -213,6 +217,7 @@ endmodule
 Console output :<br />
 <textarea readonly id="console" style="width: 100%; height: 30%; position: right;"></textarea>
 <script>
+	var i, n;
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 
 	// svg.js init
@@ -233,6 +238,9 @@ Console output :<br />
 
 	// Reset the console log
 	document.getElementById('console').value = '';
+	// --
+	
+
 </script>
 </body>
 </html>

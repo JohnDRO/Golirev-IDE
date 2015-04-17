@@ -38,5 +38,6 @@ I plan to work on these things :
 * A good component placement
 * Read name of nets
 * Add Dlatch, DFF_PN0, .. (Chapter 5 yosys manual)
+* Don't make ALL wires everytime -> Make a function to make only wires for a components
 
 --
