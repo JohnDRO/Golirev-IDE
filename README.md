@@ -17,6 +17,19 @@ What is not working / not done :
 * Generating the Netlist on the SVG element
 * ..
 
+## Dependencies :
+* [YosysJS](http://www.clifford.at/yosys/yosysjs.html)
+    - Synthesises the Verilog code
+    - Provides the netlist of the equivalent schematic as an JSON file
+* [Svg.js](http://svgjs.com/)
+    - A lightweight library for manipulating and animating SVG
+* [Svg.js](http://svgjs.com/) plugins
+    - [svg.draggable.js](https://github.com/wout/svg.draggable.js)
+      - An extension for the svg.js library to make elements draggable
+    - [svg.pan-zoom.js/](https://github.com/jillix/svg.pan-zoom.js/)
+      - An extension for the svg.js for panning and zooming SVG elements
+ 
+
 ## TODO
 
 I plan to work on these things : 
