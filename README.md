@@ -28,7 +28,8 @@ What is not working / not done :
       - An extension for the svg.js library to make elements draggable
     - [svg.pan-zoom.js/](https://github.com/jillix/svg.pan-zoom.js/)
       - An extension for the svg.js for panning and zooming SVG elements
- 
+* [CodeMirror](http://codemirror.net)
+    - A text editor implemented in JavaScript
 
 ## TODO
 
@@ -39,5 +40,5 @@ I plan to work on these things :
 * Read name of nets
 * Add Dlatch, DFF_PN0, .. (Chapter 5 yosys manual)
 * Don't make ALL wires everytime -> Make a function to make only wires for a components
-
+* Configure correctly CodeMirror
 --
