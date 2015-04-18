@@ -96,10 +96,8 @@ function GenerateSVG() { // JSON -> SVG element
 		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
 			UpdateGateType(draw, Number(current_Type));
-			for (i = 1; i <= Components[0]; i++)
-				MoveToGrid(Components[i][6], 3, 3);
-			
 			GenerateAllWires(draw, current_Type);
+			PlaceCircuitName();
 		}
 		else {
 			log('[GOLIREV] Generating SVG file from the JSON file');
@@ -109,6 +107,7 @@ function GenerateSVG() { // JSON -> SVG element
 			ParseJson(json_yosysJS2);
 			GenerateAllGates(draw, current_Type);
 			GenerateAllWires(draw, current_Type);
+			PlaceCircuitName();
 		}
 		
 		previous_JSON = current_JSON;
@@ -139,8 +138,8 @@ Schematic : <br />
 <script src="codemirror/closebrackets.js"></script>
 
 <style type="text/css">
-      .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
-    </style>
+	.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;}
+</style>
 
 <hr>
 Verilog code and Json Output :<br />
