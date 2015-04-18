@@ -132,18 +132,29 @@ Schematic : <br />
 <script src="./svgjs/svg.pan-zoom.js"></script>
 <script src="./functions.js"></script>
 <script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
+
+<script src="codemirror/codemirror.js"></script>
+<link rel="stylesheet" href="codemirror/codemirror.css">
+<script src="codemirror/verilog.js"></script>
+<script src="codemirror/closebrackets.js"></script>
+
+<style type="text/css">
+      .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+    </style>
+
 <hr>
 Verilog code and Json Output :<br />
-<textarea id="Verilog" style="width: 49%; height: 50%; position: left;">
+
+<textarea id="Verilog" style="width: 100%; height: 50%;">
 module counter_2bit ( a, b, c);
-input a, b;
-output c;
+	input a, b;
+	output c;
 
-assign c = a && b;
-
+	assign c = a && b;
 endmodule
 </textarea>
-<textarea id="JSON" style="width: 49%; height: 50%; position: right;">{
+<br />
+<textarea id="JSON" style="width: 100%; height: 50%; position: right;">{
  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
     "counter_2bit": {
@@ -240,6 +251,16 @@ Console output :<br />
 	document.getElementById('console').value = '';
 	// --
 	
+	var myCodeMirror = CodeMirror.fromTextArea(Verilog, {
+		lineNumbers: true,
+		matchBrackets: true,
+		autoCloseBrackets: true,
+		mode: {
+		  name: "verilog",
+		  noIndentKeywords: ["package"]
+		}
+		
+});
 
 </script>
 </body>

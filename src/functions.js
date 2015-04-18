@@ -961,3 +961,10 @@ function MoveToGrid(gate, x, y) {
 	
 	return 1;
 }
+
+function GetCircuitPos() {
+	// Calculate min left
+	// Calculate max right
+	// Calculate max height
+	return []; // [0] == x, [1] == y
+}
