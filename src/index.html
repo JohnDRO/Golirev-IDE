@@ -58,7 +58,7 @@ var WireLength = new Array();
 // buttons functions
 function GenerateJSON() { // Verilog -> JSON
 	var index = 0, output = '';
-	current_code = document.getElementById('Verilog').value;
+	current_code = myCodeMirror.getValue();
 	current_button1 = document.Settings.splitnets.checked;
 	if (current_code != previous_code || current_button1 != previous_button1) {
 		ys.write_file("input.v", current_code);
