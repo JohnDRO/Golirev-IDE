@@ -250,17 +250,19 @@ Console output :<br />
 	document.getElementById('console').value = '';
 	// --
 	
+	// CodeMirror
 	var myCodeMirror = CodeMirror.fromTextArea(Verilog, {
 		lineNumbers: true,
 		matchBrackets: true,
 		autoCloseBrackets: true,
+		indentUnit: 4,
 		mode: {
 		  name: "verilog",
 		  noIndentKeywords: ["package"]
-		}
-		
-});
-
+		}	
+	});
+	// --
+	
 </script>
 </body>
 </html>
