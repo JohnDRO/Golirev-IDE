@@ -55,6 +55,14 @@ Wires[0] = 0;
 
 var WireLength = new Array();
 
+var Grid = new Array(), a, b;
+for (a = -500; a < 500; a++) {
+	Grid[a] = new Array();
+		for (b = -500; b < 500; b++) {
+			Grid[a][b] = 0;
+	}
+}
+
 // buttons functions
 function GenerateJSON() { // Verilog -> JSON
 	var index = 0, output = '';
@@ -96,7 +104,7 @@ function GenerateSVG() { // JSON -> SVG element
 		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
 			UpdateGateType(draw, Number(current_Type));
-			GenerateAllWires(draw, current_Type);
+			GenerateAllWires(draw, Number(current_Type));
 			PlaceCircuitName();
 		}
 		else {
@@ -106,7 +114,7 @@ function GenerateSVG() { // JSON -> SVG element
 			json_yosysJS2 = JSON.parse(json_yosysJS2);
 			ParseJson(json_yosysJS2);
 			GenerateAllGates(draw, current_Type);
-			GenerateAllWires(draw, current_Type);
+			SimulatedAnnealing(current_Type);
 			PlaceCircuitName();
 		}
 		
@@ -262,6 +270,10 @@ Console output :<br />
 		}	
 	});
 	// --
+	
+	
+
+	
 	
 </script>
 </body>

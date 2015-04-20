@@ -201,10 +201,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		case 0: // Input
 			longeur = (-Label.length) * 3 - 5;
 			
-			rect = draw.rect(60, 10)
-			text = SVG_Element.plain(Label).center(longeur, 5).stroke({ width: 0.1 }).fill('#000');
+			rect = draw.rect(60, 10).y(18.9);
+			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
 			
-			group.path('m 60,5 16,0');
+			group.path('m 60,23.9 16,0');
 			
 			group.add(rect);
 			group.add(text);
@@ -218,10 +218,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		case 1: // Output
 			longeur = Label.length * 3 + 70;
 			
-			rect = draw.rect(60, 10)
-			text = SVG_Element.plain(Label).center(longeur, 5).stroke({ width: 0.1 }).fill('#000');
+			rect = draw.rect(60, 10).y(18.9);
+			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
 			
-			group.path('m -16,5 16,0');
+			group.path('m -16,23.9 16,0');
 			
 			group.add(rect);	
 			group.add(text);
@@ -709,11 +709,11 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 	switch (Gate_Type) {
 		case 0: // Input
 			Varx = 76;
-			Vary = 5;
+			Vary = 23.9;
 		break;
 		case 1: // Output
 			Varx = -16;
-			Vary = 5;
+			Vary = 23.9;
 		break;
 		case 2: // Buf
 			if (Gate_Norme == 0) {
@@ -926,12 +926,23 @@ function log(str) {
 function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
 	var i = 0;
 	
+	var x = 0;
+	var y = 0;
+	
 	for (i = 1; i <= Components[0]; i++) {
+		// Save coords
+		x = Components[i][6].x() / 100;
+		y = Components[i][6].y() / 100;
+		
+		// Remove the SVG component and then remake it.
 		Components[i][6].remove();
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+	
+		// Replace the component
+		MoveToGrid(Components[i][6], x, y);
 	}
 	
-	GenerateAllWires(SVG_Element, Gate_Type);
+	RemoveAllWires();
 }
 
 function GetWiresLength() {
@@ -1017,3 +1028,93 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	
 	return 1;
 }
+
+function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
+    var iteration = 0;
+    var proba;
+    var alpha =0.999;
+    var temperature = 400.0;
+    var epsilon = 0.001;
+    var delta;
+	var i = 0;
+	var j = 0;
+	var Arr;
+
+	// Init components positions
+	for (i = 1; i <= Components[0]; i++) {
+		Grid[5][i] = 1;
+		MoveToGrid(Components[i][6], 5, i);
+	}
+	
+	GenerateAllWires(draw, Gate_Norm);
+	
+    var distance = GetWiresLength();
+
+    // While the temperature did not reach epsilon
+    while(temperature > epsilon) {
+        iteration++;
+    
+		// Make a random change
+        Arr = RandomChange();
+		GenerateAllWires(draw, 0);
+		
+		// Get the new delta
+        delta = GetWiresLength() - distance;
+		
+        if(delta < 0)
+            distance = delta + distance;
+        
+		else {
+            proba = Math.random();
+
+            if(proba < Math.exp(-delta/temperature))
+                distance = delta+distance;
+			
+			else 
+				ReverseChange(Arr[0], Arr[1], Arr[2]);
+        }
+        
+		// Cooling process on every iteration
+        temperature *= alpha;
+    }
+	
+	GenerateAllWires(draw, Gate_Norm);
+}
+
+function RandomChange() { // Make a random change, must return ID_Compo, x and y.
+	// Random component ID
+	var RandomID = Math.floor((Math.random() * Components[0]) + 1); 
+	
+	// Get x and y of this component
+	var x = Components[RandomID][6].x() / 100;
+	var y = Components[RandomID][6].y() / 100;
+	
+	// Random axis (x or y) and gain (-1 or 1)
+	var axis = Math.floor((Math.random() * 2) + 1);
+	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
+	
+	if (axis == 1) { // axis : x
+		if (Grid[x + gain][y] == 0) {
+			MoveToGrid(Components[RandomID][6], x + gain, y);
+			Grid[x][y] = 0;				
+			Grid[x + gain][y] = 1; 				
+		}
+	}
+	
+	else { // axis : y
+		if (Grid[x][y + gain] == 0) {
+			MoveToGrid(Components[RandomID][6], x, y + gain);
+			Grid[x][y] = 0;				
+			Grid[x][y + gain] = 1; 				
+		}	
+	}
+	
+	return [RandomID, x, y];
+}
+
+function ReverseChange(ID, x, y) {
+	Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
+	Grid[x][y] = 1;
+	MoveToGrid(Components[ID][6], x, y);
+}
+
