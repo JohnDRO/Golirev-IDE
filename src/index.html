@@ -239,7 +239,7 @@ Console output :<br />
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 
 	// svg.js init
-	var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');
+	var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');;
 	// --
 
 	// Yosys init
@@ -271,8 +271,10 @@ Console output :<br />
 	});
 	// --
 	
-	
 
+	
+	MoveToGrid(GenerateGate(draw, 8, 'a', 1, 0), 5, 1);
+	MoveToGrid(GenerateGate(draw, 7, 'a', 1, 0), 5, 2);
 	
 	
 </script>
