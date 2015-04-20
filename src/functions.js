@@ -1029,9 +1029,8 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	return 1;
 }
 
-function SimulatedAnnealing(Gate_Norm) {
-    var  iteration = 0;
-    //the probability
+function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
+    var iteration = 0;
     var proba;
     var alpha =0.999;
     var temperature = 400.0;
@@ -1041,7 +1040,7 @@ function SimulatedAnnealing(Gate_Norm) {
 	var j = 0;
 	var Arr;
 
-	// J'aligne les composants ici
+	// Init components positions
 	for (i = 1; i <= Components[0]; i++) {
 		Grid[5][i] = 1;
 		MoveToGrid(Components[i][6], 5, i);
@@ -1051,43 +1050,32 @@ function SimulatedAnnealing(Gate_Norm) {
 	
     var distance = GetWiresLength();
 
-    //while the temperature did not reach epsilon
+    // While the temperature did not reach epsilon
     while(temperature > epsilon) {
         iteration++;
     
-        //get the next random permutation of distances 
+		// Make a random change
         Arr = RandomChange();
 		GenerateAllWires(draw, 0);
-        //compute the distance of the new permuted configuration
+		
+		// Get the new delta
         delta = GetWiresLength() - distance;
-        //if the new distance is better accept it and assign it
-        if(delta<0) {
-            //assign(current,next);
-            distance = delta+distance;
-        }
+		
+        if(delta < 0)
+            distance = delta + distance;
         
 		else {
             proba = Math.random();
-            //if the new distance is worse accept 
-            //it but with a probability level
-            //if the probability is less than 
-            //E to the power -delta/temperature.
-            //otherwise the old value is kept
-            if(proba< Math.exp(-delta/temperature))
-            {
-                //assign(current,next);
+
+            if(proba < Math.exp(-delta/temperature))
                 distance = delta+distance;
-            }
 			
-			else {
+			else 
 				ReverseChange(Arr[0], Arr[1], Arr[2]);
-			}
         }
-        //cooling process on every iteration
-        temperature *=alpha;
-        //print every 400 iterations
-        //if (iteration%400==0)
-		//	alert('distance : ' + distance + 'x :' + Components[1][6].x());
+        
+		// Cooling process on every iteration
+        temperature *= alpha;
     }
 	
 	GenerateAllWires(draw, Gate_Norm);
