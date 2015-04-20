@@ -104,7 +104,7 @@ function GenerateSVG() { // JSON -> SVG element
 		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
 			UpdateGateType(draw, Number(current_Type));
-			SimulatedAnnealing(current_Type);
+			GenerateAllWires(draw, Number(current_Type));
 			PlaceCircuitName();
 		}
 		else {

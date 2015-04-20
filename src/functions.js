@@ -926,12 +926,23 @@ function log(str) {
 function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
 	var i = 0;
 	
+	var x = 0;
+	var y = 0;
+	
 	for (i = 1; i <= Components[0]; i++) {
+		// Save coords
+		x = Components[i][6].x() / 100;
+		y = Components[i][6].y() / 100;
+		
+		// Remove the SVG component and then remake it.
 		Components[i][6].remove();
 		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+	
+		// Replace the component
+		MoveToGrid(Components[i][6], x, y);
 	}
 	
-	GenerateAllWires(SVG_Element, Gate_Type);
+	RemoveAllWires();
 }
 
 function GetWiresLength() {
@@ -1118,3 +1129,4 @@ function ReverseChange(ID, x, y) {
 	Grid[x][y] = 1;
 	MoveToGrid(Components[ID][6], x, y);
 }
+
