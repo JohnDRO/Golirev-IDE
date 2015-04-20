@@ -1017,3 +1017,158 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	
 	return 1;
 }
+
+/*function PlaceComponents() { // Simulated annealing
+	var MaxIteration = 100;
+	var i = 0;
+	
+	var newCost;
+	var OldCost = GetWiresLength();
+	
+	var DeltaEnergy = 0;
+	
+	// Compute current cost
+	
+	for (i = 1; i <= MaxIteration; i++) {
+		// 1. Generate a Random change
+		// Function1();
+		newCost = GetWiresLength();
+		// 2. Compute DeltaE
+		DeltaEnergy = ;
+		
+		if (DeltaEnergy > 0)
+		// 		Accept the change
+		else if ()
+			// Accept
+		else {
+			ReverseChange();
+		}
+	}
+	
+}*/
+
+function SimulatedAnnealing() {
+
+
+    var  iteration = 0;
+    //the probability
+    var proba;
+    var alpha =0.999;
+    var temperature = 400.0;
+    var epsilon = 0.001;
+    var delta;
+	var i = 0;
+	var j = 0;
+	var Arr;
+	
+	
+	
+	// J'aligne les composants ici
+	for (i = 1; i <= Components[0]; i++) {
+		Grid[5][i] = 1;
+		MoveToGrid(Components[i][6], 5, i);
+	}
+	
+	GenerateAllWires(draw, 0);
+	
+    var distance = GetWiresLength();
+
+	
+
+    //while the temperature did not reach epsilon
+    while(temperature > epsilon)
+    {
+        iteration++;
+    
+        //get the next random permutation of distances 
+        Arr = RandomChange();
+		GenerateAllWires(draw, 0);
+        //compute the distance of the new permuted configuration
+        delta = GetWiresLength() - distance;
+        //if the new distance is better accept it and assign it
+        if(delta<0)
+        {
+            //assign(current,next);
+            distance = delta+distance;
+        }
+        else
+        {
+            proba = Math.random();
+            //if the new distance is worse accept 
+            //it but with a probability level
+            //if the probability is less than 
+            //E to the power -delta/temperature.
+            //otherwise the old value is kept
+            if(proba< Math.exp(-delta/temperature))
+            {
+                //assign(current,next);
+                distance = delta+distance;
+            }
+			
+			else {
+				reverse(Arr[0], Arr[1], Arr[2]);
+			}
+        }
+        //cooling process on every iteration
+        temperature *=alpha;
+        //print every 400 iterations
+        //if (iteration%400==0)
+		//	alert('distance : ' + distance + 'x :' + Components[1][6].x());
+    }
+}
+
+function RandomChange() { // Make a random change, must return ID_Compo, x and y.
+	// Je genère un random id [1; Component[0	]];
+	// Je genère un random axe (x/y)
+	// Je genère un random gain (-1/1)
+	var RandomID = Math.floor((Math.random() * Components[0]) + 1); 
+	var x = Components[RandomID][6].x() / 100;
+	var y = Components[RandomID][6].y() / 100;
+	
+	var axis = Math.floor((Math.random() * 2) + 1);
+	var gain = Math.floor((Math.random() * 2) + 1);
+	
+	if (axis == 1) {
+		if (gain == 1) {
+			if (Grid[x + 1][y] == 0) {
+				MoveToGrid(Components[RandomID][6], x + 1, y);
+				Grid[x][y] = 0;				
+				Grid[x + 1][y] = 1; 				
+			}
+		}
+		
+		else {
+			if (Grid[x - 1][y] == 0) {
+				MoveToGrid(Components[RandomID][6], x - 1, y);
+				Grid[x][y] = 0;				
+				Grid[x - 1][y] = 1; 				
+			}	
+		}
+	}
+	
+	else {
+		if (gain == 1) {
+			if (Grid[x][y + 1] == 0) {
+				MoveToGrid(Components[RandomID][6], x, y + 1);
+				Grid[x][y] = 0;				
+				Grid[x][y + 1] = 1; 				
+			}	
+		}
+		
+		else {
+			if (Grid[x][y - 1] == 0) {
+				MoveToGrid(Components[RandomID][6], x, y - 1);
+				Grid[x][y] = 0;				
+				Grid[x][y - 1] = 1; 				
+			}	
+		}
+	}
+	
+	return [RandomID, x, y];
+}
+
+function reverse(ID, x, y) {
+	Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
+	Grid[x][y] = 1;
+	MoveToGrid(Components[ID][6], x, y);
+}
