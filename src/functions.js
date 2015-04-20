@@ -201,10 +201,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		case 0: // Input
 			longeur = (-Label.length) * 3 - 5;
 			
-			rect = draw.rect(60, 10)
-			text = SVG_Element.plain(Label).center(longeur, 5).stroke({ width: 0.1 }).fill('#000');
+			rect = draw.rect(60, 10).y(18.9);
+			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
 			
-			group.path('m 60,5 16,0');
+			group.path('m 60,23.9 16,0');
 			
 			group.add(rect);
 			group.add(text);
@@ -218,10 +218,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		case 1: // Output
 			longeur = Label.length * 3 + 70;
 			
-			rect = draw.rect(60, 10)
-			text = SVG_Element.plain(Label).center(longeur, 5).stroke({ width: 0.1 }).fill('#000');
+			rect = draw.rect(60, 10).y(18.9);
+			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
 			
-			group.path('m -16,5 16,0');
+			group.path('m -16,23.9 16,0');
 			
 			group.add(rect);	
 			group.add(text);
@@ -709,11 +709,11 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 	switch (Gate_Type) {
 		case 0: // Input
 			Varx = 76;
-			Vary = 5;
+			Vary = 23.9;
 		break;
 		case 1: // Output
 			Varx = -16;
-			Vary = 5;
+			Vary = 23.9;
 		break;
 		case 2: // Buf
 			if (Gate_Norme == 0) {
@@ -1115,6 +1115,8 @@ function SimulatedAnnealing() {
         //if (iteration%400==0)
 		//	alert('distance : ' + distance + 'x :' + Components[1][6].x());
     }
+	
+	GenerateAllWires(draw, 0);
 }
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
