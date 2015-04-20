@@ -32,13 +32,8 @@ What is not working / not done :
     - A text editor implemented in JavaScript
 
 ## TODO
-
-I plan to work on these things : 
-* Finishing parsejson() (registers are not ok atm.)
-* Generating the Netlist correctly
-* A good component placement
-* Read name of nets
-* Add Dlatch, DFF_PN0, .. (Chapter 5 yosys manual)
-* Don't make ALL wires everytime -> Make a function to make only wires for a components
-* Configure correctly CodeMirror
---
+* Finish Netlist (buses)
+* Finish components (chapter 5 on the yosys manual)
+* Finish Simulated Annealing
+* Show Netnames
+* Configure CodeMirror (i.e. Display Verilog errors, ..)
