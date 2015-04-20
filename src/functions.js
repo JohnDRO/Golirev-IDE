@@ -199,12 +199,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 
 	switch(Gate_Type) {
 		case 0: // Input
-			longeur = (-Label.length) * 3 - 5;
+			rect = draw.rect(60, 10).center(50, 50);
+			text = SVG_Element.plain(Label).x(20).y(30).stroke({ width: 0.1 }).fill('#000');
 			
-			rect = draw.rect(60, 10).y(18.9);
-			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
-			
-			group.path('m 60,23.9 16,0');
+			group.path('m 80,50 16,0');
 			
 			group.add(rect);
 			group.add(text);
@@ -216,12 +214,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 		break;
 		case 1: // Output
-			longeur = Label.length * 3 + 70;
+			rect = draw.rect(60, 10).center(50, 50);
+			text = SVG_Element.plain(Label).x(20).y(30).stroke({ width: 0.1 }).fill('#000');
 			
-			rect = draw.rect(60, 10).y(18.9);
-			text = SVG_Element.plain(Label).center(longeur, 23.9).stroke({ width: 0.1 }).fill('#000');
-			
-			group.path('m -16,23.9 16,0');
+			group.path('m 5,50 16,0');
 			
 			group.add(rect);	
 			group.add(text);
@@ -708,12 +704,12 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 	
 	switch (Gate_Type) {
 		case 0: // Input
-			Varx = 76;
-			Vary = 23.9;
+			Varx = 96;
+			Vary = 50;
 		break;
 		case 1: // Output
-			Varx = -16;
-			Vary = 23.9;
+			Varx = 4;
+			Vary = 50;
 		break;
 		case 2: // Buf
 			if (Gate_Norme == 0) {
