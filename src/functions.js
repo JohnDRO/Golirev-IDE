@@ -332,11 +332,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;		
 		case 5: // OR
 			if (Gate_Norm == 0) {
-				
-				group.path('m -3.5,1 19.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -19.5,0 a 40,40 0 0 0 0,-46 z');
-				group.path('m -16,9 16,0');
-				group.path('m 47,25 16,0');
-				group.path('m -16,41 16,0');
+				group.path('m -3.5,1 19.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -19.5,0 a 40,40 0 0 0 0,-46 z').center(50, 50);
+				group.path('m 11,34 16,0');
+				group.path('m 74,50 16,0');
+				group.path('m 11,66 16,0');
 			
 				if(!hide_label) {
 					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
@@ -709,7 +708,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			Vary = 50;
 		break;
 		case 1: // Output
-			Varx = 4;
+			Varx = 5;
 			Vary = 50;
 		break;
 		case 2: // Buf
@@ -789,16 +788,16 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 		case 5: // OR
 			if (Gate_Norme == 0) {
 				if (IO_Name === 'A') {
-					Varx = -16;
-					Vary = 9;
+					Varx = 11;
+					Vary = 34;
 				}
 				else if (IO_Name === 'B') {
-					Varx = -16;
-					Vary = 41;	
+					Varx = 11;
+					Vary = 66;	
 				}
 				else {
-					Varx = 62;
-					Vary = 25;	
+					Varx = 90;
+					Vary = 50;	
 				}
 			}
 			else if (Gate_Norme == 1) {
