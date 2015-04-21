@@ -1131,8 +1131,8 @@ function CheckVerilogError(str) {
 		ErrorLine = lineNumber;
 		
 		// Panel, remove the old one and then make a new one
-		panels[PanelID2].clear();
-		PanelID2 = addPanel("bottom", str);
+		panels[BotPanelID].clear();
+		BotPanelID = addPanel("bottom", str);
 
 		return lineNumber;
 	}
@@ -1140,13 +1140,13 @@ function CheckVerilogError(str) {
 	else // No errors
 		return 0;
 }
+
 function CreateErrorSign() {
 	var image = document.createElement("img");
 	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII="
 
 	return image;
 }
-
 
 // Panels
 function makePanel(where, str) {

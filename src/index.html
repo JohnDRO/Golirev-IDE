@@ -140,18 +140,15 @@ function GenerateSVG() { // JSON -> SVG element
 	}
 }
 // --
-
 </script>
-</head>
-<body>
-Golirev IDE<hr>
-Schematic : <br />
-<div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
+
+<script src="./functions.js"></script>
+
+<script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
+
 <script src="./svgjs/svg.js"></script>
 <script src="./svgjs/svg.draggable.js"></script>
 <script src="./svgjs/svg.pan-zoom.js"></script>
-<script src="./functions.js"></script>
-<script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
 
 <script src="codemirror/codemirror.js"></script>
 <link rel="stylesheet" href="codemirror/codemirror.css">
@@ -161,44 +158,26 @@ Schematic : <br />
 <script src="codemirror/active-line.js"></script>
 
 <style type="text/css">
-	.CodeMirror {	border-top: 1px solid black; 
-					border-bottom: 1px solid black; 
-					border-left: 1px solid black; 
-					border-right: 1px solid black;
+	.CodeMirror {	
+		border: 1px solid black; 
 	}
-  .border {
-    border: 1px solid #f7f7f7;
-  }
-  .add-panel {
-    background: orange;
-    padding: 3px 6px;
-    color: white !important; 
-    border-radius: 3px;
-  }
-  .add-panel, .remove-panel {
-    cursor: pointer;
-  }
-  .remove-panel {
-    float: right;
-  }
-  .panel {
-    background: #f7f7f7;
-    padding: 3px 7px;
-    font-size: 0.85em;
-	color: blue;
-	border-top: 1px solid black; 
-	border-bottom: 1px solid black;
-	border-left: 1px solid black; 
-	border-right: 1px solid black;
-  }
-  .panel.top, .panel.after-top {
-	border-bottom: 1px solid #ddd;
-  }
-  .panel.bottom, .panel.before-bottom {
-    border-top: 1px solid #ddd;
-  }
+	.panel {
+		background: #f7f7f7;
+		padding: 3px 7px;
+		font-size: 0.85em;
+		color: blue;
+		border: 1px solid black; 
+	}
+	.remove-panel {
+		float: right;
+		cursor: pointer;
+	}
 </style>
-
+</head>
+<body>
+Golirev IDE<hr>
+Schematic : <br />
+<div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
 <hr>
 Verilog code and Json Output :<br />
 
@@ -312,6 +291,8 @@ Console output :<br />
 	var numPanels = 0;
 	var panels = {};
 	
+	var ErrorLine = 0;
+	
 	var myCodeMirror = CodeMirror.fromTextArea(Verilog, {
 		lineNumbers: true,
 		matchBrackets: true,
@@ -323,15 +304,10 @@ Console output :<br />
 		  noIndentKeywords: ["package"]
 		}	
 	});
+	
+	var TopPanelID = addPanel("top", "Type your Verilog code here !");
+	var BotPanelID = addPanel("bottom", "The status of your code will be displayed here !");
 	// --
-
-	var ErrorLine = 0;
-	var PanelID;
-	var PanelID2;
-
-	PanelID = addPanel("top", "Type your Verilog code here !");
-	PanelID2 = addPanel("bottom", "The status of your code will be displayed here !");
-
 </script>
 </body>
 </html>
