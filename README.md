@@ -18,6 +18,8 @@ What is not working / not done :
 * ..
 
 ## Features :
+* Automatic placement using Simulated Annealing
+![Automatic placement using Simulated Annealing](http://i.imgur.com/EszUZct.png)
 * Digital gates : 
 ![Gates](http://i.imgur.com/mPVuerk.png)
 * Display errors in your Verilog code :
