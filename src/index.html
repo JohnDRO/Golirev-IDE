@@ -89,6 +89,8 @@ function GenerateJSON() { // Verilog -> JSON
 			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
 		}
 		else {
+			panels[BotPanelID].clear();
+			BotPanelID = addPanel("bottom", "No errors in your Verilog code");
 			log('[GOLIREV] No errors in your Verilog code');
 			
 			// Generate JSON
@@ -128,11 +130,14 @@ function GenerateSVG() { // JSON -> SVG element
 			ParseJson(json_yosysJS2);
 			GenerateAllGates(draw, current_Type);
 			SimulatedAnnealing(current_Type);
+			CenterComponents();
+			GenerateAllWires(draw, current_Type);
 			PlaceCircuitName();
 		}
 		
 		previous_JSON = current_JSON;
 		previous_Type = current_Type;
+
 	}
 	
 	else {
@@ -308,6 +313,7 @@ Console output :<br />
 	var TopPanelID = addPanel("top", "Type your Verilog code here !");
 	var BotPanelID = addPanel("bottom", "The status of your code will be displayed here !");
 	// --
+
 </script>
 </body>
 </html>

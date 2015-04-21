@@ -236,7 +236,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 65,50 16,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(30, 25).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -250,7 +250,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -270,7 +270,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.circle(7).center(68, 50);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(30, 25).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -285,7 +285,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -304,7 +304,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 17,65 10,0');
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(30, 15).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -319,7 +319,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -338,7 +338,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 17,66 10,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -353,7 +353,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -374,7 +374,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 10,66 10,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(17, -10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -389,7 +389,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 10).stroke({ width: 0.1 }).fill('#000');
+					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -413,7 +413,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 80,20 10,0'); // (Q)
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(23, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -443,7 +443,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 50,80 0,10'); // (S)
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(20, 5).stroke({ width: 0.1 }).fill('#000'); 
+					text = SVG_Element.plain(Label).center(50, 0).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 			
@@ -1078,7 +1078,6 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
         temperature *= alpha;
     }
 	
-	GenerateAllWires(draw, Gate_Norm);
 }
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
@@ -1122,16 +1121,19 @@ function ReverseChange(ID, x, y) {
 }
 
 function CheckVerilogError(str) {
+
+	// Remove old panel and error sign
+	myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+	panels[BotPanelID].clear();
+	
 	if (str.indexOf("ERROR") == 0) { // Error in the Verilog code
 		var lineNumber = str.match(/\d+/)[0];
 		
 		// Gutter note (Error sign)
-		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
 		myCodeMirror.setGutterMarker(Number(lineNumber) - 1, "note-gutter", CreateErrorSign());
 		ErrorLine = lineNumber;
 		
-		// Panel, remove the old one and then make a new one
-		panels[BotPanelID].clear();
+		// Make a new panel containing the error msg
 		BotPanelID = addPanel("bottom", str);
 
 		return lineNumber;
@@ -1181,4 +1183,39 @@ function replacePanel(PanelID) {
 
   panels[node.id] = myCodeMirror.addPanel(node, {replace: panel, position: "after-top"});
   return false;
+}
+// --
+
+function CenterComponents() {
+	var MaxLeft = 0;
+	var MaxHeight = 0;
+	
+	var i = 0;
+	
+	var x = 0;
+	var y = 0;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		if (i == 1) {
+			MaxLeft = Components[i][6].x();
+			MaxHeight = Components[i][6].y();
+		}
+		
+		x = Components[i][6].x();
+		y = Components[i][6].y();
+		
+		if (MaxLeft > x) {
+			MaxLeft = x;
+		}
+		if (MaxHeight < y) {
+			MaxHeight = y;
+		}
+	}
+	
+	x = x / 100;
+	y = y / 100;
+
+	for (i = 1; i <= Components[0]; i++) {
+		MoveToGrid(Components[i][6], Components[i][6].x()/100 - x + 2, Components[i][6].y()/100 - y + 2);
+	}
 }
