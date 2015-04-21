@@ -1121,28 +1121,45 @@ function ReverseChange(ID, x, y) {
 	MoveToGrid(Components[ID][6], x, y);
 }
 
-function CheckVerilogError(str) { // return 1 if error, 0 if no errors
-	if (str.indexOf("ERROR") == 0) {
-		addPanel(str);
-		return lines[lines.length - 2].match(/\d+/)[0];
+function CheckVerilogError(str) {
+	if (str.indexOf("ERROR") == 0) { // Error in the Verilog code
+		var lineNumber = str.match(/\d+/)[0];
+		
+		// Gutter note (Error sign)
+		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+		myCodeMirror.setGutterMarker(Number(lineNumber) - 1, "note-gutter", CreateErrorSign());
+		ErrorLine = lineNumber;
+		
+		// Panel, remove the old one and then make a new one
+		panels[PanelID2].clear();
+		PanelID2 = addPanel("bottom", str);
+
+		return lineNumber;
 	}
 	
-	else
+	else // No errors
 		return 0;
 }
+function CreateErrorSign() {
+	var image = document.createElement("img");
+	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII="
+
+	return image;
+}
+
 
 // Panels
-function makePanel(str) {
+function makePanel(where, str) {
 	var node = document.createElement("div");
 	var id = ++numPanels;
-	var close, label;
+	var widget, close, label;
 
 	node.id = "panel-" + id;
-	node.className = "panel top";
+	node.className = "panel " + where;
 	close = node.appendChild(document.createElement("a"));
 	close.setAttribute("title", "Remove me!");
 	close.setAttribute("class", "remove-panel");
-	close.textContent = "X";
+	close.textContent = "✖";
 	CodeMirror.on(close, "click", function() {
 	panels[node.id].clear();
 	});
@@ -1150,7 +1167,18 @@ function makePanel(str) {
 	label.textContent = str;
 	return node;
 }
-function addPanel(str) {
-	var node = makePanel(str);
-	panels[node.id] = myCodeMirror.addPanel(node, {position: "top"});
+
+function addPanel(where, str) {
+	var node = makePanel(where, str);
+	panels[node.id] = myCodeMirror.addPanel(node, {position: where});
+	return node.id;
+}
+
+function replacePanel(PanelID) {
+  var id = PanelID
+  var panel = panels["panel-" + id];
+  var node = makePanel("");
+
+  panels[node.id] = myCodeMirror.addPanel(node, {replace: panel, position: "after-top"});
+  return false;
 }

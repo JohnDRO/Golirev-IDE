@@ -185,7 +185,7 @@ Schematic : <br />
     background: #f7f7f7;
     padding: 3px 7px;
     font-size: 0.85em;
-	color: red;
+	color: blue;
 	border-top: 1px solid black; 
 	border-bottom: 1px solid black;
 	border-left: 1px solid black; 
@@ -317,6 +317,7 @@ Console output :<br />
 		matchBrackets: true,
 		autoCloseBrackets: true,
 		indentUnit: 4,
+		gutters: ["note-gutter", "CodeMirror-linenumbers"],
 		mode: {
 		  name: "verilog",
 		  noIndentKeywords: ["package"]
@@ -324,13 +325,13 @@ Console output :<br />
 	});
 	// --
 
+	var ErrorLine = 0;
+	var PanelID;
+	var PanelID2;
 
-	
+	PanelID = addPanel("top", "Type your Verilog code here !");
+	PanelID2 = addPanel("bottom", "The status of your code will be displayed here !");
 
-
-
-	
-	
 </script>
 </body>
 </html>
