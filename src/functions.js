@@ -872,7 +872,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 				Vary = 47.5;	
 			}
 			else { // S
-				Varx = 60;
+				Varx = 50;
 				Vary = 90;	
 			}
 		break;
@@ -1040,6 +1040,11 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 		Grid[5][i] = 1;
 		MoveToGrid(Components[i][6], 5, i);
 	}
+	/*
+	for (i, n = 1; n <= Constants[0]; i++, n++) {
+		Grid[5][i] = 1;
+		MoveToGrid(Constants[n][1], 5, i);
+	}*/
 	
 	GenerateAllWires(draw, Gate_Norm);
 	
@@ -1078,11 +1083,12 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
 	// Random component ID
-	var RandomID = Math.floor((Math.random() * Components[0]) + 1); 
+	var RandomID = Math.floor((Math.random() * Components[0] + 1)); 
 	
 	// Get x and y of this component
 	var x = Components[RandomID][6].x() / 100;
 	var y = Components[RandomID][6].y() / 100;
+	// --
 	
 	// Random axis (x or y) and gain (-1 or 1)
 	var axis = Math.floor((Math.random() * 2) + 1);
@@ -1091,6 +1097,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 	if (axis == 1) { // axis : x
 		if (Grid[x + gain][y] == 0) {
 			MoveToGrid(Components[RandomID][6], x + gain, y);
+
 			Grid[x][y] = 0;				
 			Grid[x + gain][y] = 1; 				
 		}
@@ -1099,6 +1106,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 	else { // axis : y
 		if (Grid[x][y + gain] == 0) {
 			MoveToGrid(Components[RandomID][6], x, y + gain);
+
 			Grid[x][y] = 0;				
 			Grid[x][y + gain] = 1; 				
 		}	
@@ -1113,3 +1121,36 @@ function ReverseChange(ID, x, y) {
 	MoveToGrid(Components[ID][6], x, y);
 }
 
+function CheckVerilogError(str) { // return 1 if error, 0 if no errors
+	if (str.indexOf("ERROR") == 0) {
+		addPanel(str);
+		return lines[lines.length - 2].match(/\d+/)[0];
+	}
+	
+	else
+		return 0;
+}
+
+// Panels
+function makePanel(str) {
+	var node = document.createElement("div");
+	var id = ++numPanels;
+	var close, label;
+
+	node.id = "panel-" + id;
+	node.className = "panel top";
+	close = node.appendChild(document.createElement("a"));
+	close.setAttribute("title", "Remove me!");
+	close.setAttribute("class", "remove-panel");
+	close.textContent = "X";
+	CodeMirror.on(close, "click", function() {
+	panels[node.id].clear();
+	});
+	label = node.appendChild(document.createElement("span"));
+	label.textContent = str;
+	return node;
+}
+function addPanel(str) {
+	var node = makePanel(str);
+	panels[node.id] = myCodeMirror.addPanel(node, {position: "top"});
+}

@@ -65,7 +65,7 @@ for (a = -500; a < 500; a++) {
 
 // buttons functions
 function GenerateJSON() { // Verilog -> JSON
-	var index = 0, output = '';
+	var index = 0, output = '', lines, result;
 	current_code = myCodeMirror.getValue();
 	current_button1 = document.Settings.splitnets.checked;
 	if (current_code != previous_code || current_button1 != previous_button1) {
@@ -81,13 +81,26 @@ function GenerateJSON() { // Verilog -> JSON
 		
 		log('[GOLIREV] Synthesis : ');
 		log(output);
-		log('[GOLIREV] Generating JSON File');
-		output = ys.run('write_json');
 		
-		index = output.indexOf('{');
-		output = output.substring(index); 
-		document.getElementById('JSON').value = output;
-		
+		// Error Check
+		lines = output.split(/\r\n|\r|\n/); 
+		result = CheckVerilogError(lines[lines.length - 2]);
+		if (result) {
+			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
+		}
+		else {
+			log('[GOLIREV] No errors in your Verilog code');
+			
+			// Generate JSON
+			log('[GOLIREV] Generating JSON File');
+			output = ys.run('write_json');
+			index = output.indexOf('{');
+			output = output.substring(index); 
+			document.getElementById('JSON').value = output;
+			// --
+		}
+		// --
+
 		previous_code = current_code;
 	}
 	
@@ -144,9 +157,46 @@ Schematic : <br />
 <link rel="stylesheet" href="codemirror/codemirror.css">
 <script src="codemirror/verilog.js"></script>
 <script src="codemirror/closebrackets.js"></script>
+<script src="codemirror/panel.js"></script>
+<script src="codemirror/active-line.js"></script>
 
 <style type="text/css">
-	.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;}
+	.CodeMirror {	border-top: 1px solid black; 
+					border-bottom: 1px solid black; 
+					border-left: 1px solid black; 
+					border-right: 1px solid black;
+	}
+  .border {
+    border: 1px solid #f7f7f7;
+  }
+  .add-panel {
+    background: orange;
+    padding: 3px 6px;
+    color: white !important; 
+    border-radius: 3px;
+  }
+  .add-panel, .remove-panel {
+    cursor: pointer;
+  }
+  .remove-panel {
+    float: right;
+  }
+  .panel {
+    background: #f7f7f7;
+    padding: 3px 7px;
+    font-size: 0.85em;
+	color: red;
+	border-top: 1px solid black; 
+	border-bottom: 1px solid black;
+	border-left: 1px solid black; 
+	border-right: 1px solid black;
+  }
+  .panel.top, .panel.after-top {
+	border-bottom: 1px solid #ddd;
+  }
+  .panel.bottom, .panel.before-bottom {
+    border-top: 1px solid #ddd;
+  }
 </style>
 
 <hr>
@@ -259,6 +309,9 @@ Console output :<br />
 	// --
 	
 	// CodeMirror
+	var numPanels = 0;
+	var panels = {};
+	
 	var myCodeMirror = CodeMirror.fromTextArea(Verilog, {
 		lineNumbers: true,
 		matchBrackets: true,
@@ -270,11 +323,12 @@ Console output :<br />
 		}	
 	});
 	// --
-	
+
 
 	
-	MoveToGrid(GenerateGate(draw, 8, 'a', 1, 0), 5, 1);
-	MoveToGrid(GenerateGate(draw, 7, 'a', 1, 0), 5, 2);
+
+
+
 	
 	
 </script>
