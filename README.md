@@ -17,6 +17,12 @@ What is not working / not done :
 * Generating the Netlist on the SVG element
 * ..
 
+## Features :
+* Digital gates : 
+![Gates](http://i.imgur.com/mPVuerk.png)
+* Display errors in your Verilog code :
+![CodeMiror](http://i.imgur.com/aDx3Kpf.png)
+
 ## Dependencies :
 * [YosysJS](http://www.clifford.at/yosys/yosysjs.html)
     - Synthesises the Verilog code
