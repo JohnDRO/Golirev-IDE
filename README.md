@@ -23,7 +23,7 @@ What is not working / not done :
 * Digital gates : 
 ![Gates](http://i.imgur.com/mPVuerk.png)
 * Display errors in your Verilog code :
-![CodeMiror](http://imgur.com/vDswAv7)
+![CodeMiror](http://i.imgur.com/vDswAv7.png)
 
 ## Dependencies :
 * [YosysJS](http://www.clifford.at/yosys/yosysjs.html)
