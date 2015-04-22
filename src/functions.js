@@ -43,7 +43,7 @@ function Init() {
 }
 // --
 
-// Parsing
+// Yosys and JSON related
 function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
 	// Définition et initialisation des variables
 	var Circuit_Name; // circuits related variables
@@ -175,6 +175,14 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	//document.write('Nbr ' + Constants[0]);
 	
 	return 1;
+}
+
+function CheckVerilogError(str) {
+	if (str.indexOf("ERROR") == 0) // Error in the Verilog code
+		return str.match(/\d+/)[0];
+	
+	else // No errors
+		return 0;
 }
 // --
 
@@ -1219,7 +1227,7 @@ function GetConnectionType(Component_ID) {
 }
 // --
 
-// Panels
+// Panels, Gutter-note
 function makePanel(where, str) {
 	var node = document.createElement("div");
 	var id = ++numPanels;
@@ -1253,15 +1261,6 @@ function replacePanel(PanelID) {
   panels[node.id] = myCodeMirror.addPanel(node, {replace: panel, position: "after-top"});
   return false;
 }
-// --
-
-function CheckVerilogError(str) {
-	if (str.indexOf("ERROR") == 0) // Error in the Verilog code
-		return str.match(/\d+/)[0];
-	
-	else // No errors
-		return 0;
-}
 
 function CreateErrorSign() {
 	var image = document.createElement("img");
@@ -1269,7 +1268,9 @@ function CreateErrorSign() {
 
 	return image;
 }
+// --
 
+// Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
 }
@@ -1280,3 +1281,4 @@ function log(str) {
 	var textarea = document.getElementById('console');
 	textarea.scrollTop = textarea.scrollHeight;
 }
+// --
