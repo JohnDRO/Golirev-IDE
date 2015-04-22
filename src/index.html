@@ -95,7 +95,7 @@ function GenerateJSON() { // Verilog -> JSON
 			myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
 			ErrorLine = result;
 		
-			BotPanelID = addPanel("bottom", str);
+			BotPanelID = addPanel("bottom", lines[lines.length - 2]);
 		}
 		else {
 			// Panels
@@ -120,6 +120,7 @@ function GenerateJSON() { // Verilog -> JSON
 	
 	else {
 		log('[GOLIREV] No modifications to do.');
+		return 1;
 	}
 }
 
