@@ -564,18 +564,18 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 		Grid[5][i] = 1;
 		MoveToGrid(Components[i][6], 5, i);
 	}
-	/*
+	
 	for (i, n = 1; n <= Constants[0]; i++, n++) {
 		Grid[5][i] = 1;
 		MoveToGrid(Constants[n][1], 5, i);
-	}*/
+	}
 	
 	GenerateAllWires(draw, Gate_Norm);
 	
     var distance = GetWiresLength();
 
     // While the temperature did not reach epsilon
-    while(temperature > epsilon) {
+    while (temperature > epsilon) {
         iteration++;
     
 		// Make a random change
@@ -595,7 +595,7 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
                 distance = delta+distance;
 			
 			else 
-				ReverseChange(Arr[0], Arr[1], Arr[2]);
+				ReverseChange(Arr[0], Arr[1], Arr[2], Arr[3]);
         }
         
 		// Cooling process on every iteration
@@ -606,42 +606,86 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
 	// Random component ID
-	var RandomID = Math.floor((Math.random() * Components[0] + 1)); 
-	
-	// Get x and y of this component
-	var x = Components[RandomID][6].x() / 100;
-	var y = Components[RandomID][6].y() / 100;
-	// --
-	
-	// Random axis (x or y) and gain (-1 or 1)
-	var axis = Math.floor((Math.random() * 2) + 1);
-	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
-	
-	if (axis == 1) { // axis : x
-		if (Grid[x + gain][y] == 0) {
-			MoveToGrid(Components[RandomID][6], x + gain, y);
+	var RandomID = Math.floor((Math.random() * (Components[0] + Constants[0]) + 1)); 
 
-			Grid[x][y] = 0;				
-			Grid[x + gain][y] = 1; 				
+	var type = 0;
+	
+	if (RandomID > Components[0]) { // Constant
+		type = 1;
+		RandomID = RandomID - Components[0];
+		
+		// Get x and y of this component
+		var x = Constants[RandomID][1].x() / 100;
+		var y = Constants[RandomID][1].y() / 100;
+		// --
+		
+		// Random axis (x or y) and gain (-1 or 1)
+		var axis = Math.floor((Math.random() * 2) + 1);
+		var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
+		
+		if (axis == 1) { // axis : x
+			if (Grid[x + gain][y] == 0) {
+				MoveToGrid(Constants[RandomID][1], x + gain, y);
+
+				Grid[x][y] = 0;				
+				Grid[x + gain][y] = 1; 				
+			}
+		}
+		
+		else { // axis : y
+			if (Grid[x][y + gain] == 0) {
+				MoveToGrid(Constants[RandomID][1], x, y + gain);
+
+				Grid[x][y] = 0;				
+				Grid[x][y + gain] = 1; 				
+			}	
 		}
 	}
 	
-	else { // axis : y
-		if (Grid[x][y + gain] == 0) {
-			MoveToGrid(Components[RandomID][6], x, y + gain);
+	else { // "Real" component
+		// Get x and y of this component
+		var x = Components[RandomID][6].x() / 100;
+		var y = Components[RandomID][6].y() / 100;
+		// --
+		
+		// Random axis (x or y) and gain (-1 or 1)
+		var axis = Math.floor((Math.random() * 2) + 1);
+		var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
+		
+		if (axis == 1) { // axis : x
+			if (Grid[x + gain][y] == 0) {
+				MoveToGrid(Components[RandomID][6], x + gain, y);
 
-			Grid[x][y] = 0;				
-			Grid[x][y + gain] = 1; 				
-		}	
+				Grid[x][y] = 0;				
+				Grid[x + gain][y] = 1; 				
+			}
+		}
+		
+		else { // axis : y
+			if (Grid[x][y + gain] == 0) {
+				MoveToGrid(Components[RandomID][6], x, y + gain);
+
+				Grid[x][y] = 0;				
+				Grid[x][y + gain] = 1; 				
+			}	
+		}
 	}
 	
-	return [RandomID, x, y];
+	return [RandomID, x, y, type];
 }
 
-function ReverseChange(ID, x, y) {
-	Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
-	Grid[x][y] = 1;
-	MoveToGrid(Components[ID][6], x, y);
+function ReverseChange(ID, x, y, type) {
+	if (type == 0) {
+		Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
+		Grid[x][y] = 1;
+		MoveToGrid(Components[ID][6], x, y);
+	}
+	
+	else {
+		Grid[Constants[ID][1].x() / 100][Constants[ID][1].y() / 100] = 0;
+		Grid[x][y] = 1;
+		MoveToGrid(Constants[ID][1], x, y);	
+	}
 }
 
 function CenterComponents() {
