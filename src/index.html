@@ -83,12 +83,22 @@ function GenerateJSON() { // Verilog -> JSON
 		log(output);
 		
 		// Error Check
+		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+		panels[BotPanelID].clear();
+	
 		lines = output.split(/\r\n|\r|\n/); 
 		result = CheckVerilogError(lines[lines.length - 2]);
 		if (result) {
 			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
+		
+			// Panels && Gutter Note
+			myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
+			ErrorLine = result;
+		
+			BotPanelID = addPanel("bottom", str);
 		}
 		else {
+			// Panels
 			panels[BotPanelID].clear();
 			BotPanelID = addPanel("bottom", "No errors in your Verilog code");
 			log('[GOLIREV] No errors in your Verilog code');
@@ -104,6 +114,8 @@ function GenerateJSON() { // Verilog -> JSON
 		// --
 
 		previous_code = current_code;
+		
+		return (!result);
 	}
 	
 	else {
@@ -137,12 +149,17 @@ function GenerateSVG() { // JSON -> SVG element
 		
 		previous_JSON = current_JSON;
 		previous_Type = current_Type;
+		
+		return 1;
 
 	}
 	
 	else {
 		log('[GOLIREV] No modifications to do.');
+		return 1;
 	}
+	
+	return 1;
 }
 // --
 </script>

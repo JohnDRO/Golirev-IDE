@@ -1,4 +1,11 @@
-﻿function Init() {
+﻿/*
+ * Golirev : function.js
+ * Details : Contains functions used in this project.
+ *
+*/
+
+// Initial configuration
+function Init() {
 	// Init CircuitInfo
 	CircuitInfo[0] = 0;
 	CircuitInfo[1] = 0;
@@ -34,7 +41,9 @@
 	
 	return 1;
 }
+// --
 
+// Parsing
 function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
 	// Définition et initialisation des variables
 	var Circuit_Name; // circuits related variables
@@ -167,7 +176,9 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	
 	return 1;
 }
+// --
 
+// Components
 function GenerateAllGates(SVG_Element, Gate_Type) {
 	var i = 0;
 	
@@ -472,6 +483,292 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 	return group;
 }
 
+function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
+	var GateNumber = -1; // -1 is undefined here
+	
+	switch (GateString) {
+		case '$_NOT_':
+			GateNumber = 3;
+		break;
+		case '$_AND_':
+			GateNumber = 4;
+		break;
+		case '$_OR_':
+			GateNumber = 5;
+		break;
+		case '$_XOR_':
+			GateNumber = 6;
+		break;
+		case '$_DFF_P_':
+			GateNumber = 7;
+		break;
+		case '$_MUX_':
+			GateNumber = 8;
+		break;
+		case '$_DLATCH_P_':
+			GateNumber = 9;
+		break;
+	}
+	
+	return GateNumber;
+}
+
+function RemoveAllGates() {
+	var i = 0;
+	
+	for (i = 1; i <= Components[0]; i++) { // Remove componants
+		if (typeof Components[i][6] != 'undefined')
+			Components[i][6] = Components[i][6].remove();
+	}
+
+
+}
+
+function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
+	var i = 0;
+	
+	var x = 0;
+	var y = 0;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		// Save coords
+		x = Components[i][6].x() / 100;
+		y = Components[i][6].y() / 100;
+		
+		// Remove the SVG component and then remake it.
+		Components[i][6].remove();
+		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+	
+		// Replace the component
+		MoveToGrid(Components[i][6], x, y);
+	}
+	
+	RemoveAllWires();
+}
+// --
+
+// Placement
+function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
+    var iteration = 0;
+    var proba;
+    var alpha =0.999;
+    var temperature = 400.0;
+    var epsilon = 0.001;
+    var delta;
+	var i = 0;
+	var j = 0;
+	var Arr;
+
+	// Init components positions
+	for (i = 1; i <= Components[0]; i++) {
+		Grid[5][i] = 1;
+		MoveToGrid(Components[i][6], 5, i);
+	}
+	/*
+	for (i, n = 1; n <= Constants[0]; i++, n++) {
+		Grid[5][i] = 1;
+		MoveToGrid(Constants[n][1], 5, i);
+	}*/
+	
+	GenerateAllWires(draw, Gate_Norm);
+	
+    var distance = GetWiresLength();
+
+    // While the temperature did not reach epsilon
+    while(temperature > epsilon) {
+        iteration++;
+    
+		// Make a random change
+        Arr = RandomChange();
+		GenerateAllWires(draw, 0);
+		
+		// Get the new delta
+        delta = GetWiresLength() - distance;
+		
+        if(delta < 0)
+            distance = delta + distance;
+        
+		else {
+            proba = Math.random();
+
+            if(proba < Math.exp(-delta/temperature))
+                distance = delta+distance;
+			
+			else 
+				ReverseChange(Arr[0], Arr[1], Arr[2]);
+        }
+        
+		// Cooling process on every iteration
+        temperature *= alpha;
+    }
+	
+}
+
+function RandomChange() { // Make a random change, must return ID_Compo, x and y.
+	// Random component ID
+	var RandomID = Math.floor((Math.random() * Components[0] + 1)); 
+	
+	// Get x and y of this component
+	var x = Components[RandomID][6].x() / 100;
+	var y = Components[RandomID][6].y() / 100;
+	// --
+	
+	// Random axis (x or y) and gain (-1 or 1)
+	var axis = Math.floor((Math.random() * 2) + 1);
+	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
+	
+	if (axis == 1) { // axis : x
+		if (Grid[x + gain][y] == 0) {
+			MoveToGrid(Components[RandomID][6], x + gain, y);
+
+			Grid[x][y] = 0;				
+			Grid[x + gain][y] = 1; 				
+		}
+	}
+	
+	else { // axis : y
+		if (Grid[x][y + gain] == 0) {
+			MoveToGrid(Components[RandomID][6], x, y + gain);
+
+			Grid[x][y] = 0;				
+			Grid[x][y + gain] = 1; 				
+		}	
+	}
+	
+	return [RandomID, x, y];
+}
+
+function ReverseChange(ID, x, y) {
+	Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
+	Grid[x][y] = 1;
+	MoveToGrid(Components[ID][6], x, y);
+}
+
+function CenterComponents() {
+	var MaxLeft = 0;
+	var MaxHeight = 0;
+	
+	var i = 0;
+	
+	var x = 0;
+	var y = 0;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		if (i == 1) {
+			MaxLeft = Components[i][6].x();
+			MaxHeight = Components[i][6].y();
+		}
+		
+		x = Components[i][6].x();
+		y = Components[i][6].y();
+		
+		if (MaxLeft > x) {
+			MaxLeft = x;
+		}
+		if (MaxHeight < y) {
+			MaxHeight = y;
+		}
+	}
+	
+	for (i = 1; i <= Constants[0]; i++) {
+		x = Constants[i][1].x();
+		y = Constants[i][1].y();
+		
+		if (MaxLeft > x) {
+			MaxLeft = x;
+		}
+		if (MaxHeight < y) {
+			MaxHeight = y;
+		}
+	}
+	
+	x = x / 100;
+	y = y / 100;
+
+	for (i = 1; i <= Components[0]; i++) {
+		MoveToGrid(Components[i][6], Components[i][6].x()/100 - x + 2, Components[i][6].y()/100 - y + 2);
+	}
+	
+	for (i = 1; i <= Constants[0]; i++) {
+		MoveToGrid(Constants[i][1], Constants[i][1].x()/100 - x + 2, Constants[i][1].y()/100 - y + 2);
+	}
+}
+
+function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') correctly (under the schematic).
+	var i = 0;
+	
+	var max_left = 0;
+	var max_right = 0;
+	var max_height = 0;
+	
+	var resultx = 0;
+	var resulty = 0;
+	
+	var Offset = +150;
+	
+	for (i = 1; i <= Components[0]; i++) { // Components (IO + Cells)
+		if (i == 1) {
+			max_left = Components[1][6].x();
+			max_right = max_left;
+			max_height = Components[1][6].y();
+		}
+		
+		else {
+			if (max_left > Components[i][6].x()) {
+				max_left = Components[i][6].x();
+			}
+			
+			if (max_right < Components[i][6].x()) {
+				max_right = Components[i][6].x();
+			}
+			
+			if (max_height < Components[i][6].y()) {
+				max_height = Components[i][6].y();
+			}
+		}
+	}
+	
+	for (i = 1; i <= Constants[0]; i++) { // Constants
+		if (max_left > Constants[i][1].x()) {
+			max_left = Constants[i][1].x();
+		}
+		
+		if (max_right < Constants[i][1].x()) {
+			max_right = Constants[i][1].x();
+		}
+		
+		if (max_height < Constants[i][1].y()) {
+			max_height = Constants[i][1].y();
+		}
+	}
+	
+	resultx = (max_right + max_left) / 2;
+	resulty = max_height  + Offset;
+	
+	MoveGateXY(CircuitInfo[4], resultx, resulty);
+	
+	return 1;
+}
+
+function MoveGateXY(gate, x, y) {
+	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
+	
+	gate.x(x);
+	gate.y(y);
+	
+	return 1;
+}
+
+function MoveToGrid(gate, x, y) {
+	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
+	
+	MoveGateXY(gate, x * 100, y * 100);
+	
+	return 1;
+}
+// --
+
+// Wires
 function GenerateAllWires(draw, Gate_Norme) { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
 	var i = 0, n = 0, k = 0, v = 0; // loops index
 	
@@ -654,45 +951,24 @@ function GenerateOneWire(xa, xb, ya, yb) {
 	return wire;
 }	
 
-function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
-	var GateNumber = -1; // -1 is undefined here
-	
-	switch (GateString) {
-		case '$_NOT_':
-			GateNumber = 3;
-		break;
-		case '$_AND_':
-			GateNumber = 4;
-		break;
-		case '$_OR_':
-			GateNumber = 5;
-		break;
-		case '$_XOR_':
-			GateNumber = 6;
-		break;
-		case '$_DFF_P_':
-			GateNumber = 7;
-		break;
-		case '$_MUX_':
-			GateNumber = 8;
-		break;
-		case '$_DLATCH_P_':
-			GateNumber = 9;
-		break;
-	}
-	
-	return GateNumber;
-}
-
-function RemoveAllGates() {
+function RemoveAllWires() {
 	var i = 0;
 	
-	for (i = 1; i <= Components[0]; i++) { // Remove componants
-		if (typeof Components[i][6] != 'undefined')
-			Components[i][6] = Components[i][6].remove();
-	}
+	for (i = 1; i <= Wires[0]; i++)
+		Wires[i].remove();
+	
+	Wires[0] = 0;
+}
 
-
+function GetWiresLength() {
+	var i = 0;
+	var TotalLength = 0;
+	
+		
+	for (i = 1; i <= Wires[0]; i++)
+		TotalLength += WireLength[i];
+	
+	return TotalLength;
 }
 
 function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the connection point
@@ -739,7 +1015,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;
 				}
 				else {
-					Varx = 74;
+					Varx = 79;
 					Vary = 50;	
 				}
 			}
@@ -897,258 +1173,7 @@ function GetConnectionType(Component_ID) {
 		
 	return type;
 }
-
-function RemoveAllWires() {
-	var i = 0;
-	
-	for (i = 1; i <= Wires[0]; i++)
-		Wires[i].remove();
-	
-	Wires[0] = 0;
-}
-
-function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
-	return Object.prototype.toString.apply(obj) === "[object Array]";
-}
-
-function log(str) {
-	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
-
-	var textarea = document.getElementById('console');
-	textarea.scrollTop = textarea.scrollHeight;
-}
-
-function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
-	var i = 0;
-	
-	var x = 0;
-	var y = 0;
-	
-	for (i = 1; i <= Components[0]; i++) {
-		// Save coords
-		x = Components[i][6].x() / 100;
-		y = Components[i][6].y() / 100;
-		
-		// Remove the SVG component and then remake it.
-		Components[i][6].remove();
-		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
-	
-		// Replace the component
-		MoveToGrid(Components[i][6], x, y);
-	}
-	
-	RemoveAllWires();
-}
-
-function GetWiresLength() {
-	var i = 0;
-	var TotalLength = 0;
-	
-		
-	for (i = 1; i <= Wires[0]; i++)
-		TotalLength += WireLength[i];
-	
-	return TotalLength;
-}
-
-function MoveGateXY(gate, x, y) {
-	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
-	
-	gate.x(x);
-	gate.y(y);
-	
-	return 1;
-}
-
-function MoveToGrid(gate, x, y) {
-	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
-	
-	MoveGateXY(gate, x * 100, y * 100);
-	
-	return 1;
-}
-
-function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') correctly (under the schematic).
-	var i = 0;
-	
-	var max_left = 0;
-	var max_right = 0;
-	var max_height = 0;
-	
-	var resultx = 0;
-	var resulty = 0;
-	
-	var Offset = +150;
-	
-	for (i = 1; i <= Components[0]; i++) { // Components (IO + Cells)
-		if (i == 1) {
-			max_left = Components[1][6].x();
-			max_right = max_left;
-			max_height = Components[1][6].y();
-		}
-		
-		else {
-			if (max_left > Components[i][6].x()) {
-				max_left = Components[i][6].x();
-			}
-			
-			if (max_right < Components[i][6].x()) {
-				max_right = Components[i][6].x();
-			}
-			
-			if (max_height < Components[i][6].y()) {
-				max_height = Components[i][6].y();
-			}
-		}
-	}
-	
-	for (i = 1; i <= Constants[0]; i++) { // Constants
-		if (max_left > Constants[i][1].x()) {
-			max_left = Constants[i][1].x();
-		}
-		
-		if (max_right < Constants[i][1].x()) {
-			max_right = Constants[i][1].x();
-		}
-		
-		if (max_height < Constants[i][1].y()) {
-			max_height = Constants[i][1].y();
-		}
-	}
-	
-	resultx = (max_right + max_left) / 2;
-	resulty = max_height  + Offset;
-	
-	MoveGateXY(CircuitInfo[4], resultx, resulty);
-	
-	return 1;
-}
-
-function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
-    var iteration = 0;
-    var proba;
-    var alpha =0.999;
-    var temperature = 400.0;
-    var epsilon = 0.001;
-    var delta;
-	var i = 0;
-	var j = 0;
-	var Arr;
-
-	// Init components positions
-	for (i = 1; i <= Components[0]; i++) {
-		Grid[5][i] = 1;
-		MoveToGrid(Components[i][6], 5, i);
-	}
-	/*
-	for (i, n = 1; n <= Constants[0]; i++, n++) {
-		Grid[5][i] = 1;
-		MoveToGrid(Constants[n][1], 5, i);
-	}*/
-	
-	GenerateAllWires(draw, Gate_Norm);
-	
-    var distance = GetWiresLength();
-
-    // While the temperature did not reach epsilon
-    while(temperature > epsilon) {
-        iteration++;
-    
-		// Make a random change
-        Arr = RandomChange();
-		GenerateAllWires(draw, 0);
-		
-		// Get the new delta
-        delta = GetWiresLength() - distance;
-		
-        if(delta < 0)
-            distance = delta + distance;
-        
-		else {
-            proba = Math.random();
-
-            if(proba < Math.exp(-delta/temperature))
-                distance = delta+distance;
-			
-			else 
-				ReverseChange(Arr[0], Arr[1], Arr[2]);
-        }
-        
-		// Cooling process on every iteration
-        temperature *= alpha;
-    }
-	
-}
-
-function RandomChange() { // Make a random change, must return ID_Compo, x and y.
-	// Random component ID
-	var RandomID = Math.floor((Math.random() * Components[0] + 1)); 
-	
-	// Get x and y of this component
-	var x = Components[RandomID][6].x() / 100;
-	var y = Components[RandomID][6].y() / 100;
-	// --
-	
-	// Random axis (x or y) and gain (-1 or 1)
-	var axis = Math.floor((Math.random() * 2) + 1);
-	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
-	
-	if (axis == 1) { // axis : x
-		if (Grid[x + gain][y] == 0) {
-			MoveToGrid(Components[RandomID][6], x + gain, y);
-
-			Grid[x][y] = 0;				
-			Grid[x + gain][y] = 1; 				
-		}
-	}
-	
-	else { // axis : y
-		if (Grid[x][y + gain] == 0) {
-			MoveToGrid(Components[RandomID][6], x, y + gain);
-
-			Grid[x][y] = 0;				
-			Grid[x][y + gain] = 1; 				
-		}	
-	}
-	
-	return [RandomID, x, y];
-}
-
-function ReverseChange(ID, x, y) {
-	Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
-	Grid[x][y] = 1;
-	MoveToGrid(Components[ID][6], x, y);
-}
-
-function CheckVerilogError(str) {
-
-	// Remove old panel and error sign
-	myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
-	panels[BotPanelID].clear();
-	
-	if (str.indexOf("ERROR") == 0) { // Error in the Verilog code
-		var lineNumber = str.match(/\d+/)[0];
-		
-		// Gutter note (Error sign)
-		myCodeMirror.setGutterMarker(Number(lineNumber) - 1, "note-gutter", CreateErrorSign());
-		ErrorLine = lineNumber;
-		
-		// Make a new panel containing the error msg
-		BotPanelID = addPanel("bottom", str);
-
-		return lineNumber;
-	}
-	
-	else // No errors
-		return 0;
-}
-
-function CreateErrorSign() {
-	var image = document.createElement("img");
-	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII="
-
-	return image;
-}
+// --
 
 // Panels
 function makePanel(where, str) {
@@ -1186,36 +1211,28 @@ function replacePanel(PanelID) {
 }
 // --
 
-function CenterComponents() {
-	var MaxLeft = 0;
-	var MaxHeight = 0;
+function CheckVerilogError(str) {
+	if (str.indexOf("ERROR") == 0) // Error in the Verilog code
+		return str.match(/\d+/)[0];
 	
-	var i = 0;
-	
-	var x = 0;
-	var y = 0;
-	
-	for (i = 1; i <= Components[0]; i++) {
-		if (i == 1) {
-			MaxLeft = Components[i][6].x();
-			MaxHeight = Components[i][6].y();
-		}
-		
-		x = Components[i][6].x();
-		y = Components[i][6].y();
-		
-		if (MaxLeft > x) {
-			MaxLeft = x;
-		}
-		if (MaxHeight < y) {
-			MaxHeight = y;
-		}
-	}
-	
-	x = x / 100;
-	y = y / 100;
+	else // No errors
+		return 0;
+}
 
-	for (i = 1; i <= Components[0]; i++) {
-		MoveToGrid(Components[i][6], Components[i][6].x()/100 - x + 2, Components[i][6].y()/100 - y + 2);
-	}
+function CreateErrorSign() {
+	var image = document.createElement("img");
+	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII="
+
+	return image;
+}
+
+function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
+	return Object.prototype.toString.apply(obj) === "[object Array]";
+}
+
+function log(str) {
+	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
+
+	var textarea = document.getElementById('console');
+	textarea.scrollTop = textarea.scrollHeight;
 }
