@@ -207,7 +207,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 	var group = draw.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	var MAXX = 5000, MAXY = 5000;
 	
-	if (Gate_Type < 0 || Gate_Type > 9) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF_P, 8 == MUX, 9 == DFF_N
+	if (Gate_Type < 0 || Gate_Type > 13) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF_P, 8 == MUX, 9 == DFF_N, 10 == DFF_NNX, 11 == DFF_NPX, 12 == DFF_PNX, 13 == DFF_PPX
 		return -1;
 	
 	if (typeof Label == 'undefined')
@@ -510,6 +510,138 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 			
 		break;
+		case 10: // DFF_NNX
+			if (Gate_Norm == 0 || Gate_Norm == 1) {
+				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.rect(60, 80).center(50, 50); // The main rect
+				group.path('m 10,20 10,0'); // symboles de connections (D)
+				group.path('m 10,65 10,0'); // (clk)
+				group.path('m 10,80 10,0'); // (RST)
+				group.path('m 80,20 10,0'); // (Q)
+				group.circle(7).center(16, 65); // clk
+				group.circle(7).center(16, 80); // RST
+				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					group.add(text);
+				}
+				
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+				group.add(text4);
+			}
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+		
+			group.dragmove = function() {
+				GenerateAllWires(draw, Gate_Norm);
+			}
+			
+		break;
+		case 11: // DFF_NPX
+			if (Gate_Norm == 0 || Gate_Norm == 1) {
+				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.rect(60, 80).center(50, 50); // The main rect
+				group.path('m 10,20 10,0'); // symboles de connections (D)
+				group.path('m 10,65 10,0'); // (clk)
+				group.path('m 10,80 10,0'); // (RST)
+				group.path('m 80,20 10,0'); // (Q)
+				group.circle(7).center(16, 65); // clk
+				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					group.add(text);
+				}
+				
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+				group.add(text4);
+			}
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+		
+			group.dragmove = function() {
+				GenerateAllWires(draw, Gate_Norm);
+			}
+			
+		break;
+		case 12: // DFF_PNX
+			if (Gate_Norm == 0 || Gate_Norm == 1) {
+				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.rect(60, 80).center(50, 50); // The main rect
+				group.path('m 10,20 10,0'); // symboles de connections (D)
+				group.path('m 10,65 10,0'); // (clk)
+				group.path('m 10,80 10,0'); // (RST)
+				group.path('m 80,20 10,0'); // (Q)
+				group.circle(7).center(16, 80); // RST
+				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					group.add(text);
+				}
+				
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+				group.add(text4);
+			}
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+		
+			group.dragmove = function() {
+				GenerateAllWires(draw, Gate_Norm);
+			}
+			
+		break;
+		case 13: // DFF_PPX
+			if (Gate_Norm == 0 || Gate_Norm == 1) {
+				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+				
+				group.rect(60, 80).center(50, 50); // The main rect
+				group.path('m 10,20 10,0'); // symboles de connections (D)
+				group.path('m 10,65 10,0'); // (clk)
+				group.path('m 10,80 10,0'); // (RST)
+				group.path('m 80,20 10,0'); // (Q)
+				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
+				
+				if(!hide_label) {
+					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					group.add(text);
+				}
+				
+				group.add(text1);
+				group.add(text2);
+				group.add(text3);
+				group.add(text4);
+			}
+			
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+		
+			group.dragmove = function() {
+				GenerateAllWires(draw, Gate_Norm);
+			}
+			
+		break;
 		default: // Error
 			return -1;
 		break;
@@ -546,6 +678,30 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 		break;
 		case '$_DFF_N_':
 			GateNumber = 9;
+		break;
+		case '$_DFF_NN0_':
+			GateNumber = 10;
+		break;
+		case '$_DFF_NN1_':
+			GateNumber = 10;
+		break;
+		case '$_DFF_NP0_':
+			GateNumber = 11;
+		break;
+		case '$_DFF_NP1_':
+			GateNumber = 11;
+		break;
+		case '$_DFF_PN0_':
+			GateNumber = 12;
+		break;
+		case '$_DFF_PN1_':
+			GateNumber = 12;
+		break;
+		case '$_DFF_PP0_':
+			GateNumber = 13;
+		break;
+		case '$_DFF_PP1_':
+			GateNumber = 13;
 		break;
 		/*
 		case '$_DLATCH_P_':
@@ -1252,6 +1408,78 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			else { // Q
 				Varx = 90;
 				Vary = 20;	
+			}
+		break;
+		case 10: // DFF_NNX
+			if (IO_Name === 'C') { // clock
+				Varx = 10;
+				Vary = 65;
+			}
+			else if (IO_Name === 'D') { // D
+				Varx = 10;
+				Vary = 20;	
+			}
+			else if (IO_Name === 'Q') { // Q
+				Varx = 90;
+				Vary = 20;	
+			}
+			else { // R
+				Varx = 10;
+				Vary = 80;
+			}
+		break;
+		case 11: // DFF_NPX
+			if (IO_Name === 'C') { // clock
+				Varx = 10;
+				Vary = 65;
+			}
+			else if (IO_Name === 'D') { // D
+				Varx = 10;
+				Vary = 20;	
+			}
+			else if (IO_Name === 'Q') { // Q
+				Varx = 90;
+				Vary = 20;	
+			}
+			else { // R
+				Varx = 10;
+				Vary = 80;
+			}
+		break;
+		case 12: // DFF_PNX
+			if (IO_Name === 'C') { // clock
+				Varx = 10;
+				Vary = 65;
+			}
+			else if (IO_Name === 'D') { // D
+				Varx = 10;
+				Vary = 20;	
+			}
+			else if (IO_Name === 'Q') { // Q
+				Varx = 90;
+				Vary = 20;	
+			}
+			else { // R
+				Varx = 10;
+				Vary = 80;
+			}
+		break;
+		case 13: // DFF_PPX
+			if (IO_Name === 'C') { // clock
+				Varx = 10;
+				Vary = 65;
+			}
+			else if (IO_Name === 'D') { // D
+				Varx = 10;
+				Vary = 20;	
+			}
+			else if (IO_Name === 'Q') { // Q
+				Varx = 90;
+				Vary = 20;	
+			}
+			else { // R
+				Varx = 10;
+				Vary = 80;
 			}
 		break;
 		default:
