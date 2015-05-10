@@ -7,36 +7,36 @@
 // Initial configuration
 function Init() {
 	// Init CircuitInfo
-	CircuitInfo[0] = 0;
-	CircuitInfo[1] = 0;
-	CircuitInfo[2] = "Default Name"
-	CircuitInfo[3] = "Default Creator"
-	if (typeof CircuitInfo[4] != 'undefined')
-		CircuitInfo[4].remove();
+	this.CircuitInfo[0] = 0;
+	this.CircuitInfo[1] = 0;
+	this.CircuitInfo[2] = "Default Name"
+	this.CircuitInfo[3] = "Default Creator"
+	if (typeof this.CircuitInfo[4] != 'undefined')
+		this.CircuitInfo[4].remove();
 	// --
 	
-	RemoveAllGates();
-	RemoveAllWires();
+	RemoveAllGates.call(this);
+	RemoveAllWires.call(this);
 	
 	// Remove Netlist
-	for (i = 1, n = 1; n <= NetList[0]; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			delete NetList[i];
+	for (i = 1, n = 1; n <= this.NetList[0]; i++) {
+		if (typeof this.NetList[i] != 'undefined') {
+			delete this.NetList[i];
 			n++;
 		}
 	} 
 	// --
 	
 	// Remove Constants
-	for (i = 1; i <= Constants[0]; i++) {
-		Constants[i][1].remove();
+	for (i = 1; i <= this.Constants[0]; i++) {
+		this.Constants[i][1].remove();
 	}
 	// --
 	
 	// Reset vars
-	Components[0] = 0; // Init components to 0
-	NetList[0] = 0; // Init links to 0
-	Constants[0] = 0;
+	this.Components[0] = 0; // Init components to 0
+	this.NetList[0] = 0; // Init links to 0
+	this.Constants[0] = 0;
 	// --
 	
 	return 1;
@@ -52,8 +52,9 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	
 	var i = 0, n = 0, k = 0, l = 0; // loops counters
 	// ---
-	
-	Init();
+
+	Init.call(this); 
+
 	
 	Circuit_Name = Object.keys(json_yosysJS.modules); // example : 'up3down5', 'DCF77_CIRCUIT', '4 BIT COUNTER', ..
 	
@@ -61,13 +62,13 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	io_names = Object.keys(json_yosysJS.modules[Circuit_Name].ports);
 	
 	for (i in io_names) {
-		Components[0]++;
-		Components[Components[0]] = new Array();
+		this.Components[0]++;
+		this.Components[this.Components[0]] = new Array();
 		
 		// Component related : done
-		Components[Components[0]][0] = io_names[i]; // label
-		Components[Components[0]][1] = (json_yosysJS.modules[Circuit_Name].ports[io_names[i]].direction === 'input') ? 0 : 1;
-		Components[Components[0]][2] = 1; // Show label of I/O by default
+		this.Components[this.Components[0]][0] = io_names[i]; // label
+		this.Components[this.Components[0]][1] = (json_yosysJS.modules[Circuit_Name].ports[io_names[i]].direction === 'input') ? 0 : 1;
+		this.Components[this.Components[0]][2] = 1; // Show label of I/O by default
 		// --
 		
 		// Netlist related : todo
@@ -78,36 +79,36 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 		for (l = 0; l <= meh2.length - 1; l++) { // bus loop
 			if (typeof meh2[l] == 'string') { // is it a constant ?
 				// On l'ajoute dans le tableau.
-				Constants[0]++;
-				Constants[Constants[0]] = new Array();
-				Constants[Constants[0]][0] = meh2[l]; // Value
-				Constants[Constants[0]][2] = 1 + parseInt(i); // Component id
-				Constants[Constants[0]][3] = 0; // Name of the gate
+				this.Constants[0]++;
+				this.Constants[this.Constants[0]] = new Array();
+				this.Constants[this.Constants[0]][0] = meh2[l]; // Value
+				this.Constants[this.Constants[0]][2] = 1 + parseInt(i); // Component id
+				this.Constants[this.Constants[0]][3] = 0; // Name of the gate
 			}
 			
 			else {
-				if (typeof NetList[meh2[l]] === 'undefined') {
-					NetList[meh2[l]] = new Array();
-					NetList[meh2[l]][0] = 1;
+				if (typeof this.NetList[meh2[l]] === 'undefined') {
+					this.NetList[meh2[l]] = new Array();
+					this.NetList[meh2[l]][0] = 1;
 					
-					NetList[meh2[l]][1] = new Array();
-					NetList[meh2[l]][1][0] = 1 + parseInt(i);
-					NetList[meh2[l]][1][1] = 0;
+					this.NetList[meh2[l]][1] = new Array();
+					this.NetList[meh2[l]][1][0] = 1 + parseInt(i);
+					this.NetList[meh2[l]][1][1] = 0;
 					
-					NetList[meh2[l]][1][2] = 0; // x
-					NetList[meh2[l]][1][3] = 0; // y
-					NetList[0]++;
+					this.NetList[meh2[l]][1][2] = 0; // x
+					this.NetList[meh2[l]][1][3] = 0; // y
+					this.NetList[0]++;
 				}
 				
 				else {
-					NetList[meh2[l]][0]++;
-					NetList[meh2[l]][NetList[meh2[l]][0]] = new Array();
+					this.NetList[meh2[l]][0]++;
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]] = new Array();
 					
-					NetList[meh2[l]][NetList[meh2[l]][0]][0] = 1 + parseInt(i);
-					NetList[meh2[l]][NetList[meh2[l]][0]][1] = 0;
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][0] = 1 + parseInt(i);
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][1] = 0;
 					
-					NetList[meh2[l]][NetList[meh2[l]][0]][2] = 0; // x
-					NetList[meh2[l]][NetList[meh2[l]][0]][3] = 0; // y
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][2] = 0; // x
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][3] = 0; // y
 				}
 			}
 		}
@@ -119,13 +120,13 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	cells_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells);
 	
 	for (n in cells_name) {
-		Components[0]++;
-		Components[Components[0]] = new Array();
+		this.Components[0]++;
+		this.Components[this.Components[0]] = new Array();
 		
 		// Component related : ok
-		Components[Components[0]][0] = cells_name[n]; // label
-		Components[Components[0]][1] = GateToEqNumber(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].type);
-		Components[Components[0]][2] = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].hide_name;
+		this.Components[this.Components[0]][0] = cells_name[n]; // label
+		this.Components[this.Components[0]][1] = GateToEqNumber(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].type);
+		this.Components[this.Components[0]][2] = json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].hide_name;
 		// --
 		// Netlist related : ok
 		cell_io_name = Object.keys(json_yosysJS.modules[Circuit_Name].cells[cells_name[n]].connections);
@@ -135,33 +136,33 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 			//document.write('<br /> -- ' + meh[0] + '<br />');
 			//document.write('<hr>' + typeof meh[0] + '<hr>');
 			if (typeof meh[0] === 'string') { // is it a constant ?
-				Constants[0]++;
-				Constants[Constants[0]] = new Array();
-				Constants[Constants[0]][0] = meh[0]; // Value
-				Constants[Constants[0]][2] = 2 + parseInt(i) + parseInt(n); // Component id
-				Constants[Constants[0]][3] = cell_io_name[k]; // Name of the gate
+				this.Constants[0]++;
+				this.Constants[this.Constants[0]] = new Array();
+				this.Constants[this.Constants[0]][0] = meh[0]; // Value
+				this.Constants[this.Constants[0]][2] = 2 + parseInt(i) + parseInt(n); // Component id
+				this.Constants[this.Constants[0]][3] = cell_io_name[k]; // Name of the gate
 			}
 			
-			else if (!isArray(NetList[meh])) {
-				NetList[meh] = new Array();
-				NetList[meh][0] = 1;
-				NetList[meh][1] = new Array();
-				NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
-				NetList[meh][1][1] = cell_io_name[k];
+			else if (!isArray(this.NetList[meh])) {
+				this.NetList[meh] = new Array();
+				this.NetList[meh][0] = 1;
+				this.NetList[meh][1] = new Array();
+				this.NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
+				this.NetList[meh][1][1] = cell_io_name[k];
 				
-				NetList[meh][1][2] = 0; // x
-				NetList[meh][1][3] = 0; // y
-				NetList[0]++;
+				this.NetList[meh][1][2] = 0; // x
+				this.NetList[meh][1][3] = 0; // y
+				this.NetList[0]++;
 			}
 		
 			else  {
-				NetList[meh][0]++;
-				NetList[meh][NetList[meh][0]] = new Array();
-				NetList[meh][NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
-				NetList[meh][NetList[meh][0]][1] = cell_io_name[k];
+				this.NetList[meh][0]++;
+				this.NetList[meh][this.NetList[meh][0]] = new Array();
+				this.NetList[meh][this.NetList[meh][0]][0] = parseInt(n) + parseInt(i) + 2;
+				this.NetList[meh][this.NetList[meh][0]][1] = cell_io_name[k];
 				
-				NetList[meh][NetList[meh][0]][2] = 0; // x
-				NetList[meh][NetList[meh][0]][3] = 0; // y
+				this.NetList[meh][this.NetList[meh][0]][2] = 0; // x
+				this.NetList[meh][this.NetList[meh][0]][3] = 0; // y
 			}							
 		
 
@@ -169,8 +170,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	}
 	// ---
 	
-	CircuitInfo[2] = String(Circuit_Name);
-	CircuitInfo[3] = json_yosysJS.creator;
+	this.CircuitInfo[2] = String(Circuit_Name);
+	this.CircuitInfo[3] = json_yosysJS.creator;
 	
 	//document.write('Nbr ' + Constants[0]);
 	
@@ -190,17 +191,17 @@ function CheckVerilogError(str) {
 function GenerateAllGates(SVG_Element, Gate_Type) {
 	var i = 0;
 	
-	RemoveAllGates();
+	RemoveAllGates.call(this);
 	
-	for (i = 1; i <= Components[0]; i++) // IO + Cells
-		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+	for (i = 1; i <= this.Components[0]; i++) // IO + Cells
+		this.Components[i][6] = GenerateGate.call(this, SVG_Element, this.Components[i][1], this.Components[i][0], Gate_Type, this.Components[i][2]);
 	
-	for (i = 1; i <= Constants[0]; i++) { // Constants
-		Constants[i][1] = GenerateGate(SVG_Element, 0, Constants[i][0], 0, 0);
+	for (i = 1; i <= this.Constants[0]; i++) { // Constants
+		this.Constants[i][1] = GenerateGate.call(this, SVG_Element, 0, this.Constants[i][0], 0, 0);
 	}
 
-	CircuitInfo[4] = SVG_Element.text('Circuit : ' + CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
-	nodes.add(CircuitInfo[4]); // Circuit name is in the spannable and zoomable
+	this.CircuitInfo[4] = SVG_Element.text('Circuit : ' + this.CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
+	nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
@@ -214,12 +215,14 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		Label = 'Default gate name';
 		
 	if (typeof Gate_Norm == 'undefined')
-		Gate_Norm = 0; // Distinctive shape by default
+		Gate_Norm = 0; // Distinctive shape by default 
+	
+	var obj = this;
 
 	switch(Gate_Type) {
 		case 0: // Input
 			rect = draw.rect(60, 10).center(50, 50);
-			text = SVG_Element.plain(Label).x(20).y(30).stroke({ width: 0.1 }).fill('#000');
+			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 80,50 10,0');
 			
@@ -229,12 +232,12 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 		break;
 		case 1: // Output
 			rect = draw.rect(60, 10).center(50, 50);
-			text = SVG_Element.plain(Label).x(20).y(30).stroke({ width: 0.1 }).fill('#000');
+			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 11,50 10,0');
 			
@@ -244,7 +247,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 		break;
 		case 2: // YES
@@ -277,7 +280,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 		break;
 		case 3: // NOT
@@ -312,7 +315,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 		break;			
 		case 4: // AND
@@ -346,7 +349,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}		
 		break;		
 		case 5: // OR
@@ -380,7 +383,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -416,7 +419,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -445,7 +448,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -476,7 +479,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -506,7 +509,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -540,7 +543,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -573,7 +576,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -606,7 +609,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -638,7 +641,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires(draw, Gate_Norm);
+				GenerateAllWires.call(obj, draw, Gate_Norm);
 			}
 			
 		break;
@@ -716,9 +719,9 @@ function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input :
 function RemoveAllGates() {
 	var i = 0;
 	
-	for (i = 1; i <= Components[0]; i++) { // Remove componants
-		if (typeof Components[i][6] != 'undefined')
-			Components[i][6] = Components[i][6].remove();
+	for (i = 1; i <= this.Components[0]; i++) { // Remove componants
+		if (typeof this.Components[i][6] != 'undefined')
+			this.Components[i][6] = this.Components[i][6].remove();
 	}
 
 
@@ -730,20 +733,20 @@ function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e.
 	var x = 0;
 	var y = 0;
 	
-	for (i = 1; i <= Components[0]; i++) {
+	for (i = 1; i <= this.Components[0]; i++) {
 		// Save coords
-		x = Components[i][6].x() / 100;
-		y = Components[i][6].y() / 100;
+		x = this.Components[i][6].x() / 100;
+		y = this.Components[i][6].y() / 100;
 		
 		// Remove the SVG component and then remake it.
-		Components[i][6].remove();
-		Components[i][6] = GenerateGate(SVG_Element, Components[i][1], Components[i][0], Gate_Type, Components[i][2]);
+		this.Components[i][6].remove();
+		this.Components[i][6] = GenerateGate.call(this, SVG_Element, this.Components[i][1], this.Components[i][0], Gate_Type, this.Components[i][2]);
 	
 		// Replace the component
-		MoveToGrid(Components[i][6], x, y);
+		MoveToGrid(this.Components[i][6], x, y);
 	}
 	
-	RemoveAllWires();
+	RemoveAllWires.call(this);
 }
 // --
 
@@ -760,30 +763,30 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 	var Arr;
 
 	// Init components positions
-	for (i = 1; i <= Components[0]; i++) {
-		Grid[5][i] = 1;
-		MoveToGrid(Components[i][6], 5, i);
+	for (i = 1; i <= this.Components[0]; i++) {
+		this.Grid[5][i] = 1;
+		MoveToGrid(this.Components[i][6], 5, i);
 	}
 	
-	for (i, n = 1; n <= Constants[0]; i++, n++) {
-		Grid[5][i] = 1;
-		MoveToGrid(Constants[n][1], 5, i);
+	for (i, n = 1; n <= this.Constants[0]; i++, n++) {
+		this.Grid[5][i] = 1;
+		MoveToGrid(this.Constants[n][1], 5, i);
 	}
 	
-	GenerateAllWires(draw, Gate_Norm);
+	GenerateAllWires.call(this, draw, Gate_Norm);
 	
-    var distance = GetWiresLength();
+    var distance = GetWiresLength.call(this);
 
     // While the temperature did not reach epsilon
     while (temperature > epsilon) {
         iteration++;
     
 		// Make a random change
-        Arr = RandomChange();
-		GenerateAllWires(draw, 0);
+        Arr = RandomChange.call(this);
+		GenerateAllWires.call(this, draw, 0);
 		
 		// Get the new delta
-        delta = GetWiresLength() - distance;
+        delta = GetWiresLength.call(this) - distance;
 		
         if(delta < 0)
             distance = delta + distance;
@@ -792,10 +795,10 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
             proba = Math.random();
 
             if(proba < Math.exp(-delta/temperature))
-                distance = delta+distance;
+                distance = delta + distance;
 			
 			else 
-				ReverseChange(Arr[0], Arr[1], Arr[2], Arr[3]);
+				ReverseChange.call(this, Arr[0], Arr[1], Arr[2], Arr[3]);
         }
         
 		// Cooling process on every iteration
@@ -806,17 +809,17 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
 	// Random component ID
-	var RandomID = Math.floor((Math.random() * (Components[0] + Constants[0]) + 1)); 
+	var RandomID = Math.floor((Math.random() * (this.Components[0] + this.Constants[0]) + 1)); 
 
 	var type = 0;
 	
-	if (RandomID > Components[0]) { // Constant
+	if (RandomID > this.Components[0]) { // Constant
 		type = 1;
-		RandomID = RandomID - Components[0];
+		RandomID = RandomID - this.Components[0];
 		
 		// Get x and y of this component
-		var x = Constants[RandomID][1].x() / 100;
-		var y = Constants[RandomID][1].y() / 100;
+		var x = this.Constants[RandomID][1].x() / 100;
+		var y = this.Constants[RandomID][1].y() / 100;
 		// --
 		
 		// Random axis (x or y) and gain (-1 or 1)
@@ -824,28 +827,28 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 		var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
 		
 		if (axis == 1) { // axis : x
-			if (Grid[x + gain][y] == 0) {
-				MoveToGrid(Constants[RandomID][1], x + gain, y);
+			if (this.Grid[x + gain][y] == 0) {
+				MoveToGrid(this.Constants[RandomID][1], x + gain, y);
 
-				Grid[x][y] = 0;				
-				Grid[x + gain][y] = 1; 				
+				this.Grid[x][y] = 0;				
+				this.Grid[x + gain][y] = 1; 				
 			}
 		}
 		
 		else { // axis : y
-			if (Grid[x][y + gain] == 0) {
-				MoveToGrid(Constants[RandomID][1], x, y + gain);
+			if (this.Grid[x][y + gain] == 0) {
+				MoveToGrid(this.Constants[RandomID][1], x, y + gain);
 
-				Grid[x][y] = 0;				
-				Grid[x][y + gain] = 1; 				
+				this.Grid[x][y] = 0;				
+				this.Grid[x][y + gain] = 1; 				
 			}	
 		}
 	}
 	
 	else { // "Real" component
 		// Get x and y of this component
-		var x = Components[RandomID][6].x() / 100;
-		var y = Components[RandomID][6].y() / 100;
+		var x = this.Components[RandomID][6].x() / 100;
+		var y = this.Components[RandomID][6].y() / 100;
 		// --
 		
 		// Random axis (x or y) and gain (-1 or 1)
@@ -853,20 +856,20 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 		var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
 		
 		if (axis == 1) { // axis : x
-			if (Grid[x + gain][y] == 0) {
-				MoveToGrid(Components[RandomID][6], x + gain, y);
+			if (this.Grid[x + gain][y] == 0) {
+				MoveToGrid(this.Components[RandomID][6], x + gain, y);
 
-				Grid[x][y] = 0;				
-				Grid[x + gain][y] = 1; 				
+				this.Grid[x][y] = 0;				
+				this.Grid[x + gain][y] = 1; 				
 			}
 		}
 		
 		else { // axis : y
-			if (Grid[x][y + gain] == 0) {
-				MoveToGrid(Components[RandomID][6], x, y + gain);
+			if (this.Grid[x][y + gain] == 0) {
+				MoveToGrid(this.Components[RandomID][6], x, y + gain);
 
-				Grid[x][y] = 0;				
-				Grid[x][y + gain] = 1; 				
+				this.Grid[x][y] = 0;				
+				this.Grid[x][y + gain] = 1; 				
 			}	
 		}
 	}
@@ -876,15 +879,15 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 
 function ReverseChange(ID, x, y, type) {
 	if (type == 0) {
-		Grid[Components[ID][6].x() / 100][Components[ID][6].y() / 100] = 0;
-		Grid[x][y] = 1;
-		MoveToGrid(Components[ID][6], x, y);
+		this.Grid[this.Components[ID][6].x() / 100][this.Components[ID][6].y() / 100] = 0;
+		this.Grid[x][y] = 1;
+		MoveToGrid(this.Components[ID][6], x, y);
 	}
 	
 	else {
-		Grid[Constants[ID][1].x() / 100][Constants[ID][1].y() / 100] = 0;
-		Grid[x][y] = 1;
-		MoveToGrid(Constants[ID][1], x, y);	
+		this.Grid[this.Constants[ID][1].x() / 100][this.Constants[ID][1].y() / 100] = 0;
+		this.Grid[x][y] = 1;
+		MoveToGrid(this.Constants[ID][1], x, y);	
 	}
 }
 
@@ -897,14 +900,14 @@ function CenterComponents() {
 	var x = 0;
 	var y = 0;
 	
-	for (i = 1; i <= Components[0]; i++) {
+	for (i = 1; i <= this.Components[0]; i++) {
 		if (i == 1) {
-			MaxLeft = Components[i][6].x();
-			MaxHeight = Components[i][6].y();
+			MaxLeft = this.Components[i][6].x();
+			MaxHeight = this.Components[i][6].y();
 		}
 		
-		x = Components[i][6].x();
-		y = Components[i][6].y();
+		x = this.Components[i][6].x();
+		y = this.Components[i][6].y();
 		
 		if (MaxLeft > x) {
 			MaxLeft = x;
@@ -914,9 +917,9 @@ function CenterComponents() {
 		}
 	}
 	
-	for (i = 1; i <= Constants[0]; i++) {
-		x = Constants[i][1].x();
-		y = Constants[i][1].y();
+	for (i = 1; i <= this.Constants[0]; i++) {
+		x = this.Constants[i][1].x();
+		y = this.Constants[i][1].y();
 		
 		if (MaxLeft > x) {
 			MaxLeft = x;
@@ -929,12 +932,12 @@ function CenterComponents() {
 	x = x / 100;
 	y = y / 100;
 
-	for (i = 1; i <= Components[0]; i++) {
-		MoveToGrid(Components[i][6], Components[i][6].x()/100 - x + 2, Components[i][6].y()/100 - y + 2);
+	for (i = 1; i <= this.Components[0]; i++) {
+		MoveToGrid(this.Components[i][6], this.Components[i][6].x()/100 - x + 2, this.Components[i][6].y()/100 - y + 2);
 	}
 	
-	for (i = 1; i <= Constants[0]; i++) {
-		MoveToGrid(Constants[i][1], Constants[i][1].x()/100 - x + 2, Constants[i][1].y()/100 - y + 2);
+	for (i = 1; i <= this.Constants[0]; i++) {
+		MoveToGrid(this.Constants[i][1], this.Constants[i][1].x()/100 - x + 2, this.Constants[i][1].y()/100 - y + 2);
 	}
 }
 
@@ -950,46 +953,46 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	
 	var Offset = +150;
 	
-	for (i = 1; i <= Components[0]; i++) { // Components (IO + Cells)
+	for (i = 1; i <= this.Components[0]; i++) { // this.Components (IO + Cells)
 		if (i == 1) {
-			max_left = Components[1][6].x();
+			max_left = this.Components[1][6].x();
 			max_right = max_left;
-			max_height = Components[1][6].y();
+			max_height = this.Components[1][6].y();
 		}
 		
 		else {
-			if (max_left > Components[i][6].x()) {
-				max_left = Components[i][6].x();
+			if (max_left > this.Components[i][6].x()) {
+				max_left = this.Components[i][6].x();
 			}
 			
-			if (max_right < Components[i][6].x()) {
-				max_right = Components[i][6].x();
+			if (max_right < this.Components[i][6].x()) {
+				max_right = this.Components[i][6].x();
 			}
 			
-			if (max_height < Components[i][6].y()) {
-				max_height = Components[i][6].y();
+			if (max_height < this.Components[i][6].y()) {
+				max_height = this.Components[i][6].y();
 			}
 		}
 	}
 	
-	for (i = 1; i <= Constants[0]; i++) { // Constants
-		if (max_left > Constants[i][1].x()) {
-			max_left = Constants[i][1].x();
+	for (i = 1; i <= this.Constants[0]; i++) { // Constants
+		if (max_left > this.Constants[i][1].x()) {
+			max_left = this.Constants[i][1].x();
 		}
 		
-		if (max_right < Constants[i][1].x()) {
-			max_right = Constants[i][1].x();
+		if (max_right < this.Constants[i][1].x()) {
+			max_right = this.Constants[i][1].x();
 		}
 		
-		if (max_height < Constants[i][1].y()) {
-			max_height = Constants[i][1].y();
+		if (max_height < this.Constants[i][1].y()) {
+			max_height = this.Constants[i][1].y();
 		}
 	}
 	
 	resultx = (max_right + max_left) / 2;
 	resulty = max_height  + Offset;
 	
-	MoveGateXY(CircuitInfo[4], resultx, resulty);
+	MoveGateXY(this.CircuitInfo[4], resultx, resulty);
 	
 	return 1;
 }
@@ -1020,34 +1023,34 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 	var Offset1 = 0, Offset2 = 0; // Points offset (see function GetOffset)
 
 	// 1. Removing "old" wires
-	for (i = 1; i <= Wires[0]; i++) {
-		Wires[i].remove();
-		WireLength[i] = 0;
+	for (i = 1; i <= this.Wires[0]; i++) {
+		this.Wires[i].remove();
+		this.WireLength[i] = 0;
 	}
 	
-	Wires[0] = 0;
+	this.Wires[0] = 0;
 
 	// 2. Making new wires
-	for (i = 1, n = 1; (n - v) <= NetList[0] && i <= 300; i++) {
+	for (i = 1, n = 1; (n - v) <= this.NetList[0] && i <= 300; i++) {
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
-		if (typeof NetList[i] != 'undefined') {
-			if (NetList[i][0] == 2) { // Only two components on the same line.
-				Offset1 = GetOffset(Components[NetList[i][1][0]][1], NetList[i][1][1], Gate_Norme);
-				Offset2 = GetOffset(Components[NetList[i][2][0]][1], NetList[i][2][1], Gate_Norme);
+		if (typeof this.NetList[i] != 'undefined') {
+			if (this.NetList[i][0] == 2) { // Only two this.Components on the same line.
+				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1], Gate_Norme);
+				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1], Gate_Norme);
 
-				xa = Components[NetList[i][1][0]][6].x() + Offset1[0];
-				ya = Components[NetList[i][1][0]][6].y() + Offset1[1];
-				xb = Components[NetList[i][2][0]][6].x() + Offset2[0];
-				yb = Components[NetList[i][2][0]][6].y() + Offset2[1];
+				xa = this.Components[this.NetList[i][1][0]][6].x() + Offset1[0];
+				ya = this.Components[this.NetList[i][1][0]][6].y() + Offset1[1];
+				xb = this.Components[this.NetList[i][2][0]][6].x() + Offset2[0];
+				yb = this.Components[this.NetList[i][2][0]][6].y() + Offset2[1];
 				
-				Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
-				WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+				this.Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
+				this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 				
-				Wires[0]++;
+				this.Wires[0]++;
 				n++;
 			}
 				
-			else { // More than 2 components on the same line.
+			else { // More than 2 this.Components on the same line.
 				// There is 3 mains cases :
 				// Case 1 : One circuit input and the rest is circuit output / cell input
 				// Case 2 : One circuit output and the rest is circuit output / cell input
@@ -1065,8 +1068,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 				
 				var id1 = 0, id2 = 0;
 
-				for (k = 1; k <= NetList[i][0]; k++) { // I count the number of circuit input, circuit output and cell output
-					result = GetConnectionType(NetList[i][k][0]);
+				for (k = 1; k <= this.NetList[i][0]; k++) { // I count the number of circuit input, circuit output and cell output
+					result = GetConnectionType(this.NetList[i][k][0]);
 					if (result == 1) { // input circuit
 						input_circuit_number++;
 						index1 = k;
@@ -1082,24 +1085,24 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 				}
 				
 				if (input_circuit_number >= 1) { // case 1
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the circuit input to the other elements
+					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the circuit input to the other elements
 						if (m != index1) {
-							id1 = NetList[i][m][0];
-							id2 = NetList[i][index1][0];
+							id1 = this.NetList[i][m][0];
+							id2 = this.NetList[i][index1][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index1][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1], Gate_Norme);
 							
-							xa = Components[id1][6].x() + Offset1[0];
-							ya = Components[id1][6].y() + Offset1[1];
+							xa = this.Components[id1][6].x() + Offset1[0];
+							ya = this.Components[id1][6].y() + Offset1[1];
 
-							xb = Components[id2][6].x() + Offset2[0];
-							yb = Components[id2][6].y() + Offset2[1];
+							xb = this.Components[id2][6].x() + Offset2[0];
+							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
-							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
-							Wires[0]++;
+							this.Wires[0]++;
 							n++;
 							v++;
 						}
@@ -1107,24 +1110,24 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 				}
 				
 				else if (output_circuit_number >= 1) { // case 2
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the circuit output to the other elements
+					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the circuit output to the other elements
 						if (m != index2) {
-							id1 = NetList[i][m][0];
-							id2 = NetList[i][index2][0];
+							id1 = this.NetList[i][m][0];
+							id2 = this.NetList[i][index2][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index2][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1], Gate_Norme);
 							
-							xa = Components[id1][6].x() + Offset1[0];
-							ya = Components[id1][6].y() + Offset1[1];
+							xa = this.Components[id1][6].x() + Offset1[0];
+							ya = this.Components[id1][6].y() + Offset1[1];
 
-							xb = Components[id2][6].x() + Offset2[0];
-							yb = Components[id2][6].y() + Offset2[1];
+							xb = this.Components[id2][6].x() + Offset2[0];
+							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
-							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
-							Wires[0]++;
+							this.Wires[0]++;
 							n++;
 							v++;
 						}
@@ -1132,24 +1135,24 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 				}
 				
 				else if (output_cell_number >= 1) { // case 3
-					for (var m = 1; m <= NetList[i][0]; m++) { // I connect the cell output to the other elements
+					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the cell output to the other elements
 						if (m != index3) {
-							id1 = NetList[i][m][0];
-							id2 = NetList[i][index3][0];
+							id1 = this.NetList[i][m][0];
+							id2 = this.NetList[i][index3][0];
 							
-							Offset1 = GetOffset(Components[id1][1], NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(Components[id2][1], NetList[i][index3][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1], Gate_Norme);
 							
-							xa = Components[id1][6].x() + Offset1[0];
-							ya = Components[id1][6].y() + Offset1[1];
+							xa = this.Components[id1][6].x() + Offset1[0];
+							ya = this.Components[id1][6].y() + Offset1[1];
 
-							xb = Components[id2][6].x() + Offset2[0];
-							yb = Components[id2][6].y() + Offset2[1];
+							xb = this.Components[id2][6].x() + Offset2[0];
+							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							Wires[n] = GenerateOneWire(xa, xb, ya, yb);
-							WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
-							Wires[0]++;
+							this.Wires[0]++;
 							n++;
 							v++;
 						}
@@ -1164,26 +1167,26 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 	}
 
 	// 3. Constants
-	for (i = 1; i <= Constants[0]; i++) {
+	for (i = 1; i <= this.Constants[0]; i++) {
 		Offset1 = GetOffset(0, 0);
-		Offset2 = GetOffset(Components[Constants[i][2]][1], Constants[i][3]);
+		Offset2 = GetOffset(this.Components[this.Constants[i][2]][1], this.Constants[i][3]);
 
-		xa = Constants[i][1].x() + Offset1[0];
-		ya = Constants[i][1].y() + Offset1[1];
+		xa = this.Constants[i][1].x() + Offset1[0];
+		ya = this.Constants[i][1].y() + Offset1[1];
 		
-		xb = Components[Constants[i][2]][6].x() + Offset2[0];
-		yb = Components[Constants[i][2]][6].y() + Offset2[1];
+		xb = this.Components[this.Constants[i][2]][6].x() + Offset2[0];
+		yb = this.Components[this.Constants[i][2]][6].y() + Offset2[1];
 		
-		Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
-		WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+		this.Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
+		this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 		
 		n++;
-		Wires[0]++;
+		this.Wires[0]++;
 	}
 	
 	// 4. Add wires to the pannable and zoomable group
-	for (i = 1; i <= Wires[0]; i++) {
-		nodes.add(Wires[i]);
+	for (i = 1; i <= this.Wires[0]; i++) {
+		nodes.add(this.Wires[i]);
 	}
 }
 
@@ -1198,10 +1201,10 @@ function GenerateOneWire(xa, xb, ya, yb) {
 function RemoveAllWires() {
 	var i = 0;
 	
-	for (i = 1; i <= Wires[0]; i++)
-		Wires[i].remove();
+	for (i = 1; i <= this.Wires[0]; i++)
+		this.Wires[i].remove();
 	
-	Wires[0] = 0;
+	this.Wires[0] = 0;
 }
 
 function GetWiresLength() {
@@ -1209,8 +1212,8 @@ function GetWiresLength() {
 	var TotalLength = 0;
 	
 		
-	for (i = 1; i <= Wires[0]; i++)
-		TotalLength += WireLength[i];
+	for (i = 1; i <= this.Wires[0]; i++)
+		TotalLength += this.WireLength[i];
 	
 	return TotalLength;
 }
@@ -1494,8 +1497,8 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 function GetConnectionType(Component_ID) {
 	var type = 0, k = 0;
 	
-	if (Components[Component_ID][1] == 0 || Components[Component_ID][1] == 1) { // Is it an input / output ?
-		type = (Components[Component_ID][1] == 0) ? 1 : 2;
+	if (this.Components[Component_ID][1] == 0 || this.Components[Component_ID][1] == 1) { // Is it an input / output ?
+		type = (this.Components[Component_ID][1] == 0) ? 1 : 2;
 	}
 	
 	else // Else it's a cell.
@@ -1560,3 +1563,81 @@ function log(str) {
 	textarea.scrollTop = textarea.scrollHeight;
 }
 // --
+
+// testing objects
+function Golirev(svg_id) {
+	this.svgjs = SVG(svg_id);
+	
+	this.CircuitInfo = new Array(); // Informations concerning the circuits
+	/*
+	Details about Circuit Info
+	CircuitInfo[0] = rect x of the svg element
+	CircuitInfo[1] = rect y of the svg element
+	CircuitInfo[2] = name of the circuit
+	CircuitInfo[3] = "Creator"
+	CircuitInfo[4] = Text svg element.
+	*/
+
+	this.Components = new Array(); // variable globale
+	/*
+	Details about Components
+	Components[0] = Number of components;
+	Components[Components[0]][0] = Label of component number Components[0]
+	Components[Components[0]][1] = Type of component number Components[0]
+	Components[Components[0]][2] = Hide Label ?
+	Components[Components[0]][3] = Parameters
+	Components[Components[0]][4] = Attributes
+	Components[Components[0]][5] = Connections
+	Components[Components[0]][6] = Svg element
+	*/
+
+	this.NetList = new Array();
+	/*
+	Details about NetList
+	NetList[0] = Number of connections;
+	NetList[n][0] = Number of elements on that connection;
+	NetList[n][1] = Array (First Object)
+			[n][1][0] = ID on the component var;
+			[n][1][1] = Name of the Output;
+			[n][1][2] = OffsetX;
+			[n][1][3] = OffsetY;
+	NetList[n][2] = Array (Second Object)
+	NetList[n][y] = Array (ynd Object)
+	*/
+
+	this.Constants = new Array();
+	/*
+	Details about Constants
+	Constants[0] - Number of constants
+	Constants[n][0] = valeur
+	Constants[n][1] = elem svg
+	Constants[n][2] = id du composant
+	Constants[n][3] = nom de la porte (A/B/Y/S/..)
+	*/
+
+	this.Wires = new Array();
+	this.Wires[0] = 0;
+
+	this.WireLength = new Array();
+
+	this.Grid = new Array();
+	var a, b;
+	for (a = -500; a < 500; a++) {
+		this.Grid[a] = new Array();
+			for (b = -500; b < 500; b++) {
+				this.Grid[a][b] = 0;
+		}
+	}
+
+	this.DisplayJson = ShowJSON;
+	this.ParseJSON = ParseJson;
+}
+
+function ShowJSON(json_object, gate_type) {
+	ParseJson.call(this, json_object);
+	GenerateAllGates.call(this, this.svgjs, gate_type);
+	SimulatedAnnealing.call(this, gate_type);
+	CenterComponents.call(this);
+	GenerateAllWires.call(this, this.svgjs, gate_type);
+	PlaceCircuitName.call(this);
+}
