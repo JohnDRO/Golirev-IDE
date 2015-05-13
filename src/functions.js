@@ -188,23 +188,23 @@ function CheckVerilogError(str) {
 // --
 
 // Components
-function GenerateAllGates(SVG_Element, Gate_Type) {
+function GenerateAllGates() {
 	var i = 0;
 	
 	RemoveAllGates.call(this);
 	
 	for (i = 1; i <= this.Components[0]; i++) // IO + Cells
-		this.Components[i][6] = GenerateGate.call(this, SVG_Element, this.Components[i][1], this.Components[i][0], Gate_Type, this.Components[i][2]);
+		this.Components[i][6] = GenerateGate.call(this, this.Components[i][1], this.Components[i][0], this.Components[i][2]);
 	
 	for (i = 1; i <= this.Constants[0]; i++) { // Constants
-		this.Constants[i][1] = GenerateGate.call(this, SVG_Element, 0, this.Constants[i][0], 0, 0);
+		this.Constants[i][1] = GenerateGate.call(this, 0, this.Constants[i][0], 0);
 	}
 
-	this.CircuitInfo[4] = SVG_Element.text('Circuit : ' + this.CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
+	this.CircuitInfo[4] = this.svgjs.text('Circuit : ' + this.CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
 	this.nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
-function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
+function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and return the svgjs element created.
 	var group = this.svgjs.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	var MAXX = 5000, MAXY = 5000;
 	
@@ -214,15 +214,15 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 	if (typeof Label == 'undefined')
 		Label = 'Default gate name';
 		
-	if (typeof Gate_Norm == 'undefined')
-		Gate_Norm = 0; // Distinctive shape by default 
+	if (typeof this.gate_type == 'undefined')
+		this.gate_type = 0; // Distinctive shape by default 
 	
 	var obj = this;
 
 	switch(Gate_Type) {
 		case 0: // Input
 			rect = this.svgjs.rect(60, 10).center(50, 50);
-			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
+			text = this.svgjs.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 80,50 10,0');
 			
@@ -237,7 +237,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 		break;
 		case 1: // Output
 			rect = this.svgjs.rect(60, 10).center(50, 50);
-			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
+			text = this.svgjs.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 11,50 10,0');
 			
@@ -251,28 +251,28 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 		break;
 		case 2: // YES
-			if (Gate_Norm == 0) {
+			if (this.gate_type == 0) {
 			
 				group.path('m 32,24 -31,-15 0,30 z').center(50, 50);
 				group.path('m 18,50 16,0');
 				group.path('m 65,50 16,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
 			
-			else if (Gate_Norm == 1) {
+			else if (this.gate_type == 1) {
 				group.rect(60, 60).center(50, 50);
 				group.path('m 80,50 10,0');
 				group.path('m 11,50 10,0');
 				
-				text1 = SVG_Element.plain('1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				text1 = this.svgjs.plain('1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -284,7 +284,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 		break;
 		case 3: // NOT
-			if (Gate_Norm == 0) {
+			if (this.gate_type == 0) {
 				group.path('m 32,24 -31,-15 0,30 z').center(50, 50);
 				
 				group.path('m 24,50 10,0');
@@ -292,22 +292,22 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.circle(7).center(68, 50);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 25).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
 			
-			else if (Gate_Norm == 1) {
+			else if (this.gate_type == 1) {
 				group.rect(60, 60).center(50, 50);
 				group.path('m 80,50 10,0');
 				group.path('m 11,50 10,0');
 				group.path('m 80,40 10,10');
 				
-				text1 = SVG_Element.plain('1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				text1 = this.svgjs.plain('1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -319,29 +319,29 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}
 		break;			
 		case 4: // AND
-			if (Gate_Norm == 0) {
+			if (this.gate_type == 0) {
 				group.path('m 0,1 24,0 a 23,23 0 0 1 0,46 l -24,0 z').center(50, 50);
 				group.path('m 17,35 10,0');
 				group.path('m 73,50 10,0');
 				group.path('m 17,65 10,0');
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
 			
-			else if (Gate_Norm == 1) {
+			else if (this.gate_type == 1) {
 				group.rect(60, 60).center(50, 50);
 				group.path('m 11,34 10,0');
 				group.path('m 80,50 10,0');
 				group.path('m 11,66 10,0');
 				
-				text1 = SVG_Element.plain('&').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				text1 = this.svgjs.plain('&').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -353,29 +353,29 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			}		
 		break;		
 		case 5: // OR
-			if (Gate_Norm == 0) {
+			if (this.gate_type == 0) {
 				group.path('m -3.5,1 19.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -19.5,0 a 40,40 0 0 0 0,-46 z').center(50, 50);
 				group.path('m 17,34 10,0');
 				group.path('m 74,50 10,0');
 				group.path('m 17,66 10,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
 			
-			else if (Gate_Norm == 1) {
+			else if (this.gate_type == 1) {
 				group.rect(60, 60).center(50, 50);
 				group.path('m 11,34 10,0');
 				group.path('m 80,50 10,0');
 				group.path('m 11,66 10,0');
 				
-				text1 = SVG_Element.plain('≥1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				text1 = this.svgjs.plain('≥1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -388,7 +388,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 6: // XOR
-			if (Gate_Norm == 0) {
+			if (this.gate_type == 0) {
 				group.path('m 2.5,1 13.5,0 a 40,46 0 0 1 32,23 a 40,46 0 0 1 -32,23 l -13.5,0 a 40,40 0 0 0 0,-46 z').center(50, 50);
 				group.path('m -3.5,1 a 40,40 0 0 1 0,46').center(20, 50);
 				group.path('m 10,34 10,0');
@@ -396,22 +396,22 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 10,66 10,0');
 			
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 15).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
 			
-			else if (Gate_Norm == 1) {
+			else if (this.gate_type == 1) {
 				group.rect(60, 60).center(50, 50);
 				group.path('m 11,34 10,0');
 				group.path('m 80,50 10,0');
 				group.path('m 11,66 10,0');
 				
-				text1 = SVG_Element.plain('=1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
+				text1 = this.svgjs.plain('=1').center(17, 17).stroke({ width: 0.1 }).fill('#000').scale(3); 
 				group.add(text1);
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
+					text = this.svgjs.plain(Label).center(50, 10).stroke({ width: 0.1 }).fill('#000');
 					group.add(text);
 				}
 			}
@@ -424,10 +424,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 7: // DFF_P
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -436,7 +436,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk 
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -453,11 +453,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 8: // MUX
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('A').center(45, 35).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Y').center(60, 47.5).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('B').center(45, 60).stroke({ width: 0.1 }).fill('#000'); 
-				text4 = SVG_Element.plain('S').center(52, 70).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('A').center(45, 35).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Y').center(60, 47.5).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('B').center(45, 60).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = this.svgjs.plain('S').center(52, 70).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.path('M 0 0 L 30 20 L 30 60 L 0 80 L 0 0Z').center(50, 50);
 				group.path('m 25,35 10,0'); // symboles de connections (A)
@@ -466,7 +466,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('m 50,80 0,10'); // (S)
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 0).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 0).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 			
@@ -484,10 +484,10 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 9: // DFF_N
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -497,7 +497,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -514,11 +514,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 10: // DFF_NNX
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
-				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = this.svgjs.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -530,7 +530,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -548,11 +548,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 11: // DFF_NPX
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
-				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = this.svgjs.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -563,7 +563,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -581,11 +581,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 12: // DFF_PNX
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
-				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = this.svgjs.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -596,7 +596,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -614,11 +614,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			
 		break;
 		case 13: // DFF_PPX
-			if (Gate_Norm == 0 || Gate_Norm == 1) {
-				text1 = SVG_Element.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text2 = SVG_Element.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
-				text3 = SVG_Element.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
-				text4 = SVG_Element.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
+			if (this.gate_type == 0 || this.gate_type == 1) {
+				text1 = this.svgjs.plain('D').center(30, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text2 = this.svgjs.plain('Q').center(70, 20).stroke({ width: 0.1 }).fill('#000'); 
+				text3 = this.svgjs.plain('CLK').center(40, 65).stroke({ width: 0.1 }).fill('#000'); 
+				text4 = this.svgjs.plain('RST').center(40, 80).stroke({ width: 0.1 }).fill('#000'); 
 				
 				group.rect(60, 80).center(50, 50); // The main rect
 				group.path('m 10,20 10,0'); // symboles de connections (D)
@@ -628,7 +628,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 				group.path('M15,0 15,20 L22.5,10 Z').center(24, 65); // clk
 				
 				if(!hide_label) {
-					text = SVG_Element.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
+					text = this.svgjs.plain(Label).center(50, 3).stroke({ width: 0.1 }).fill('#000'); 
 					group.add(text);
 				}
 				
@@ -740,7 +740,7 @@ function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e.
 		
 		// Remove the SVG component and then remake it.
 		this.Components[i][6].remove();
-		this.Components[i][6] = GenerateGate.call(this, SVG_Element, this.Components[i][1], this.Components[i][0], Gate_Type, this.Components[i][2]);
+		this.Components[i][6] = GenerateGate.call(this, this.Components[i][1], this.Components[i][0], this.Components[i][2]);
 	
 		// Replace the component
 		MoveToGrid(this.Components[i][6], x, y);
@@ -933,7 +933,7 @@ function CenterComponents() {
 	y = y / 100;
 
 	for (i = 1; i <= this.Components[0]; i++) {
-		MoveToGrid(this.Components[i][6], this.Components[i][6].x()/100 - x + 2, this.Components[i][6].y()/100 - y + 2);
+		MoveToGrid(this.Components[i][6], this.Components[i][6].x()/100 - x + 1, this.Components[i][6].y()/100 - y + 1);
 	}
 	
 	for (i = 1; i <= this.Constants[0]; i++) {
@@ -951,7 +951,7 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	var resultx = 0;
 	var resulty = 0;
 	
-	var Offset = +150;
+	var Offset = +100;
 	
 	for (i = 1; i <= this.Components[0]; i++) { // this.Components (IO + Cells)
 		if (i == 1) {
@@ -990,7 +990,7 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 	}
 	
 	resultx = (max_right + max_left) / 2;
-	resulty = max_height  + Offset;
+	resulty = max_height + Offset;
 	
 	MoveGateXY(this.CircuitInfo[4], resultx, resulty);
 	
@@ -1035,8 +1035,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof this.NetList[i] != 'undefined') {
 			if (this.NetList[i][0] == 2) { // Only two this.Components on the same line.
-				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1], this.gate_type);
-				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1], this.gate_type);
+				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1]);
+				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1]);
 
 				xa = this.Components[this.NetList[i][1][0]][6].x() + Offset1[0];
 				ya = this.Components[this.NetList[i][1][0]][6].y() + Offset1[1];
@@ -1090,8 +1090,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index1][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1], this.gate_type);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1115,8 +1115,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index2][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1], this.gate_type);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1140,8 +1140,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index3][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1], this.gate_type);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1218,11 +1218,11 @@ function GetWiresLength() {
 	return TotalLength;
 }
 
-function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the connection point
+function GetOffset(Gate_Type, IO_Name) { // Get the offset for the connection point
 	var Varx = 0, Vary = 0;
 
-	if (typeof Gate_Norme == 'undefined')
-		Gate_Norme = 0;
+	if (typeof this.gate_type == 'undefined')
+		this.gate_type = 0;
 	
 	switch (Gate_Type) {
 		case 0: // Input
@@ -1234,7 +1234,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			Vary = 50;
 		break;
 		case 2: // Buf
-			if (Gate_Norme == 0) {
+			if (this.gate_type == 0) {
 				if (IO_Name === 'A') {
 					Varx = 24;
 					Vary = 50;
@@ -1244,7 +1244,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;	
 				}
 			}
-			else if (Gate_Norme == 1) {
+			else if (this.gate_type == 1) {
 				if (IO_Name === 'A') {
 					Varx = 11;
 					Vary = 50;
@@ -1256,7 +1256,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			}
 		break;
 		case 3: // Not
-			if (Gate_Norme == 0) {
+			if (this.gate_type == 0) {
 				if (IO_Name === 'A') {
 					Varx = 24;
 					Vary = 50;
@@ -1266,7 +1266,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;	
 				}
 			}
-			else if (Gate_Norme == 1) {
+			else if (this.gate_type == 1) {
 				if (IO_Name === 'A') {
 					Varx = 11;
 					Vary = 50;
@@ -1278,7 +1278,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			}
 		break;
 		case 4: // And
-			if (Gate_Norme == 0) {
+			if (this.gate_type == 0) {
 				if (IO_Name === 'A') {
 					Varx = 17;
 					Vary = 35;
@@ -1292,7 +1292,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;	
 				}
 			}
-			else if (Gate_Norme == 1) {
+			else if (this.gate_type == 1) {
 				if (IO_Name === 'A') {
 					Varx = 11;
 					Vary = 34;
@@ -1308,7 +1308,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			}
 		break;
 		case 5: // OR
-			if (Gate_Norme == 0) {
+			if (this.gate_type == 0) {
 				if (IO_Name === 'A') {
 					Varx = 17;
 					Vary = 34;
@@ -1322,7 +1322,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;	
 				}
 			}
-			else if (Gate_Norme == 1) {
+			else if (this.gate_type == 1) {
 				if (IO_Name === 'A') {
 					Varx = 11;
 					Vary = 34;
@@ -1338,7 +1338,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 			}
 		break;
 		case 6: // XOR
-			if (Gate_Norme == 0) {
+			if (this.gate_type == 0) {
 				if (IO_Name === 'A') {
 					Varx = 10;
 					Vary = 34;
@@ -1352,7 +1352,7 @@ function GetOffset(Gate_Type, IO_Name, Gate_Norme) { // Get the offset for the c
 					Vary = 50;	
 				}
 			}
-			else if (Gate_Norme == 1) {
+			else if (this.gate_type == 1) {
 				if (IO_Name === 'A') {
 					Varx = 11;
 					Vary = 34;
@@ -1568,6 +1568,7 @@ function log(str) {
 function Golirev(svg_id, sizeX, sizeY) {
 	if (typeof sizeX === 'undefined') sizeX = '100%';
 	if (typeof sizeY === 'undefined') sizeY = '100%';
+	
 	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size(sizeX, sizeX);
 	this.gate_type = 0;
 	
@@ -1644,7 +1645,7 @@ function ShowJSON(json_object, gate_type) {
 	this.nodes = this.svgjs.group();
 	this.nodes.panZoom();
 	
-	GenerateAllGates.call(this, this.svgjs, this.gate_type);
+	GenerateAllGates.call(this);
 	SimulatedAnnealing.call(this, this.gate_type);
 	CenterComponents.call(this);
 	GenerateAllWires.call(this);
