@@ -43,6 +43,103 @@ function Init() {
 }
 // --
 
+// Objects
+function Golirev(svg_id, sizeX, sizeY) {
+	if (typeof sizeX === 'undefined') sizeX = '100%';
+	if (typeof sizeY === 'undefined') sizeY = '100%';
+	
+	// SVG Init
+	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size(sizeX, sizeX);
+	// --
+	
+	// Vars
+	this.gate_type = 0;
+	
+	this.CircuitInfo = new Array(); // Informations concerning the circuits
+	/*
+	Details about Circuit Info
+	CircuitInfo[0] = rect x of the svg element
+	CircuitInfo[1] = rect y of the svg element
+	CircuitInfo[2] = name of the circuit
+	CircuitInfo[3] = "Creator"
+	CircuitInfo[4] = Text svg element.
+	*/
+
+	this.Components = new Array(); // variable globale
+	/*
+	Details about Components
+	Components[0] = Number of components;
+	Components[Components[0]][0] = Label of component number Components[0]
+	Components[Components[0]][1] = Type of component number Components[0]
+	Components[Components[0]][2] = Hide Label ?
+	Components[Components[0]][3] = Parameters
+	Components[Components[0]][4] = Attributes
+	Components[Components[0]][5] = Connections
+	Components[Components[0]][6] = Svg element
+	*/
+
+	this.NetList = new Array();
+	/*
+	Details about NetList
+	NetList[0] = Number of connections;
+	NetList[n][0] = Number of elements on that connection;
+	NetList[n][1] = Array (First Object)
+			[n][1][0] = ID on the component var;
+			[n][1][1] = Name of the Output;
+			[n][1][2] = OffsetX;
+			[n][1][3] = OffsetY;
+	NetList[n][2] = Array (Second Object)
+	NetList[n][y] = Array (ynd Object)
+	*/
+
+	this.Constants = new Array();
+	/*
+	Details about Constants
+	Constants[0] - Number of constants
+	Constants[n][0] = valeur
+	Constants[n][1] = elem svg
+	Constants[n][2] = id du composant
+	Constants[n][3] = nom de la porte (A/B/Y/S/..)
+	*/
+
+	this.Wires = new Array();
+	this.Wires[0] = 0;
+
+	this.WireLength = new Array();
+
+	this.Grid = new Array();
+	var a, b;
+	for (a = -500; a < 500; a++) {
+		this.Grid[a] = new Array();
+			for (b = -500; b < 500; b++) {
+				this.Grid[a][b] = 0;
+		}
+	}
+	// --
+	
+	// Methods
+	this.DisplayJson = ShowJSON;
+	this.ParseJSON = ParseJson;
+	// --
+}
+
+function ShowJSON(json_object, gate_type) {
+	this.gate_type = gate_type;
+	
+	ParseJson.call(this, json_object);
+	
+	// Pan + zoom init
+	this.nodes = this.svgjs.group();
+	this.nodes.panZoom();
+	// --
+	
+	GenerateAllGates.call(this);
+	SimulatedAnnealing.call(this);
+	CenterComponents.call(this);
+	GenerateAllWires.call(this);
+	PlaceCircuitName.call(this);
+}
+
 // Yosys and JSON related
 function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
 	// Définition et initialisation des variables
@@ -176,14 +273,6 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	//document.write('Nbr ' + Constants[0]);
 	
 	return 1;
-}
-
-function CheckVerilogError(str) {
-	if (str.indexOf("ERROR") == 0) // Error in the Verilog code
-		return str.match(/\d+/)[0];
-	
-	else // No errors
-		return 0;
 }
 // --
 
@@ -751,7 +840,7 @@ function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e.
 // --
 
 // Placement
-function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
+function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
     var iteration = 0;
     var proba;
     var alpha =0.999;
@@ -1508,146 +1597,8 @@ function GetConnectionType(Component_ID) {
 }
 // --
 
-// Panels, Gutter-note
-function makePanel(where, str) {
-	var node = document.createElement("div");
-	var id = ++numPanels;
-	var widget, close, label;
-
-	node.id = "panel-" + id;
-	node.className = "panel " + where;
-	close = node.appendChild(document.createElement("a"));
-	close.setAttribute("title", "Remove me!");
-	close.setAttribute("class", "remove-panel");
-	close.textContent = "✖";
-	CodeMirror.on(close, "click", function() {
-	panels[node.id].clear();
-	});
-	label = node.appendChild(document.createElement("span"));
-	label.textContent = str;
-	return node;
-}
-
-function addPanel(where, str) {
-	var node = makePanel(where, str);
-	panels[node.id] = myCodeMirror.addPanel(node, {position: where});
-	return node.id;
-}
-
-function replacePanel(PanelID) {
-  var id = PanelID
-  var panel = panels["panel-" + id];
-  var node = makePanel("");
-
-  panels[node.id] = myCodeMirror.addPanel(node, {replace: panel, position: "after-top"});
-  return false;
-}
-
-function CreateErrorSign() {
-	var image = document.createElement("img");
-	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII="
-
-	return image;
-}
-// --
-
 // Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
 }
-
-function log(str) {
-	document.getElementById('console').value = document.getElementById('console').value + (str + '\n');
-
-	var textarea = document.getElementById('console');
-	textarea.scrollTop = textarea.scrollHeight;
-}
 // --
-
-// testing objects
-function Golirev(svg_id, sizeX, sizeY) {
-	if (typeof sizeX === 'undefined') sizeX = '100%';
-	if (typeof sizeY === 'undefined') sizeY = '100%';
-	
-	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size(sizeX, sizeX);
-	this.gate_type = 0;
-	
-	this.CircuitInfo = new Array(); // Informations concerning the circuits
-	/*
-	Details about Circuit Info
-	CircuitInfo[0] = rect x of the svg element
-	CircuitInfo[1] = rect y of the svg element
-	CircuitInfo[2] = name of the circuit
-	CircuitInfo[3] = "Creator"
-	CircuitInfo[4] = Text svg element.
-	*/
-
-	this.Components = new Array(); // variable globale
-	/*
-	Details about Components
-	Components[0] = Number of components;
-	Components[Components[0]][0] = Label of component number Components[0]
-	Components[Components[0]][1] = Type of component number Components[0]
-	Components[Components[0]][2] = Hide Label ?
-	Components[Components[0]][3] = Parameters
-	Components[Components[0]][4] = Attributes
-	Components[Components[0]][5] = Connections
-	Components[Components[0]][6] = Svg element
-	*/
-
-	this.NetList = new Array();
-	/*
-	Details about NetList
-	NetList[0] = Number of connections;
-	NetList[n][0] = Number of elements on that connection;
-	NetList[n][1] = Array (First Object)
-			[n][1][0] = ID on the component var;
-			[n][1][1] = Name of the Output;
-			[n][1][2] = OffsetX;
-			[n][1][3] = OffsetY;
-	NetList[n][2] = Array (Second Object)
-	NetList[n][y] = Array (ynd Object)
-	*/
-
-	this.Constants = new Array();
-	/*
-	Details about Constants
-	Constants[0] - Number of constants
-	Constants[n][0] = valeur
-	Constants[n][1] = elem svg
-	Constants[n][2] = id du composant
-	Constants[n][3] = nom de la porte (A/B/Y/S/..)
-	*/
-
-	this.Wires = new Array();
-	this.Wires[0] = 0;
-
-	this.WireLength = new Array();
-
-	this.Grid = new Array();
-	var a, b;
-	for (a = -500; a < 500; a++) {
-		this.Grid[a] = new Array();
-			for (b = -500; b < 500; b++) {
-				this.Grid[a][b] = 0;
-		}
-	}
-
-	this.DisplayJson = ShowJSON;
-	this.ParseJSON = ParseJson;
-}
-
-function ShowJSON(json_object, gate_type) {
-	this.gate_type = gate_type;
-	
-	ParseJson.call(this, json_object);
-	
-	this.nodes = this.svgjs.group();
-	this.nodes.panZoom();
-	
-	GenerateAllGates.call(this);
-	SimulatedAnnealing.call(this, this.gate_type);
-	CenterComponents.call(this);
-	GenerateAllWires.call(this);
-	PlaceCircuitName.call(this);
-}
