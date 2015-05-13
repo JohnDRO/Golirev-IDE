@@ -1,0 +1,89 @@
+<html>
+<head></head>
+<body>
+
+<script src="./functions.js"></script>
+
+<script type="text/javascript" src="./yosysjs/yosysjs.js"></script>
+
+<script src="./svgjs/svg.js"></script>
+<script src="./svgjs/svg.draggable.js"></script>
+<script src="./svgjs/svg.pan-zoom.js"></script>
+
+<div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
+<hr>
+<div id="drawing2" style="border: 2px solid #ccc; border-radius: 4px;"></div>
+<hr>
+
+<script>
+	// tests
+	var json = {
+	 "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+	  "modules": {
+		"counter_2bit": {
+		  "ports": {
+			"a": {
+			  "direction": "input",
+			  "bits": [ 2 ]
+			},
+			"b": {
+			  "direction": "input",
+			  "bits": [ 3 ]
+			},
+			"c": {
+			  "direction": "output",
+			  "bits": [ 4 ]
+			}
+		  },
+		  "cells": {
+			"$auto$simplemap.cc:228:simplemap_logbin$2072": {
+			  "hide_name": 1,
+			  "type": "$_AND_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 2 ],
+				"B": [ 3 ],
+				"Y": [ 4 ]
+			  }
+			}
+		  },
+		  "netnames": {
+			"a": {
+			  "hide_name": 0,
+			  "bits": [ 2 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"b": {
+			  "hide_name": 0,
+			  "bits": [ 3 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"c": {
+			  "hide_name": 0,
+			  "bits": [ 4 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			}
+		  }
+		}
+	  }
+	}
+	
+	var test = new Golirev('drawing');
+	test.DisplayJson(json, 0);
+	
+	var test2 = new Golirev('drawing');
+	test2.DisplayJson(json, 0);
+
+	// --
+</script>
+</body>
+</html>

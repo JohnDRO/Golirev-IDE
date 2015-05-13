@@ -201,11 +201,11 @@ function GenerateAllGates(SVG_Element, Gate_Type) {
 	}
 
 	this.CircuitInfo[4] = SVG_Element.text('Circuit : ' + this.CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
-	nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
+	this.nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
 function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { // Generate a gate and return the svgjs element created.
-	var group = draw.group(), text, text1, text2, text3, text4, longeur = 0, rect;
+	var group = this.svgjs.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	var MAXX = 5000, MAXY = 5000;
 	
 	if (Gate_Type < 0 || Gate_Type > 13) // 0 == INPUT, 1 == OUTPUT, 2 == BUF, 3 == NOT, 4 == AND, 5 == OR, 6 == XOR, 7 == DFF_P, 8 == MUX, 9 == DFF_N, 10 == DFF_NNX, 11 == DFF_NPX, 12 == DFF_PNX, 13 == DFF_PPX
@@ -221,7 +221,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 
 	switch(Gate_Type) {
 		case 0: // Input
-			rect = draw.rect(60, 10).center(50, 50);
+			rect = this.svgjs.rect(60, 10).center(50, 50);
 			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 80,50 10,0');
@@ -232,11 +232,11 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 		break;
 		case 1: // Output
-			rect = draw.rect(60, 10).center(50, 50);
+			rect = this.svgjs.rect(60, 10).center(50, 50);
 			text = SVG_Element.plain(Label).x(20).y(25).stroke({ width: 0.1 }).fill('#000');
 			
 			group.path('m 11,50 10,0');
@@ -247,7 +247,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 		break;
 		case 2: // YES
@@ -280,7 +280,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 		break;
 		case 3: // NOT
@@ -315,7 +315,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 			
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 		break;			
 		case 4: // AND
@@ -349,7 +349,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}		
 		break;		
 		case 5: // OR
@@ -383,7 +383,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -419,7 +419,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -448,7 +448,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -479,7 +479,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -509,7 +509,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -543,7 +543,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -576,7 +576,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -609,7 +609,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -641,7 +641,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
 		
 			group.dragmove = function() {
-				GenerateAllWires.call(obj, draw, Gate_Norm);
+				GenerateAllWires.call(obj);
 			}
 			
 		break;
@@ -652,7 +652,7 @@ function GenerateGate(SVG_Element, Gate_Type, Label, Gate_Norm, hide_label) { //
 	
 	group.style('cursor', 'move'); // Change the cursor style
 	
-	nodes.add(group); // Span and zoom
+	this.nodes.add(group); // Span and zoom
 	
 	return group;
 }
@@ -773,7 +773,7 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
 		MoveToGrid(this.Constants[n][1], 5, i);
 	}
 	
-	GenerateAllWires.call(this, draw, Gate_Norm);
+	GenerateAllWires.call(this);
 	
     var distance = GetWiresLength.call(this);
 
@@ -783,7 +783,7 @@ function SimulatedAnnealing(Gate_Norm) { // http://www.codeproject.com/Articles/
     
 		// Make a random change
         Arr = RandomChange.call(this);
-		GenerateAllWires.call(this, draw, 0);
+		GenerateAllWires.call(this);
 		
 		// Get the new delta
         delta = GetWiresLength.call(this) - distance;
@@ -1016,7 +1016,7 @@ function MoveToGrid(gate, x, y) {
 // --
 
 // Wires
-function GenerateAllWires(draw, Gate_Norme) { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
+function GenerateAllWires() { // This function generates wires between elements with the Netlist var. This function runs when a drag is one by the user.
 	var i = 0, n = 0, k = 0, v = 0; // loops index
 	
 	var xa = 0, ya = 0, xb = 0, yb = 0; // Lines points.
@@ -1035,15 +1035,15 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof this.NetList[i] != 'undefined') {
 			if (this.NetList[i][0] == 2) { // Only two this.Components on the same line.
-				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1], Gate_Norme);
-				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1], Gate_Norme);
+				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1], this.gate_type);
+				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1], this.gate_type);
 
 				xa = this.Components[this.NetList[i][1][0]][6].x() + Offset1[0];
 				ya = this.Components[this.NetList[i][1][0]][6].y() + Offset1[1];
 				xb = this.Components[this.NetList[i][2][0]][6].x() + Offset2[0];
 				yb = this.Components[this.NetList[i][2][0]][6].y() + Offset2[1];
 				
-				this.Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
+				this.Wires[n] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
 				this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 				
 				this.Wires[0]++;
@@ -1090,8 +1090,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index1][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1], this.gate_type);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1099,7 +1099,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							xb = this.Components[id2][6].x() + Offset2[0];
 							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.Wires[n] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
 							this.Wires[0]++;
@@ -1115,8 +1115,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index2][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1], this.gate_type);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1124,7 +1124,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							xb = this.Components[id2][6].x() + Offset2[0];
 							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.Wires[n] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
 							this.Wires[0]++;
@@ -1140,8 +1140,8 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index3][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], Gate_Norme);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1], Gate_Norme);
+							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1], this.gate_type);
+							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1], this.gate_type);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1149,7 +1149,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 							xb = this.Components[id2][6].x() + Offset2[0];
 							yb = this.Components[id2][6].y() + Offset2[1];
 							
-							this.Wires[n] = GenerateOneWire(xa, xb, ya, yb);
+							this.Wires[n] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
 							this.Wires[0]++;
@@ -1177,7 +1177,7 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 		xb = this.Components[this.Constants[i][2]][6].x() + Offset2[0];
 		yb = this.Components[this.Constants[i][2]][6].y() + Offset2[1];
 		
-		this.Wires[n] = GenerateOneWire(xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
+		this.Wires[n] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
 		this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 		
 		n++;
@@ -1186,14 +1186,14 @@ function GenerateAllWires(draw, Gate_Norme) { // This function generates wires b
 	
 	// 4. Add wires to the pannable and zoomable group
 	for (i = 1; i <= this.Wires[0]; i++) {
-		nodes.add(this.Wires[i]);
+		this.nodes.add(this.Wires[i]);
 	}
 }
 
 function GenerateOneWire(xa, xb, ya, yb) {
 	var wire = 0;
 	
-	wire = draw.line(xa, ya, xb, yb).stroke({ width: 1 });
+	wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 });
 	
 	return wire;
 }	
@@ -1565,8 +1565,11 @@ function log(str) {
 // --
 
 // testing objects
-function Golirev(svg_id) {
-	this.svgjs = SVG(svg_id);
+function Golirev(svg_id, sizeX, sizeY) {
+	if (typeof sizeX === 'undefined') sizeX = '100%';
+	if (typeof sizeY === 'undefined') sizeY = '100%';
+	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size(sizeX, sizeX);
+	this.gate_type = 0;
 	
 	this.CircuitInfo = new Array(); // Informations concerning the circuits
 	/*
@@ -1634,10 +1637,16 @@ function Golirev(svg_id) {
 }
 
 function ShowJSON(json_object, gate_type) {
+	this.gate_type = gate_type;
+	
 	ParseJson.call(this, json_object);
-	GenerateAllGates.call(this, this.svgjs, gate_type);
-	SimulatedAnnealing.call(this, gate_type);
+	
+	this.nodes = this.svgjs.group();
+	this.nodes.panZoom();
+	
+	GenerateAllGates.call(this, this.svgjs, this.gate_type);
+	SimulatedAnnealing.call(this, this.gate_type);
 	CenterComponents.call(this);
-	GenerateAllWires.call(this, this.svgjs, gate_type);
+	GenerateAllWires.call(this);
 	PlaceCircuitName.call(this);
 }
