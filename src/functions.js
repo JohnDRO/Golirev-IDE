@@ -265,8 +265,6 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 				this.NetList[meh][this.NetList[meh][0]][2] = 0; // x
 				this.NetList[meh][this.NetList[meh][0]][3] = 0; // y
 			}							
-		
-
 		}
 	}
 	// ---
@@ -873,7 +871,6 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
     // While the temperature did not reach epsilon
     while (temperature > epsilon) {
         iteration++;
-    
 		// Make a random change
         Arr = RandomChange.call(this);
 		GenerateAllWires.call(this);
@@ -1162,7 +1159,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 				var id1 = 0, id2 = 0;
 
 				for (k = 1; k <= this.NetList[i][0]; k++) { // I count the number of circuit input, circuit output and cell output
-					result = GetConnectionType(this.NetList[i][k][0]);
+					result = GetConnectionType.call(this, this.NetList[i][k][0]);
 					if (result == 1) { // input circuit
 						input_circuit_number++;
 						index1 = k;
@@ -1171,9 +1168,11 @@ function GenerateAllWires() { // This function generates wires between elements 
 						output_circuit_number++;
 						index2 = k;
 					}
-					else if (result == 3) { // output cell
+					else if (result == 3) { // input/output cell
+						if (this.NetList[i][k][1] === 'Y' || this.NetList[i][k][1] === 'Q')
+							index3 = k;
+						
 						output_cell_number++;
-						index3 = k;
 					}
 				}
 				
@@ -1229,7 +1228,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 				
 				else if (output_cell_number >= 1) { // case 3
 					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the cell output to the other elements
-						if (m != index3) {
+						if (m != index3) { // problème source/emetteur ici.
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index3][0];
 							
@@ -1588,14 +1587,16 @@ function GetOffset(Gate_Type, IO_Name) { // Get the offset for the connection po
 }
 
 function GetConnectionType(Component_ID) {
+
 	var type = 0, k = 0;
 	
 	if (this.Components[Component_ID][1] == 0 || this.Components[Component_ID][1] == 1) { // Is it an input / output ?
 		type = (this.Components[Component_ID][1] == 0) ? 1 : 2;
 	}
 	
-	else // Else it's a cell.
+	else { // Else it's a cell.
 		type = 3;
+	} 
 		
 	return type;
 }
