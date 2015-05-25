@@ -45,14 +45,18 @@ function Init() {
 
 // Objects
 function Golirev(svg_id, sizeX, sizeY) {
+	// Check that sizeX and sizeY are not undefined
 	if (typeof sizeX === 'undefined') sizeX = '100%';
 	if (typeof sizeY === 'undefined') sizeY = '100%';
 	
+	// Set div size to sizeX and sizeY
+	document.getElementById(svg_id).setAttribute('style', 'border: 2px solid #ccc; border-radius: 4px; width:' + sizeX + '; height:' + sizeY);
+	
 	// SVG Init
-	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size(sizeX, sizeX);
+	this.svgjs = SVG(svg_id).attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');
 	// --
 	
-	// Vars
+	// Init variables
 	this.gate_type = 0;
 	
 	this.CircuitInfo = new Array(); // Informations concerning the circuits

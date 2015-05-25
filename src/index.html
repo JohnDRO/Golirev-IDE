@@ -3,65 +3,7 @@
 <title>Golirev IDE</title>
 <script type="text/javascript">
 
-var CircuitInfo = new Array(); // Informations concerning the circuits
-/*
-Details about Circuit Info
-CircuitInfo[0] = rect x of the svg element
-CircuitInfo[1] = rect y of the svg element
-CircuitInfo[2] = name of the circuit
-CircuitInfo[3] = "Creator"
-CircuitInfo[4] = Text svg element.
-*/
 
-var Components = new Array(); // variable globale
-/*
-Details about Components
-Components[0] = Number of components;
-Components[Components[0]][0] = Label of component number Components[0]
-Components[Components[0]][1] = Type of component number Components[0]
-Components[Components[0]][2] = Hide Label ?
-Components[Components[0]][3] = Parameters
-Components[Components[0]][4] = Attributes
-Components[Components[0]][5] = Connections
-Components[Components[0]][6] = Svg element
-*/
-
-NetList = new Array();
-/*
-Details about NetList
-NetList[0] = Number of connections;
-NetList[n][0] = Number of elements on that connection;
-NetList[n][1] = Array (First Object)
-		[n][1][0] = ID on the component var;
-		[n][1][1] = Name of the Output;
-		[n][1][2] = OffsetX;
-		[n][1][3] = OffsetY;
-NetList[n][2] = Array (Second Object)
-NetList[n][y] = Array (ynd Object)
-*/
-
-var Constants = new Array();
-/*
-Details about Constants
-Constants[0] - Number of constants
-Constants[n][0] = valeur
-Constants[n][1] = elem svg
-Constants[n][2] = id du composant
-Constants[n][3] = nom de la porte (A/B/Y/S/..)
-*/
-
-var Wires = new Array();
-Wires[0] = 0;
-
-var WireLength = new Array();
-
-var Grid = new Array(), a, b;
-for (a = -500; a < 500; a++) {
-	Grid[a] = new Array();
-		for (b = -500; b < 500; b++) {
-			Grid[a][b] = 0;
-	}
-}
 
 // buttons functions
 function GenerateJSON() { // Verilog -> JSON
@@ -202,6 +144,8 @@ Golirev IDE<hr>
 Schematic : <br />
 <div id="drawing" style="border: 2px solid #ccc; border-radius: 4px;"></div>
 <hr>
+<div id="drawing2" style="border: 2px solid #ccc; border-radius: 4px;"></div>
+<hr>
 Verilog code and Json Output :<br />
 
 <textarea id="Verilog" style="width: 100%; height: 50%;">
@@ -291,7 +235,7 @@ Console output :<br />
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 
 	// svg.js init
-	var draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');;
+	var draw = SVG('drawing2').attr({ 'font-size': 10 }).fill('#f06').size('100%', '100%');
 	// --
 
 	// Yosys init
@@ -302,8 +246,8 @@ Console output :<br />
 	// --
 
 	// Make the group pannable and zoomable
-	var nodes = draw.group();
-	nodes.panZoom();
+	//var nodes = draw.group();
+	//nodes.panZoom();
 	// --
 
 	// Reset the console log
@@ -331,6 +275,76 @@ Console output :<br />
 	var TopPanelID = addPanel("top", "Type your Verilog code here !");
 	var BotPanelID = addPanel("bottom", "The status of your code will be displayed here !");
 	// --
+	
+	// tests
+	var json = {
+	 "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+	  "modules": {
+		"counter_2bit": {
+		  "ports": {
+			"a": {
+			  "direction": "input",
+			  "bits": [ 2 ]
+			},
+			"b": {
+			  "direction": "input",
+			  "bits": [ 3 ]
+			},
+			"c": {
+			  "direction": "output",
+			  "bits": [ 4 ]
+			}
+		  },
+		  "cells": {
+			"$auto$simplemap.cc:228:simplemap_logbin$2072": {
+			  "hide_name": 1,
+			  "type": "$_AND_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 2 ],
+				"B": [ 3 ],
+				"Y": [ 4 ]
+			  }
+			}
+		  },
+		  "netnames": {
+			"a": {
+			  "hide_name": 0,
+			  "bits": [ 2 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"b": {
+			  "hide_name": 0,
+			  "bits": [ 3 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"c": {
+			  "hide_name": 0,
+			  "bits": [ 4 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			}
+		  }
+		}
+	  }
+	}
+	
+	var test = new Golirev('drawing');
+	test.DisplayJson(json, 0);
+	
+	var test2 = new Golirev('drawing2');
+	test2.DisplayJson(json, 0);
+
+	// --
+	
 
 </script>
 </body>
