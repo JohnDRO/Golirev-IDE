@@ -77,95 +77,95 @@ Here is a another schematic about ...
 	}
 	
 	var json2 = {
-  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
-  "modules": {
-    "up3down5": {
-      "ports": {
-        "a": {
-          "direction": "input",
-          "bits": [ 2 ]
-        },
-        "b": {
-          "direction": "input",
-          "bits": [ 3 ]
-        },
-        "c": {
-          "direction": "input",
-          "bits": [ 4 ]
-        },
-        "d": {
-          "direction": "output",
-          "bits": [ 5 ]
-        }
-      },
-      "cells": {
-        "$auto$simplemap.cc:83:simplemap_bitop$121": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 6 ],
-            "B": [ 3 ],
-            "Y": [ 5 ]
-          }
-        },
-        "$auto$simplemap.cc:83:simplemap_bitop$124": {
-          "hide_name": 1,
-          "type": "$_XOR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 4 ],
-            "B": [ 2 ],
-            "Y": [ 6 ]
-          }
-        }
-      },
-      "netnames": {
-        "$auto$alumacc.cc:470:replace_alu$68.lcu.p": {
-          "hide_name": 1,
-          "bits": [ 6 ],
-          "attributes": {
-            "src": "<techmap.v>:203"
-          }
-        },
-        "a": {
-          "hide_name": 0,
-          "bits": [ 2 ],
-          "attributes": {
-            "src": "input.v:3"
-          }
-        },
-        "b": {
-          "hide_name": 0,
-          "bits": [ 3 ],
-          "attributes": {
-            "src": "input.v:3"
-          }
-        },
-        "c": {
-          "hide_name": 0,
-          "bits": [ 4 ],
-          "attributes": {
-            "src": "input.v:3"
-          }
-        },
-        "d": {
-          "hide_name": 0,
-          "bits": [ 5 ],
-          "attributes": {
-            "src": "input.v:5"
-          }
-        }
-      }
-    }
-  }
-}
+	  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+	  "modules": {
+		"up3down5": {
+		  "ports": {
+			"a": {
+			  "direction": "input",
+			  "bits": [ 2 ]
+			},
+			"b": {
+			  "direction": "input",
+			  "bits": [ 3 ]
+			},
+			"c": {
+			  "direction": "input",
+			  "bits": [ 4 ]
+			},
+			"d": {
+			  "direction": "output",
+			  "bits": [ 5 ]
+			}
+		  },
+		  "cells": {
+			"$auto$simplemap.cc:83:simplemap_bitop$121": {
+			  "hide_name": 1,
+			  "type": "$_XOR_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 6 ],
+				"B": [ 3 ],
+				"Y": [ 5 ]
+			  }
+			},
+			"$auto$simplemap.cc:83:simplemap_bitop$124": {
+			  "hide_name": 1,
+			  "type": "$_XOR_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 4 ],
+				"B": [ 2 ],
+				"Y": [ 6 ]
+			  }
+			}
+		  },
+		  "netnames": {
+			"$auto$alumacc.cc:470:replace_alu$68.lcu.p": {
+			  "hide_name": 1,
+			  "bits": [ 6 ],
+			  "attributes": {
+				"src": "<techmap.v>:203"
+			  }
+			},
+			"a": {
+			  "hide_name": 0,
+			  "bits": [ 2 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			},
+			"b": {
+			  "hide_name": 0,
+			  "bits": [ 3 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			},
+			"c": {
+			  "hide_name": 0,
+			  "bits": [ 4 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			},
+			"d": {
+			  "hide_name": 0,
+			  "bits": [ 5 ],
+			  "attributes": {
+				"src": "input.v:5"
+			  }
+			}
+		  }
+		}
+	  }
+	}
 	
 	
 	var test = new Golirev('drawing', '50%', '50%');
