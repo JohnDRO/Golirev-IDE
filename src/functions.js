@@ -152,10 +152,10 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	var io_names, cells_name;
 	
 	var i = 0, n = 0, k = 0, l = 0; // loops counters
+	var nbr_local_cste = 0, local_value = '';
 	// ---
 
-	Init.call(this); 
-
+	Init.call(this);
 	
 	Circuit_Name = Object.keys(json_yosysJS.modules); // example : 'up3down5', 'DCF77_CIRCUIT', '4 BIT COUNTER', ..
 	
@@ -177,17 +177,28 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 		
 		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
 		
-		for (l = 0; l <= meh2.length - 1; l++) { // bus loop
-			if (typeof meh2[l] == 'string') { // is it a constant ?
-				// On l'ajoute dans le tableau.
-				this.Constants[0]++;
-				this.Constants[this.Constants[0]] = new Array();
-				this.Constants[this.Constants[0]][0] = meh2[l]; // Value
-				this.Constants[this.Constants[0]][2] = 1 + parseInt(i); // Component id
-				this.Constants[this.Constants[0]][3] = 0; // Name of the gate
+		for (l = 0, nbr_local_cste = 0, local_value = '"'; l < meh2.length; l++) { // I count the number of constants and I add the value to local_value
+			if (typeof meh2[l] == 'string') {
+				nbr_local_cste++;
+				local_value += meh2[l];
 			}
 			
-			else {
+			else 
+				local_value += 'X'
+		}
+		
+		local_value += '"';
+		
+		if (nbr_local_cste) { // Let's add constants
+			this.Constants[0]++;
+			this.Constants[this.Constants[0]] = new Array();
+			this.Constants[this.Constants[0]][0] = local_value; // Value
+			this.Constants[this.Constants[0]][2] = 1 + parseInt(i); // Component id
+			this.Constants[this.Constants[0]][3] = 0; // Name of the gate
+		}
+
+		for (l = 0; l < meh2.length; l++) { // bus loop
+			if (typeof meh2[l] !== 'string') { // If it is not a constant
 				if (typeof this.NetList[meh2[l]] === 'undefined') {
 					this.NetList[meh2[l]] = new Array();
 					this.NetList[meh2[l]][0] = 1;
