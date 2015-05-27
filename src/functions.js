@@ -124,6 +124,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	// Methods
 	this.DisplayJson = ShowJSON;
 	this.ParseJSON = ParseJson;
+	this.UpdateGate = UpdateGate;
 	// --
 }
 
@@ -143,6 +144,15 @@ function ShowJSON(json_object, gate_type) {
 	GenerateAllWires.call(this);
 	PlaceCircuitName.call(this);
 }
+
+function UpdateGate(gate_type) {
+	 this.gate_type = gate_type;
+	 
+	 UpdateGateType.call(this);
+	 GenerateAllWires.call(this);
+	 PlaceCircuitName.call(this);
+}
+// --
 
 // Yosys and JSON related
 function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and then parse it and set CircuitInfo, Components, Netlist and Constants
@@ -829,7 +839,7 @@ function RemoveAllGates() {
 
 }
 
-function UpdateGateType(SVG_Element, Gate_Type) { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
+function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
 	var i = 0;
 	
 	var x = 0;
@@ -1136,8 +1146,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof this.NetList[i] != 'undefined') {
 			if (this.NetList[i][0] == 2) { // Only two this.Components on the same line.
-				Offset1 = GetOffset(this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1]);
-				Offset2 = GetOffset(this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1]);
+				Offset1 = GetOffset.call(this, this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1]);
+				Offset2 = GetOffset.call(this, this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1]);
 
 				xa = this.Components[this.NetList[i][1][0]][6].x() + Offset1[0];
 				ya = this.Components[this.NetList[i][1][0]][6].y() + Offset1[1];
@@ -1193,8 +1203,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index1][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index1][1]);
+							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index1][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1218,8 +1228,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index2][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index2][1]);
+							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index2][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1243,8 +1253,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index3][0];
 							
-							Offset1 = GetOffset(this.Components[id1][1], this.NetList[i][m][1]);
-							Offset2 = GetOffset(this.Components[id2][1], this.NetList[i][index3][1]);
+							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
+							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index3][1]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							ya = this.Components[id1][6].y() + Offset1[1];
@@ -1271,8 +1281,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 
 	// 3. Constants
 	for (i = 1; i <= this.Constants[0]; i++) {
-		Offset1 = GetOffset(0, 0);
-		Offset2 = GetOffset(this.Components[this.Constants[i][2]][1], this.Constants[i][3]);
+		Offset1 = GetOffset.call(this, 0, 0);
+		Offset2 = GetOffset.call(this, this.Components[this.Constants[i][2]][1], this.Constants[i][3]);
 
 		xa = this.Constants[i][1].x() + Offset1[0];
 		ya = this.Constants[i][1].y() + Offset1[1];

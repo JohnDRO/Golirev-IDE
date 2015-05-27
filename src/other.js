@@ -18,7 +18,7 @@ function makePanel(where, str) {
 	close = node.appendChild(document.createElement("a"));
 	close.setAttribute("title", "Remove me!");
 	close.setAttribute("class", "remove-panel");
-	close.textContent = "?";
+	close.textContent = "X";
 	CodeMirror.on(close, "click", function() {
 	panels[node.id].clear();
 	});
