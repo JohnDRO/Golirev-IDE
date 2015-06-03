@@ -39,6 +39,14 @@ function Init() {
 	this.Constants[0] = 0;
 	// --
 	
+	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
+	for (l = 0; l <= 300; l++) {
+		for (m = 0; m <= 300; m++) {
+			this.Connections[l][m] = 0;
+		}
+	}
+	
+	
 	return 1;
 }
 // --
@@ -89,7 +97,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	NetList[n][0] = Number of elements on that connection;
 	NetList[n][1] = Array (First Object)
 			[n][1][0] = ID on the component var;
-			[n][1][1] = Name of the Output;
+			[n][1][1] = Name of the port;
 			[n][1][2] = OffsetX;
 			[n][1][3] = OffsetY;
 	NetList[n][2] = Array (Second Object)
@@ -121,10 +129,20 @@ function Golirev(svg_id, sizeX, sizeY) {
 	}
 	// --
 	
+	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
+	this.Connections = new Array();
+	for (l = 0; l <= 300; l++) {
+		this.Connections[l] = new Array();
+		for (m = 0; m <= 300; m++) {
+			this.Connections[l][m] = 0;
+		}
+	}
+	
 	// Methods
 	this.DisplayJson = ShowJSON;
 	this.ParseJSON = ParseJson;
 	this.UpdateGate = UpdateGate;
+	this.TestsBus = TestsBus;
 	// --
 }
 
@@ -151,6 +169,25 @@ function UpdateGate(gate_type) {
 	 UpdateGateType.call(this);
 	 GenerateAllWires.call(this);
 	 PlaceCircuitName.call(this);
+}
+
+function TestsBus() {
+	document.write('<hr> Testing busses : <br />');
+	var i = 0;
+	var n = 0;
+	var k = 0;
+	
+	for (i = 1, n = 1; n <= this.NetList[0]; i++) {
+		if (isArray(this.NetList[i])) {
+			
+			document.write('k : ' + this.NetList[i][0] + '<br />');
+			for (k = 1; k <= this.NetList[i][0]; k++) {
+				document.write('____' + this.NetList[i][k][0]  + '<br />');
+			}
+			
+			n++;
+		}
+	}
 }
 // --
 
@@ -186,6 +223,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 		// json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits
 		
 		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
+		
+		this.Components[this.Components[0]][0] += ' (' + meh2.length + ')'; // Add the length to the label 
 		
 		for (l = 0, nbr_local_cste = 0, local_value = '"'; l < meh2.length; l++) { // I count the number of constants and I add the value to local_value
 			if (typeof meh2[l] == 'string') {
@@ -293,8 +332,7 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	this.CircuitInfo[2] = String(Circuit_Name);
 	this.CircuitInfo[3] = json_yosysJS.creator;
 	
-	//document.write('Nbr ' + Constants[0]);
-	
+
 	return 1;
 }
 // --
@@ -1134,18 +1172,16 @@ function GenerateAllWires() { // This function generates wires between elements 
 	var Offset1 = 0, Offset2 = 0; // Points offset (see function GetOffset)
 
 	// 1. Removing "old" wires
-	for (i = 1; i <= this.Wires[0]; i++) {
-		this.Wires[i].remove();
-		this.WireLength[i] = 0;
-	}
-	
-	this.Wires[0] = 0;
+	RemoveAllWires.call(this);
 
 	// 2. Making new wires
 	for (i = 1, n = 1; (n - v) <= this.NetList[0] && i <= 300; i++) {
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof this.NetList[i] != 'undefined') {
 			if (this.NetList[i][0] == 2) { // Only two this.Components on the same line.
+				if (this.Connections[this.NetList[i][1][0]][this.NetList[i][2][0]] == 1 && this.Connections[this.NetList[i][2][0]][this.NetList[i][1][0]] == 1 && (this.Components[this.NetList[i][1][0]][1] + this.Components[this.NetList[i][2][0]][1]) <= 2)
+					break;
+				
 				Offset1 = GetOffset.call(this, this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1]);
 				Offset2 = GetOffset.call(this, this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1]);
 
@@ -1159,6 +1195,10 @@ function GenerateAllWires() { // This function generates wires between elements 
 				
 				this.Wires[0]++;
 				n++;
+				
+				this.Connections[this.NetList[i][1][0]][this.NetList[i][2][0]] = 1;
+				this.Connections[this.NetList[i][2][0]][this.NetList[i][1][0]] = 1;
+					
 			}
 				
 			else { // More than 2 this.Components on the same line.
@@ -1301,6 +1341,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 	for (i = 1; i <= this.Wires[0]; i++) {
 		this.nodes.add(this.Wires[i]);
 	}
+
 }
 
 function GenerateOneWire(xa, xb, ya, yb) {
@@ -1313,9 +1354,17 @@ function GenerateOneWire(xa, xb, ya, yb) {
 
 function RemoveAllWires() {
 	var i = 0;
+	var l = 0;
+	var m = 0;
 	
 	for (i = 1; i <= this.Wires[0]; i++)
 		this.Wires[i].remove();
+	
+	for (l = 0; l <= 300; l++) {
+		for (m = 0; m <= 300; m++) {
+			this.Connections[l][m] = 0;
+		}
+	}
 	
 	this.Wires[0] = 0;
 }
