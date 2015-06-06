@@ -17,65 +17,69 @@ Here is a schematic about ...
 	var json1 = {
   "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
-    "mux_using_case": {
+    "counter_2bit": {
       "ports": {
-        "din_0": {
+        "a": {
           "direction": "input",
           "bits": [ 2 ]
         },
-        "din_1": {
+        "b": {
           "direction": "input",
-          "bits": [ 3 ]
+          "bits": [ 5 ]
         },
-        "sel": {
-          "direction": "input",
-          "bits": [ 4 ]
-        },
-        "mux_out": {
+        "c": {
           "direction": "output",
-          "bits": [ "0" ]
+          "bits": [ 8 ]
         }
       },
       "cells": {
+        "$auto$simplemap.cc:228:simplemap_logbin$47": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 5 ],
+            "Y": [ 8 ]
+          }
+        }
       },
       "netnames": {
-        "din_0": {
+        "a": {
           "hide_name": 0,
-          "bits": [ 2 ],
+          "bits": [ 2, 3, 4 ],
           "attributes": {
-            "src": "input.v:14"
+            "src": "input.v:2"
           }
         },
-        "din_1": {
+        "b": {
           "hide_name": 0,
-          "bits": [ 3 ],
+          "bits": [ 5, 6, 7 ],
           "attributes": {
-            "src": "input.v:14"
+            "src": "input.v:3"
           }
         },
-        "mux_out": {
+        "c": {
           "hide_name": 0,
-          "bits": [ "0" ],
+          "bits": [ 8 ],
           "attributes": {
-            "src": "input.v:16"
-          }
-        },
-        "sel": {
-          "hide_name": 0,
-          "bits": [ 4 ],
-          "attributes": {
-            "src": "input.v:14"
+            "src": "input.v:4"
           }
         }
       }
     }
   }
 };
+
 	
 	
 	
 	var test = new Golirev('drawing', '100%', '100%');
 	test.DisplayJson(json1, 0);
+	test.PlaceLabelsName();
 
 </script>
 </body>
