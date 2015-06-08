@@ -67,6 +67,8 @@ function Golirev(svg_id, sizeX, sizeY) {
 	// Init variables
 	this.gate_type = 0;
 	
+	this.PlacementDone = 0; // Is Placement done ?
+	
 	this.CircuitInfo = new Array(); // Informations concerning the circuits
 	/*
 	Details about Circuit Info
@@ -101,6 +103,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 			[n][1][2] = OffsetX;
 			[n][1][3] = OffsetY;
 			[n][1][4] = Size of the port;
+			[n][1][5] = index of element;
 	NetList[n][2] = Array (Second Object)
 	NetList[n][y] = Array (ynd Object)
 	*/
@@ -200,48 +203,33 @@ function PlaceLabelsName() { // Place labels on wires, TODO : A function to remo
 	var moyenneY = 0;
 	
 	for (i = 1; i <= this.Wires[0]; i++) { // loop on each connection in order to display informations concerning the label
-		alert(this.Wires[i][2] + ' : ' + this.Wires[i][3]);
 		if (this.Wires[i][2] == 1 && this.Wires[i][3] == 1) {
+			
 			moyenneX = (this.Wires[i][6] + this.Wires[i][8]) / 2;
 			moyenneY = (this.Wires[i][7] + this.Wires[i][9]) / 2 - 10;
-			this.Wires[i][5] = this.svgjs.text("1").center(moyenneX, moyenneY)
+			
+			if (typeof this.Wires[i][1] == 'undefined')
+				this.Wires[i][1] = this.svgjs.text("1").center(moyenneX, moyenneY);
+			else
+				this.Wires[i][1].center(moyenneX, moyenneY);
+		}
+			
+		else { // display label
+			
+			moyenneX = (this.Wires[i][6] + this.Wires[i][8]) / 2;
+			moyenneY = (this.Wires[i][7] + this.Wires[i][9]) / 2 - 10;
+			
+			if (typeof this.Wires[i][1] == 'undefined')
+				this.Wires[i][1] = this.svgjs.text(this.Wires[i][4] + '->' +this.Wires[i][5]).center(moyenneX, moyenneY)
+			else
+				this.Wires[i][1].center(moyenneX, moyenneY);
+			
 		}
 	}
-	/*
-		// idées : pas besoin de tout recalculer, on pourrait juste modifier la position
-		
-		else if (uniquement des I/O)  {
-			if (la taille de la connection est de 1 bit) {
-				Il faut que j\indique quel bit est utilisé, ie : a[4] d\'un coté et b[3] de l\'autre.
-			}
-			
-			else { // On a affaire à un bus
-				Il faut indiquer les bits utilisé sous cette forme : "A[N1], A[N2], .. -> Y[N1], Y[N2], .."
-			}
-		}
-		
-		else if (uniquement des cell) { // only cells
-			if (la taille de la connection est de 1 bit) {
-				Il faut que jindique quel bit est utilisé, ie : a[4] d\un coté et A[2] de l\autre.
-			}
-				
-			else { // On a affaire à un bus
-				Il faut indiquer les bits utilisé sous cette forme : "A[N1], A[N2], .. -> Y[N1], Y[N2], .."
-			}
-		}
-		
-		else { // IO && cells
-			if (la taille de la connection est de 1 bit) {
-				Il faut que jindique quel bit est utilisé, ie : a[4] d\un coté et A[2] de l\autre.
-			}
-			
-			else { // On a affaire à un bus
-				Il faut indiquer les bits utilisé sous cette forme : "A[N1], A[N2], .. -> Y[N1], Y[N2], .."
-			}
-		}
-	}
-*/
 	
+	for (i = 1; i <= this.Wires[0]; i++) {
+		this.nodes.add(this.Wires[i][1]);
+	}
 }
 // --
 
@@ -278,7 +266,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 		
 		var meh2 = json_yosysJS.modules[Circuit_Name].ports[io_names[i]].bits;
 		
-		this.Components[this.Components[0]][0] += ' (' + meh2.length + ')'; // Add the length to the label 
+		if (meh2.length > 1)
+			this.Components[this.Components[0]][0] += ' [' + (meh2.length - 1) + ':0]'; // Add the length to the label 
 		
 		for (l = 0, nbr_local_cste = 0, local_value = '"'; l < meh2.length; l++) { // I count the number of constants and I add the value to local_value
 			if (typeof meh2[l] == 'string') {
@@ -308,12 +297,13 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 					
 					this.NetList[meh2[l]][1] = new Array();
 					this.NetList[meh2[l]][1][0] = 1 + parseInt(i);
-					this.NetList[meh2[l]][1][1] = 0;
+					this.NetList[meh2[l]][1][1] = io_names[i];
 					
 					this.NetList[meh2[l]][1][2] = 0; // x
 					this.NetList[meh2[l]][1][3] = 0; // y
 					
 					this.NetList[meh2[l]][1][4] = meh2.length; 
+					this.NetList[meh2[l]][1][5] = l; 
 					
 					this.NetList[0]++;
 				}
@@ -323,12 +313,13 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]] = new Array();
 					
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][0] = 1 + parseInt(i);
-					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][1] = 0;
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][1] = io_names[i];;
 					
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][2] = 0; // x
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][3] = 0; // y
 					
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][4] = meh2.length; 
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][5] = l; 
 				}
 			}
 		}
@@ -369,11 +360,12 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 				this.NetList[meh][1] = new Array();
 				this.NetList[meh][1][0] = parseInt(i) + parseInt(n) + 2;
 				this.NetList[meh][1][1] = cell_io_name[k];
-				
+
 				this.NetList[meh][1][2] = 0; // x
 				this.NetList[meh][1][3] = 0; // y
 				
 				this.NetList[meh][1][4] = meh2.length; 
+				this.NetList[meh][1][5] = -1; 
 				this.NetList[0]++;
 			}
 		
@@ -388,6 +380,7 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 				
 								
 				this.NetList[meh][this.NetList[meh][0]][4] = meh2.length; 
+				this.NetList[meh][this.NetList[meh][0]][5] = -1; 
 			}							
 		}
 	}
@@ -1018,6 +1011,8 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
         temperature *= alpha;
     }
 	
+	this.PlacementDone = 1;
+	
 }
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
@@ -1264,6 +1259,29 @@ function GenerateAllWires() { // This function generates wires between elements 
 				this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
 				this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 				
+				// Labels
+				if ((this.NetList[i][2][1] == 'Y' && this.Components[this.NetList[i][1][0]][1] > 1) || this.Components[this.NetList[i][1][0]][1] == 1) { // If the second component is an output
+					this.Wires[n][4] = this.NetList[i][2][1];
+					if (this.NetList[i][2][5] != -1)
+						this.Wires[n][4] += '[' + this.NetList[i][2][5] + ']'; 
+					
+					this.Wires[n][5] = this.NetList[i][1][1]
+					if (this.NetList[i][1][5] != -1)
+						this.Wires[n][5] += '[' + this.NetList[i][1][5] + ']'; 
+				}
+				
+				else {
+					this.Wires[n][5] = this.NetList[i][2][1];
+					if (this.NetList[i][2][5] != -1)
+						this.Wires[n][5] += '[' + this.NetList[i][2][5] + ']'; 
+					
+					this.Wires[n][4] = this.NetList[i][1][1]
+					if (this.NetList[i][1][5] != -1)
+						this.Wires[n][4] += '[' + this.NetList[i][1][5] + ']'; 	
+				}
+
+				// --
+				
 				this.Wires[0]++;
 				n++;
 				
@@ -1333,6 +1351,9 @@ function GenerateAllWires() { // This function generates wires between elements 
 							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
+							this.Wires[n][4] = 'input';
+							this.Wires[n][5] = 'output';
+							
 							this.Wires[0]++;
 							n++;
 							v++;
@@ -1365,6 +1386,9 @@ function GenerateAllWires() { // This function generates wires between elements 
 							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
 							
+							this.Wires[n][4] = 'input';
+							this.Wires[n][5] = 'output';
+							
 							this.Wires[0]++;
 							n++;
 							v++;
@@ -1396,6 +1420,9 @@ function GenerateAllWires() { // This function generates wires between elements 
 							
 							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
 							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							
+							this.Wires[n][4] = 'input';
+							this.Wires[n][5] = 'output';
 							
 							this.Wires[0]++;
 							n++;
@@ -1433,6 +1460,11 @@ function GenerateAllWires() { // This function generates wires between elements 
 	for (i = 1; i <= this.Wires[0]; i++) {
 		this.nodes.add(this.Wires[i][0]);
 	}
+	
+	if (this.PlacementDone) {
+		PlaceLabelsName.call(this);	
+	}
+
 
 }
 

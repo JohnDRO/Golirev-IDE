@@ -21,19 +21,23 @@ Here is a schematic about ...
       "ports": {
         "a": {
           "direction": "input",
-          "bits": [ 2 ]
+          "bits": [ 2, 3 ]
         },
         "b": {
           "direction": "input",
-          "bits": [ 5 ]
+          "bits": [ 4, 5 ]
         },
         "c": {
           "direction": "output",
-          "bits": [ 8 ]
+          "bits": [ 6, 19 ]
+        },
+        "d": {
+          "direction": "input",
+          "bits": [ 7, 8 ]
         }
       },
       "cells": {
-        "$auto$simplemap.cc:228:simplemap_logbin$47": {
+        "$auto$simplemap.cc:228:simplemap_logbin$97": {
           "hide_name": 1,
           "type": "$_AND_",
           "parameters": {
@@ -42,37 +46,65 @@ Here is a schematic about ...
           },
           "connections": {
             "A": [ 2 ],
-            "B": [ 5 ],
-            "Y": [ 8 ]
+            "B": [ 4 ],
+            "Y": [ 9 ]
+          }
+        },
+        "$auto$simplemap.cc:228:simplemap_logbin$98": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 7 ],
+            "Y": [ 6 ]
           }
         }
       },
       "netnames": {
+        "$logic_and$input.v:5$50_Y": {
+          "hide_name": 1,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "input.v:5"
+          }
+        },
         "a": {
           "hide_name": 0,
-          "bits": [ 2, 3, 4 ],
+          "bits": [ 2, 3 ],
           "attributes": {
             "src": "input.v:2"
           }
         },
         "b": {
           "hide_name": 0,
-          "bits": [ 5, 6, 7 ],
+          "bits": [ 4, 5 ],
           "attributes": {
-            "src": "input.v:3"
+            "src": "input.v:2"
           }
         },
         "c": {
           "hide_name": 0,
-          "bits": [ 8 ],
+          "bits": [ 6, 10 ],
           "attributes": {
-            "src": "input.v:4"
+            "src": "input.v:3"
+          }
+        },
+        "d": {
+          "hide_name": 0,
+          "bits": [ 7, 8 ],
+          "attributes": {
+            "src": "input.v:2"
           }
         }
       }
     }
   }
-};
+}
+;
 
 	
 	
