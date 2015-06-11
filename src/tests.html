@@ -21,36 +21,27 @@ Here is a schematic about ...
       "ports": {
         "a": {
           "direction": "input",
-          "bits": [ 2, 3 ]
+          "bits": [ 2 ]
         },
         "b": {
           "direction": "input",
-          "bits": [ 4, 5 ]
+          "bits": [ 3 ]
         },
         "c": {
-          "direction": "output",
-          "bits": [ 6, 19 ]
+          "direction": "input",
+          "bits": [ 4 ]
         },
         "d": {
-          "direction": "input",
-          "bits": [ 7, 8 ]
+          "direction": "output",
+          "bits": [ 5 ]
+        },
+        "e": {
+          "direction": "output",
+          "bits": [ 6 ]
         }
       },
       "cells": {
-        "$auto$simplemap.cc:228:simplemap_logbin$97": {
-          "hide_name": 1,
-          "type": "$_AND_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 2 ],
-            "B": [ 4 ],
-            "Y": [ 9 ]
-          }
-        },
-        "$auto$simplemap.cc:228:simplemap_logbin$98": {
+        "$auto$simplemap.cc:228:simplemap_logbin$152": {
           "hide_name": 1,
           "type": "$_OR_",
           "parameters": {
@@ -58,60 +49,96 @@ Here is a schematic about ...
           "attributes": {
           },
           "connections": {
-            "A": [ 9 ],
+            "A": [ 4 ],
             "B": [ 7 ],
             "Y": [ 6 ]
+          }
+        },
+        "$auto$simplemap.cc:228:simplemap_logbin$153": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 7 ],
+            "Y": [ 5 ]
+          }
+        },
+        "$auto$simplemap.cc:37:simplemap_not$151": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 7 ]
           }
         }
       },
       "netnames": {
-        "$logic_and$input.v:5$50_Y": {
+        "$not$input.v:6$104_Y": {
           "hide_name": 1,
-          "bits": [ 9 ],
+          "bits": [ 7 ],
           "attributes": {
-            "src": "input.v:5"
+            "src": "input.v:6"
           }
         },
         "a": {
           "hide_name": 0,
-          "bits": [ 2, 3 ],
+          "bits": [ 2 ],
           "attributes": {
             "src": "input.v:2"
           }
         },
         "b": {
           "hide_name": 0,
-          "bits": [ 4, 5 ],
+          "bits": [ 3 ],
           "attributes": {
             "src": "input.v:2"
           }
         },
         "c": {
           "hide_name": 0,
-          "bits": [ 6, 10 ],
+          "bits": [ 4 ],
           "attributes": {
-            "src": "input.v:3"
+            "src": "input.v:2"
           }
         },
         "d": {
           "hide_name": 0,
-          "bits": [ 7, 8 ],
+          "bits": [ 5 ],
           "attributes": {
-            "src": "input.v:2"
+            "src": "input.v:3"
+          }
+        },
+        "e": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "input.v:3"
           }
         }
       }
     }
   }
-}
-;
+};
+
+
+
+
+
 
 	
 	
 	
 	var test = new Golirev('drawing', '100%', '100%');
 	test.DisplayJson(json1, 0);
-	test.PlaceLabelsName();
+	//test.PlaceLabelsName();
 
 </script>
 </body>
