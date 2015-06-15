@@ -19,7 +19,7 @@ function Init() {
 	this.LabelsDone = 0; // Are Labels done ?
 	
 	RemoveAllGates.call(this);
-	//RemoveAllWires.call(this);
+
 	
 	// Remove Netlist
 	for (i = 1, n = 1; n <= this.NetList[0]; i++) {
@@ -28,6 +28,23 @@ function Init() {
 			n++;
 		}
 	} 
+	
+	// Reset Wires data
+	for (i = 1, n = 1; n <= this.Wires[0]; i++) {
+		if (typeof this.Wires[i] != 'undefined') {
+			this.Wires[i][0].remove();
+			this.Wires[i][1].remove();
+			n++;
+		}
+	} 
+	
+	this.Wires = new Array();
+	this.Wires[0] = 0;
+	
+	for (i = 1; i <= 300; i++)
+		this.Wires[i] = new Array();
+
+
 	// --
 	
 	// Remove Constants
@@ -41,19 +58,8 @@ function Init() {
 	this.NetList[0] = 0; // Init links to 0
 	this.Constants[0] = 0;
 	
-	// Reset Wires data
-	for (i = 1; i <= this.Wires[0]; i++) {
-		this.Wires[i][1].remove();
-	}
-	
-	RemoveAllWires.call(this);
-	delete this.Wires;
-	this.Wires = new Array();
-	
-	
-	for (i = 1; i <= 300; i++)
-		this.Wires[i] = new Array();
-	// --
+
+
 	
 	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
 	for (l = 0; l <= 300; l++) {
@@ -62,6 +68,15 @@ function Init() {
 		}
 	}
 	
+	this.Grid = new Array();
+	var a, b;
+	for (a = -500; a < 500; a++) {
+		this.Grid[a] = new Array();
+			for (b = -500; b < 500; b++) {
+				this.Grid[a][b] = 0;
+		}
+	}
+	// --
 	
 	return 1;
 }
@@ -161,16 +176,6 @@ function Golirev(svg_id, sizeX, sizeY) {
 		this.Wires[i] = new Array();
 
 	this.WireLength = new Array();
-
-	this.Grid = new Array();
-	var a, b;
-	for (a = -500; a < 500; a++) {
-		this.Grid[a] = new Array();
-			for (b = -500; b < 500; b++) {
-				this.Grid[a][b] = 0;
-		}
-	}
-	// --
 	
 	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
 	this.Connections = new Array();
@@ -1026,6 +1031,7 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
         temperature *= alpha;
     }
 	
+	alert(iteration);
 	this.PlacementDone = 1;
 	
 }
