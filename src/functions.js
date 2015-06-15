@@ -1031,7 +1031,6 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
         temperature *= alpha;
     }
 	
-	alert(iteration);
 	this.PlacementDone = 1;
 	
 }
