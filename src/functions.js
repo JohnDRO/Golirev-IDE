@@ -32,8 +32,11 @@ function Init() {
 	// Reset Wires data
 	for (i = 1, n = 1; n <= this.Wires[0]; i++) {
 		if (typeof this.Wires[i] != 'undefined') {
-			this.Wires[i][0].remove();
-			this.Wires[i][1].remove();
+			if (typeof this.Wires[i][0] != 'undefined')
+				this.Wires[i][0].remove();
+			
+			if (typeof this.Wires[i][1] != 'undefined')
+				this.Wires[i][1].remove();
 			n++;
 		}
 	} 
@@ -57,9 +60,6 @@ function Init() {
 	this.Components[0] = 0; // Init components to 0
 	this.NetList[0] = 0; // Init links to 0
 	this.Constants[0] = 0;
-	
-
-
 	
 	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
 	for (l = 0; l <= 300; l++) {
@@ -164,11 +164,6 @@ function Golirev(svg_id, sizeX, sizeY) {
 	Wires[n][7] = PosY element 1
 	Wires[n][8] = PosX element 2
 	Wires[n][9] = PosY element 2
-
-	*
-	*
-	*
-	*
 	*/
 	this.Wires[0] = 0;
 	
@@ -190,8 +185,6 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.DisplayJson = ShowJSON;
 	this.ParseJSON = ParseJson;
 	this.UpdateGate = UpdateGate;
-	
-	this.PlaceLabelsName = PlaceLabelsName;
 	// --
 }
 
