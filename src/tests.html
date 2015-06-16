@@ -15,130 +15,122 @@ Here is a schematic about ...
 <script>
 	// tests
 	var json1 = {
-  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
-  "modules": {
-    "counter_2bit": {
-      "ports": {
-        "a": {
-          "direction": "input",
-          "bits": [ 2 ]
-        },
-        "b": {
-          "direction": "input",
-          "bits": [ 3 ]
-        },
-        "c": {
-          "direction": "input",
-          "bits": [ 4 ]
-        },
-        "d": {
-          "direction": "output",
-          "bits": [ 5 ]
-        },
-        "e": {
-          "direction": "output",
-          "bits": [ 6 ]
-        }
-      },
-      "cells": {
-        "$auto$simplemap.cc:228:simplemap_logbin$152": {
-          "hide_name": 1,
-          "type": "$_OR_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 4 ],
-            "B": [ 7 ],
-            "Y": [ 6 ]
-          }
-        },
-        "$auto$simplemap.cc:228:simplemap_logbin$153": {
-          "hide_name": 1,
-          "type": "$_AND_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 3 ],
-            "B": [ 7 ],
-            "Y": [ 5 ]
-          }
-        },
-        "$auto$simplemap.cc:37:simplemap_not$151": {
-          "hide_name": 1,
-          "type": "$_NOT_",
-          "parameters": {
-          },
-          "attributes": {
-          },
-          "connections": {
-            "A": [ 2 ],
-            "Y": [ 7 ]
-          }
-        }
-      },
-      "netnames": {
-        "$not$input.v:6$104_Y": {
-          "hide_name": 1,
-          "bits": [ 7 ],
-          "attributes": {
-            "src": "input.v:6"
-          }
-        },
-        "a": {
-          "hide_name": 0,
-          "bits": [ 2 ],
-          "attributes": {
-            "src": "input.v:2"
-          }
-        },
-        "b": {
-          "hide_name": 0,
-          "bits": [ 3 ],
-          "attributes": {
-            "src": "input.v:2"
-          }
-        },
-        "c": {
-          "hide_name": 0,
-          "bits": [ 4 ],
-          "attributes": {
-            "src": "input.v:2"
-          }
-        },
-        "d": {
-          "hide_name": 0,
-          "bits": [ 5 ],
-          "attributes": {
-            "src": "input.v:3"
-          }
-        },
-        "e": {
-          "hide_name": 0,
-          "bits": [ 6 ],
-          "attributes": {
-            "src": "input.v:3"
-          }
-        }
-      }
-    }
-  }
-};
+	  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+	  "modules": {
+		"counter_2bit": {
+		  "ports": {
+			"a": {
+			  "direction": "input",
+			  "bits": [ 2 ]
+			},
+			"b": {
+			  "direction": "input",
+			  "bits": [ 3 ]
+			},
+			"c": {
+			  "direction": "input",
+			  "bits": [ 4 ]
+			},
+			"d": {
+			  "direction": "output",
+			  "bits": [ 5 ]
+			},
+			"e": {
+			  "direction": "output",
+			  "bits": [ 6 ]
+			}
+		  },
+		  "cells": {
+			"$auto$simplemap.cc:228:simplemap_logbin$152": {
+			  "hide_name": 1,
+			  "type": "$_OR_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 4 ],
+				"B": [ 7 ],
+				"Y": [ 6 ]
+			  }
+			},
+			"$auto$simplemap.cc:228:simplemap_logbin$153": {
+			  "hide_name": 1,
+			  "type": "$_AND_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 3 ],
+				"B": [ 7 ],
+				"Y": [ 5 ]
+			  }
+			},
+			"$auto$simplemap.cc:37:simplemap_not$151": {
+			  "hide_name": 1,
+			  "type": "$_NOT_",
+			  "parameters": {
+			  },
+			  "attributes": {
+			  },
+			  "connections": {
+				"A": [ 2 ],
+				"Y": [ 7 ]
+			  }
+			}
+		  },
+		  "netnames": {
+			"$not$input.v:6$104_Y": {
+			  "hide_name": 1,
+			  "bits": [ 7 ],
+			  "attributes": {
+				"src": "input.v:6"
+			  }
+			},
+			"a": {
+			  "hide_name": 0,
+			  "bits": [ 2 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"b": {
+			  "hide_name": 0,
+			  "bits": [ 3 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"c": {
+			  "hide_name": 0,
+			  "bits": [ 4 ],
+			  "attributes": {
+				"src": "input.v:2"
+			  }
+			},
+			"d": {
+			  "hide_name": 0,
+			  "bits": [ 5 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			},
+			"e": {
+			  "hide_name": 0,
+			  "bits": [ 6 ],
+			  "attributes": {
+				"src": "input.v:3"
+			  }
+			}
+		  }
+		}
+	  }
+	};
 
-
-
-
-
-
-	
-	
 	
 	var test = new Golirev('drawing', '100%', '100%');
 	test.DisplayJson(json1, 0);
-	//test.PlaceLabelsName();
 
 </script>
 </body>
