@@ -199,9 +199,9 @@ function ShowJSON(json_object, gate_type) {
 	// --
 	
 	GenerateAllGates.call(this);
-	SimulatedAnnealing.call(this);
-	CenterComponents.call(this);
-	GenerateAllWires.call(this);
+	SimulatedAnnealing.call(this); 
+	CenterComponents.call(this); 
+	GenerateAllWires.call(this); 
 	PlaceCircuitName.call(this);
 }
 
@@ -213,7 +213,7 @@ function UpdateGate(gate_type) {
 	 PlaceCircuitName.call(this);
 }
 
-function PlaceLabelsName() { // Place labels on wires, TODO : A function to remove them
+function PlaceLabelsName() { // Place labels on wires
 	var i = 0;
 	var moyenneX = 0;
 	var moyenneY = 0;
@@ -242,7 +242,8 @@ function PlaceLabelsName() { // Place labels on wires, TODO : A function to remo
 			
 		}
 		
-		this.nodes.add(this.Wires[i][1]); // Erreur ici, à check
+		if (this.Wires[i][1])
+			this.nodes.add(this.Wires[i][1]);
 	}
 }
 // --
@@ -402,7 +403,6 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	this.CircuitInfo[2] = String(Circuit_Name);
 	this.CircuitInfo[3] = json_yosysJS.creator;
 	
-
 	return 1;
 }
 // --
@@ -1210,6 +1210,7 @@ function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') co
 		}
 	}
 	
+	
 	resultx = (max_right + max_left) / 2;
 	resulty = max_height + Offset;
 	
@@ -1603,7 +1604,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 			}
 		}
 	}
-
+	
 	// 3. Constants
 	for (i = 1; i <= this.Constants[0]; i++) {
 		Offset1 = GetOffset.call(this, 0, 0);
@@ -1622,19 +1623,18 @@ function GenerateAllWires() { // This function generates wires between elements 
 		this.Wires[0]++;
 	}
 	
+	
 	// 4. Add wires to the pannable and zoomable group
 	for (i = 1; i <= this.Wires[0]; i++) {
 		this.nodes.add(this.Wires[i][0]);
 	}
 	
-	if (this.PlacementDone && !this.LabelsDone) {
-		this.LabelsDone = 1;
-		PlaceLabelsName.call(this);	
-	}	
-	if (this.PlacementDone && this.LabelsDone) {
+	if (this.PlacementDone) {
+		if (!this.LabelsDone)
+			this.LabelsDone = 1;
+		
 		PlaceLabelsName.call(this);	
 	}
-
 }
 
 function GenerateOneWire(xa, xb, ya, yb) {
