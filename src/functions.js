@@ -1158,7 +1158,7 @@ function CenterComponents() {
 	}
 	
 	for (i = 1; i <= this.Constants[0]; i++) {
-		MoveToGrid(this.Constants[i][1], this.Constants[i][1].x()/100 - x + 2, this.Constants[i][1].y()/100 - y + 2);
+		MoveToGrid(this.Constants[i][1], this.Constants[i][1].x()/100 - x + 1, this.Constants[i][1].y()/100 - y + 1);
 	}
 }
 
