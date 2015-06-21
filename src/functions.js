@@ -181,19 +181,19 @@ function Golirev(svg_id, sizeX, sizeY) {
 		}
 	}
 	
-	// Methods
-	this.DisplayJson = ShowJSON;
-	this.ParseJSON = ParseJson;
-	this.UpdateGate = UpdateGate;
-	// --
-	
-	// tests SA
-	this.Async = 1; // Are we using an blocking function
+	// Simulated Annealing parameters
+	this.Async = 0; // 0 means that we will use the blocking function, 1 means that we will use the window.setTimeout method.
 	this.distance;
 	this.alpha;
 	this.temperature;
 	this.epsilon;
 	this.iteration;
+	// --
+	
+	// Methods
+	this.DisplayJson = ShowJSON;
+	this.ParseJSON = ParseJson;
+	this.UpdateGate = UpdateGate;
 	// --
 }
 
@@ -207,7 +207,7 @@ function ShowJSON(json_object, gate_type) {
 	
 	GenerateAllGates.call(this);
 	
-	if (!this.Async) {
+	if (!this.Async) { // blocking method
 		InitSimulatedAnnealing.call(this);
 		SimulatedAnnealing.call(this); 
 		
@@ -215,14 +215,14 @@ function ShowJSON(json_object, gate_type) {
 		GenerateAllWires.call(this); 
 		PlaceCircuitName.call(this);
 	}
-	else {
+	
+	else { // async with setTimeout
 		InitSimulatedAnnealing.call(this);
 		
 		var obj = this;
 		
 		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10);
-	}
-		
+	}	
 }
 
 function UpdateGate(gate_type) {
@@ -991,9 +991,41 @@ function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape t
 // --
 
 // Placement
-function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C
+// Tests Simulated Annealing
+function InitSimulatedAnnealing() { // Initialisation of Simulated annealing
+	var i = 0;
+	var n = 0;
+	
+	// Initial parameters settings
+	this.alpha = 0.999;
+    this.temperature = 400.0;
+    this.epsilon = 0.001;
+	
+	this.iteration = 0;
+	
+	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
+	//
+	
+	// Initial components placement : currently we are just placing components in a column
+	for (i = 1; i <= this.Components[0]; i++) {
+		this.Grid[5][i] = 1;
+		MoveToGrid(this.Components[i][6], 5, i);
+	}
+	
+	for (i, n = 1; n <= this.Constants[0]; i++, n++) {
+		this.Grid[5][i] = 1;
+		MoveToGrid(this.Constants[n][1], 5, i);
+	}
+	// --
+	
+	GenerateAllWires.call(this);
+	this.distance = GetWiresLength.call(this);
+}
 
+function SimulatedAnnealing() { // Simulated Annealing, blocking function (http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C)
 	var Arr;
+	var delta;
+	var proba;
 
     // While the temperature did not reach epsilon
     while (this.temperature > this.epsilon) {
@@ -1009,9 +1041,9 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
             this.distance = delta + this.distance;
         
 		else {
-            this.proba = Math.random();
+            proba = Math.random();
 			
-            if(this.proba < Math.exp(-delta/this.temperature))
+            if(proba < Math.exp(-delta/this.temperature))
                 this.distance = delta + this.distance;
 			
 			else 
@@ -1023,8 +1055,58 @@ function SimulatedAnnealing() { // http://www.codeproject.com/Articles/13789/Sim
     }
 	
 	this.PlacementDone = 1;
-	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
 	
+	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
+}
+
+function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
+	var Arr;
+	var delta;
+	var proba;
+	var Out = 0;
+	
+	for (var i = 0; i <= 100 && !Out; i++) {
+		this.iteration++;
+		
+		// Make a random change
+		Arr = RandomChange.call(this);
+		GenerateAllWires.call(this);
+		
+		// Get the new delta
+		delta = GetWiresLength.call(this) - this.distance;
+		
+		if(delta < 0)
+			this.distance = delta + this.distance;
+		
+		else {
+			proba = Math.random();
+			
+			if(proba < Math.exp(-delta/this.temperature))
+				this.distance = delta + this.distance;
+			
+			else 
+				ReverseChange.call(this, Arr[0], Arr[1], Arr[2], Arr[3]);
+		}
+		
+		// Cooling process on every iteration
+		this.temperature *= this.alpha;
+		// --
+		
+		if (this.temperature <= this.epsilon) { // Did we reach the end of the placement
+			Out = 1;
+			console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
+			this.PlacementDone = 1;
+			
+			CenterComponents.call(this); 
+			GenerateAllWires.call(this); 
+			PlaceCircuitName.call(this);
+		}
+	}
+	
+	if (!Out) { // Do we still have iterations to do (i == 100 but this.temperature >= this.epsilon).
+		var obj = this;
+		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10); // We are calling again this function in order to do more iterations.
+	}
 }
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
@@ -1968,88 +2050,5 @@ function GetConnectionType(Component_ID) {
 // Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
-}
-// --
-
-
-// Tests Simulated Annealing
-function InitSimulatedAnnealing() {
-	var i = 0;
-	var n = 0;
-	
-	// Initial parameters settings
-	this.alpha = 0.999;
-    this.temperature = 400.0;
-    this.epsilon = 0.001;
-	
-	this.iteration = 0;
-	
-	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
-	//
-	
-	// Initial components placement
-	for (i = 1; i <= this.Components[0]; i++) {
-		this.Grid[5][i] = 1;
-		MoveToGrid(this.Components[i][6], 5, i);
-	}
-	
-	for (i, n = 1; n <= this.Constants[0]; i++, n++) {
-		this.Grid[5][i] = 1;
-		MoveToGrid(this.Constants[n][1], 5, i);
-	}
-	// --
-	
-	GenerateAllWires.call(this);
-	this.distance = GetWiresLength.call(this);
-}
-
-function RunSimulatedAnnealing() {
-	var Arr;
-	var delta;
-	var Out = 0;
-	
-	// --
-	for (var i = 0; i <= 100 && !Out; i++) {
-		this.iteration++;
-		
-		// Make a random change
-		Arr = RandomChange.call(this);
-		GenerateAllWires.call(this);
-		
-		// Get the new delta
-		delta = GetWiresLength.call(this) - this.distance;
-		
-		if(delta < 0)
-			this.distance = delta + this.distance;
-		
-		else {
-			this.proba = Math.random();
-			
-			if(this.proba < Math.exp(-delta/this.temperature))
-				this.distance = delta + this.distance;
-			
-			else 
-				ReverseChange.call(this, Arr[0], Arr[1], Arr[2], Arr[3]);
-		}
-		
-		// Cooling process on every iteration
-		this.temperature *= this.alpha;
-		// --
-		
-		if (this.temperature <= this.epsilon) {
-			Out = 1;
-			console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
-			this.PlacementDone = 1;
-			
-			CenterComponents.call(this); 
-			GenerateAllWires.call(this); 
-			PlaceCircuitName.call(this);
-		}
-	}
-	
-	if (!Out) {
-		var obj = this;
-		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10);
-	}
 }
 // --
