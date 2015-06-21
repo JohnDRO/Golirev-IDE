@@ -182,7 +182,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	}
 	
 	// Simulated Annealing parameters
-	this.Async = 0; // 0 means that we will use the blocking function, 1 means that we will use the window.setTimeout method.
+	this.Async = 1; // 0 means that we will use the blocking function, 1 means that we will use the window.setTimeout method.
 	this.distance;
 	this.alpha;
 	this.temperature;
@@ -1355,7 +1355,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 					this.Wires[n][3] = this.NetList[i][2][4];
 					
 					this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
-					this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+					this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 					
 									
 					this.Wires[0]++;
@@ -1471,7 +1471,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 							this.Wires[n][3] = this.NetList[i][index1][4];
 							
 							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-							this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+							this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 							
 							this.Wires[0]++;
 							n++;
@@ -1549,7 +1549,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 								this.Wires[n][3] = this.NetList[i][index2][4];
 								
 								this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-								this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+								this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 								
 								this.Wires[0]++;
 								n++;
@@ -1628,7 +1628,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 								this.Wires[n][3] = this.NetList[i][index3][4];
 								
 								this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-								this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+								this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 								
 								this.Wires[0]++;
 								n++;
@@ -1699,7 +1699,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 		yb = this.Components[this.Constants[i][2]][6].y() + Offset2[1];
 		
 		this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two components so I only have to make a wire between the componant A and the componant B.
-		this.WireLength[n] = Math.floor(Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya)));
+		this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 		
 		n++;
 		this.Wires[0]++;
@@ -1721,8 +1721,12 @@ function GenerateAllWires() { // This function generates wires between elements 
 
 function GenerateOneWire(xa, xb, ya, yb) {
 	var wire = 0;
+	var average = 0;
 	
-	wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 });
+	average = (xa + xb) / 2;
+	
+	//wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 });
+	wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0});
 	
 	return wire;
 }	
