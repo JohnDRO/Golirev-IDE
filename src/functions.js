@@ -202,7 +202,7 @@ function ShowJSON(json_object, gate_type) {
 	ParseJson.call(this, json_object);
 	// Pan + zoom init
 	this.nodes = this.svgjs.group();
-	this.nodes.panZoom();
+	this.nodes.panZoom({zoomSpeed : 5});
 	// --
 	
 	GenerateAllGates.call(this);
