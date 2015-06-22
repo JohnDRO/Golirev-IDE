@@ -18,7 +18,7 @@ What is not working / not done :
 ## Features :
 * Verilog Editor, interactive schematic viewer (zoom, drag and span) and automatic placement using simulated annealing :
 
-![Automatic placement using Simulated Annealing](http://i.imgur.com/EszUZct.png)
+![Automatic placement using Simulated Annealing](http://i.imgur.com/tBE2wLr.png)
 * Digital gates : 
 
 ![Gates](http://i.imgur.com/mPVuerk.png)
