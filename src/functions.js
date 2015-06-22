@@ -2116,7 +2116,7 @@ function OptimizePlacement () {
 	
 	// Option 2
 	for (i = 1; i <= this.Components[0]; i++) {
-		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+		//if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
 			WireLength = GetWiresLength.call(this); // Get the current WireLength
 			
 			this.Components[i][6].dy(1);
@@ -2158,8 +2158,10 @@ function OptimizePlacement () {
 					}
 				}
 			}
-		}
+		//}
 	}
+	
+	GenerateAllWires.call(this); 
 	
 	
 	/*
