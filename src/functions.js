@@ -2072,6 +2072,7 @@ function OptimizePlacement () {
 	var xb = 0;
 	var yb = 0;
 	
+	var MaxDif = 70;
 	
 	/* Options  :
 	 * 1. Try to modify component position and check if it improves the situation
@@ -2116,20 +2117,20 @@ function OptimizePlacement () {
 	
 	// Option 2
 	for (i = 1; i <= this.Components[0]; i++) {
-		//if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
 			WireLength = GetWiresLength.call(this); // Get the current WireLength
 			
 			this.Components[i][6].dy(1);
 			
 			GenerateAllWires.call(this);
 			if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
-				for (n = 0; n < 50 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+				for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
 					WireLength = GetWiresLength.call(this);
 					this.Components[i][6].dy(1);
 					GenerateAllWires.call(this); 
 				}
 				
-				if (n < 50) {
+				if (n < MaxDif) {
 					this.Components[i][6].dy(-1);
 					GenerateAllWires.call(this); 
 				}
@@ -2146,32 +2147,65 @@ function OptimizePlacement () {
 				}
 				
 				else {
-					for (n = 0; n < 50 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
 						WireLength = GetWiresLength.call(this);
 						this.Components[i][6].dy(-1);
 						GenerateAllWires.call(this); 
 					}
 					
-					if (n < 50) {
+					if (n < MaxDif) {
 						this.Components[i][6].dy(1);
 						GenerateAllWires.call(this); 
 					}
 				}
 			}
-		//}
+		}
 	}
 	
 	GenerateAllWires.call(this); 
 	
-	
-	/*
-	
-	for () { // constants
+	for (i = 1; i <= this.Constants[0]; i++) {
+		WireLength = GetWiresLength.call(this); // Get the current WireLength
 		
+		this.Constants[i][1].dy(1);
+		
+		GenerateAllWires.call(this);
+		if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
+			for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+				WireLength = GetWiresLength.call(this);
+				this.Constants[i][1].dy(1);
+				GenerateAllWires.call(this); 
+			}
+			
+			if (n < MaxDif) {
+				this.Constants[i][1].dy(-1);
+				GenerateAllWires.call(this); 
+			}
+		}
+		
+		else { // We have to go reverse
+			WireLength = GetWiresLength.call(this);
+			this.Constants[i][1].dy(-2);
+			
+			GenerateAllWires.call(this); 
+			
+			if ((GetWiresLength.call(this) - WireLength) > 0) {
+				this.Constants[i][1].dy(1);
+			}
+			
+			else {
+				for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					WireLength = GetWiresLength.call(this);
+					this.Constants[i][1].dy(-1);
+					GenerateAllWires.call(this); 
+				}
+				
+				if (n < MaxDif) {
+					this.Constants[i][1].dy(1);
+					GenerateAllWires.call(this); 
+				}
+			}
+		}
 	}
-	
-	*/
 	// --
-	
 }
-// --
