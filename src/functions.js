@@ -214,6 +214,8 @@ function ShowJSON(json_object, gate_type) {
 		CenterComponents.call(this); 
 		GenerateAllWires.call(this); 
 		PlaceCircuitName.call(this);
+		
+		OptimizePlacement.call(this);
 	}
 	
 	else { // async with setTimeout
@@ -1100,6 +1102,8 @@ function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
 			CenterComponents.call(this); 
 			GenerateAllWires.call(this); 
 			PlaceCircuitName.call(this);
+			
+			OptimizePlacement.call(this);
 		}
 	}
 	
@@ -2054,5 +2058,81 @@ function GetConnectionType(Component_ID) {
 // Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
+}
+// --
+
+// Simulated Annealing : tests
+function OptimizePlacement () {
+	var i = 0;
+	var n = 0;
+	var WireLength = 0;
+	
+	
+	/* Options  :
+	 * 1. Try to modify component position and check if it improves the situation
+	 * 2. Modify the position of components in their grids
+	 *
+	*/
+	
+	// Option 1
+	// --	
+	
+	// Option 2
+	for (i = 1; i <= this.Components[0]; i++) {
+		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+			WireLength = GetWiresLength.call(this); // Get the current WireLength
+			
+			this.Components[i][6].dy(1);
+			
+			GenerateAllWires.call(this);
+			if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
+				for (n = 0; n < 70 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					WireLength = GetWiresLength.call(this);
+					this.Components[i][6].dy(1);
+					GenerateAllWires.call(this); 
+				}
+				
+				if (n < 70) {
+					this.Components[i][6].dy(-1);
+					GenerateAllWires.call(this); 
+				}
+			}
+			
+			else { // We have to go reverse
+				WireLength = GetWiresLength.call(this);
+				this.Components[i][6].dy(-2);
+				
+				GenerateAllWires.call(this); 
+				
+				if ((GetWiresLength.call(this) - WireLength) > 0) {
+					this.Components[i][6].dy(1);
+				}
+				
+				else {
+					for (n = 0; n < 70 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+						WireLength = GetWiresLength.call(this);
+						this.Components[i][6].dy(-1);
+						GenerateAllWires.call(this); 
+					}
+					
+					if (n < 70) {
+						this.Components[i][6].dy(1);
+						GenerateAllWires.call(this); 
+					}
+				}
+			}
+		}
+	}
+	
+	
+	/*
+	
+	for () { // constants
+		
+	}
+	
+	*/
+	// --
+	
 }
 // --
