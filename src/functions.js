@@ -2067,6 +2067,11 @@ function OptimizePlacement () {
 	var n = 0;
 	var WireLength = 0;
 	
+	var xa = 0;
+	var ya = 0;
+	var xb = 0;
+	var yb = 0;
+	
 	
 	/* Options  :
 	 * 1. Try to modify component position and check if it improves the situation
@@ -2075,6 +2080,38 @@ function OptimizePlacement () {
 	*/
 	
 	// Option 1
+	for (i = 1; i <= this.Components[0]; i++) {
+		for (n = 1; n <= this.Components[0]; n++) {
+			if (n != i) {
+				// Save the current configuration
+				xa = this.Components[i][6].x();
+				ya = this.Components[i][6].y();
+				
+				xb = this.Components[n][6].x();
+				yb = this.Components[n][6].y();
+				
+				WireLength = GetWiresLength.call(this);
+				// --
+				
+				// I switch and check the results
+				MoveGateXY(this.Components[i][6], xb, yb);
+				MoveGateXY(this.Components[n][6], xa, ya);
+
+				GenerateAllWires.call(this);
+				
+				if ((WireLength - GetWiresLength.call(this)) > 0) { // Are we improving the system ?
+					; // Nothing to do.
+				}
+				
+				else { // We have to put it back, it is not improving the system
+					MoveGateXY(this.Components[i][6], xa, ya);
+					MoveGateXY(this.Components[n][6], xb, yb);
+					
+					GenerateAllWires.call(this);
+				}
+			}
+		}
+	}
 	// --	
 	
 	// Option 2
@@ -2086,13 +2123,13 @@ function OptimizePlacement () {
 			
 			GenerateAllWires.call(this);
 			if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
-				for (n = 0; n < 70 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+				for (n = 0; n < 50 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
 					WireLength = GetWiresLength.call(this);
 					this.Components[i][6].dy(1);
 					GenerateAllWires.call(this); 
 				}
 				
-				if (n < 70) {
+				if (n < 50) {
 					this.Components[i][6].dy(-1);
 					GenerateAllWires.call(this); 
 				}
@@ -2109,13 +2146,13 @@ function OptimizePlacement () {
 				}
 				
 				else {
-					for (n = 0; n < 70 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					for (n = 0; n < 50 && (GetWiresLength.call(this) - WireLength) < 0; n++) {
 						WireLength = GetWiresLength.call(this);
 						this.Components[i][6].dy(-1);
 						GenerateAllWires.call(this); 
 					}
 					
-					if (n < 70) {
+					if (n < 50) {
 						this.Components[i][6].dy(1);
 						GenerateAllWires.call(this); 
 					}
