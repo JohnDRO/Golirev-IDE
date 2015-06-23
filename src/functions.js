@@ -13,6 +13,9 @@ function Init() {
 	this.CircuitInfo[3] = "Default Creator"
 	if (typeof this.CircuitInfo[4] != 'undefined')
 		this.CircuitInfo[4].remove();
+	this.CircuitInfo[5] = 0;
+	this.CircuitInfo[6] = 0;
+	this.CircuitInfo[7] = 0;
 	// --
 	
 	this.PlacementDone = 0; // Is Placement done ?
@@ -109,6 +112,9 @@ function Golirev(svg_id, sizeX, sizeY) {
 	CircuitInfo[2] = name of the circuit
 	CircuitInfo[3] = "Creator"
 	CircuitInfo[4] = Text svg element.
+	CircuitInfo[5] = Number of Inputs
+	CircuitInfo[6] = Number of Outputs
+	CircuitInfo[7] = Number of Cells.
 	*/
 
 	this.Components = new Array(); // variable globale
@@ -295,6 +301,12 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 		// Component related : done
 		this.Components[this.Components[0]][0] = io_names[i]; // label
 		this.Components[this.Components[0]][1] = (json_yosysJS.modules[Circuit_Name].ports[io_names[i]].direction === 'input') ? 0 : 1;
+		
+		if (!this.Components[this.Components[0]][1])
+			this.CircuitInfo[5]++;
+		else
+			this.CircuitInfo[6]++;
+		
 		this.Components[this.Components[0]][2] = 1; // Show label of I/O by default
 		// --
 		
@@ -424,6 +436,7 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 	
 	this.CircuitInfo[2] = String(Circuit_Name);
 	this.CircuitInfo[3] = json_yosysJS.creator;
+	this.CircuitInfo[7] = this.Components[0] - this.CircuitInfo[5] - this.CircuitInfo[6];
 	
 	return 1;
 }
