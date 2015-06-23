@@ -257,72 +257,8 @@ Console output :<br />
 	var TopPanelID = addPanel("top", "Type your Verilog code here !");
 	var BotPanelID = addPanel("bottom", "The status of your code will be displayed here !");
 	// --
-
-	// tests
-	var json = {
-	 "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
-	  "modules": {
-		"counter_2bit": {
-		  "ports": {
-			"a": {
-			  "direction": "input",
-			  "bits": [ 2 ]
-			},
-			"b": {
-			  "direction": "input",
-			  "bits": [ 3 ]
-			},
-			"c": {
-			  "direction": "output",
-			  "bits": [ 4 ]
-			}
-		  },
-		  "cells": {
-			"$auto$simplemap.cc:228:simplemap_logbin$2072": {
-			  "hide_name": 1,
-			  "type": "$_AND_",
-			  "parameters": {
-			  },
-			  "attributes": {
-			  },
-			  "connections": {
-				"A": [ 2 ],
-				"B": [ 3 ],
-				"Y": [ 4 ]
-			  }
-			}
-		  },
-		  "netnames": {
-			"a": {
-			  "hide_name": 0,
-			  "bits": [ 2 ],
-			  "attributes": {
-				"src": "input.v:2"
-			  }
-			},
-			"b": {
-			  "hide_name": 0,
-			  "bits": [ 3 ],
-			  "attributes": {
-				"src": "input.v:2"
-			  }
-			},
-			"c": {
-			  "hide_name": 0,
-			  "bits": [ 4 ],
-			  "attributes": {
-				"src": "input.v:3"
-			  }
-			}
-		  }
-		}
-	  }
-	}
 	
 	var schematic = new Golirev('drawing');
-	//schematic.DisplayJson(json, 0);
-	// --
-	
 
 </script>
 </body>
