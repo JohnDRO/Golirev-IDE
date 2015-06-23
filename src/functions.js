@@ -82,7 +82,7 @@ function Init() {
 }
 // --
 
-// Golirev object
+// Objects
 function Golirev(svg_id, sizeX, sizeY) {
 	// Check that sizeX and sizeY are not undefined
 	if (typeof sizeX === 'undefined') sizeX = '100%';
@@ -196,7 +196,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.UpdateGate = UpdateGate;
 	// --
 }
- 
+
 function ShowJSON(json_object, gate_type) {
 	this.gate_type = gate_type;
 	ParseJson.call(this, json_object);
@@ -1393,21 +1393,26 @@ function OptimizePlacementDelta () { // Modify components position on the Y axis
 	
 	var MaxDif = 50;
 	
+	var Out = 0;
+	
 	for (i = 1; i <= this.Components[0]; i++) {
-		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+		//if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
 			WireLength = GetWiresLength.call(this); // Get the current WireLength
 			
 			this.Components[i][6].dy(1);
 			
 			GenerateAllWires.call(this);
 			if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
-				for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+				for (n = 0, Out = 0; n < MaxDif && !Out; n++) {
 					WireLength = GetWiresLength.call(this);
 					this.Components[i][6].dy(1);
 					GenerateAllWires.call(this); 
+					
+					if ((GetWiresLength.call(this) - WireLength) >= 0)
+						Out = 1;
 				}
-
-				if (n < MaxDif) {
+				
+				if (Out) {
 					this.Components[i][6].dy(-1);
 					GenerateAllWires.call(this); 
 				}
@@ -1424,19 +1429,21 @@ function OptimizePlacementDelta () { // Modify components position on the Y axis
 				}
 				
 				else {
-					for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					for (n = 0, Out = 0; n < MaxDif && !Out; n++) {
 						WireLength = GetWiresLength.call(this);
 						this.Components[i][6].dy(-1);
 						GenerateAllWires.call(this); 
+						
+						if ((GetWiresLength.call(this) - WireLength) >= 0)
+							Out = 1;
 					}
-
-					if (n < MaxDif) {
+					
+					if (Out) {
 						this.Components[i][6].dy(1);
 						GenerateAllWires.call(this); 
 					}
 				}
 			}
-		}
 	}
 
 	GenerateAllWires.call(this); 
@@ -1448,13 +1455,16 @@ function OptimizePlacementDelta () { // Modify components position on the Y axis
 		
 		GenerateAllWires.call(this);
 		if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
-			for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+			for (n = 0, Out = 0; n < MaxDif && !Out; n++) {
 				WireLength = GetWiresLength.call(this);
 				this.Constants[i][1].dy(1);
 				GenerateAllWires.call(this); 
+				
+				if ((GetWiresLength.call(this) - WireLength) >= 0)
+					Out = 1;
 			}
 			
-			if (n < MaxDif) {
+			if (Out) {
 				this.Constants[i][1].dy(-1);
 				GenerateAllWires.call(this); 
 			}
@@ -1920,8 +1930,8 @@ function GenerateOneWire(xa, xb, ya, yb) {
 	
 	average = (xa + xb) / 2;
 	
-	//wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 }); // Straight lines (point to point)
-	wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0}); // Trivial orthogonal wire (bend at mid point)
+	//wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 });
+	wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0});
 	
 	return wire;
 }	
