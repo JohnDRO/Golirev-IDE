@@ -231,6 +231,8 @@ function ShowJSON(json_object, gate_type) {
 		
 		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10);
 	}	
+
+	return this.CircuitInfo;
 }
 
 function UpdateGate(gate_type) {
