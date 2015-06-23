@@ -400,7 +400,7 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 			if (typeof meh[0] === 'string') { // is it a constant ?
 				this.Constants[0]++;
 				this.Constants[this.Constants[0]] = new Array();
-				this.Constants[this.Constants[0]][0] = meh[0]; // Value
+				this.Constants[this.Constants[0]][0] = '"' + meh[0] + '"'; // Value
 				this.Constants[this.Constants[0]][2] = 2 + parseInt(i) + parseInt(n); // Component id
 				this.Constants[this.Constants[0]][3] = cell_io_name[k]; // Name of the gate
 			}
@@ -1406,10 +1406,10 @@ function OptimizePlacementDelta () { // Modify components position on the Y axis
 	var n = 0;
 	var WireLength = 0;
 	
-	var MaxDif = 50;
+	var MaxDif = 10;
 	
-	for (i = 1; i <= this.Components[0]; i++) {
-		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+	for (i = 1; i <= this.Components[0]; i++) { // Cells
+		if (this.Components[i][1] != 0 || this.Components[i][1] != 1) {
 			WireLength = GetWiresLength.call(this); // Get the current WireLength
 			
 			this.Components[i][6].dy(1);
@@ -1455,8 +1455,56 @@ function OptimizePlacementDelta () { // Modify components position on the Y axis
 	}
 
 	GenerateAllWires.call(this); 
+	
+	MaxDif= 50;
+	
+	for (i = 1; i <= this.Components[0]; i++) { // I/O
+		if (this.Components[i][1] == 0 || this.Components[i][1] == 1) {
+			WireLength = GetWiresLength.call(this); // Get the current WireLength
+			
+			this.Components[i][6].dy(1);
+			
+			GenerateAllWires.call(this);
+			if ((GetWiresLength.call(this) - WireLength) < 0) { // Are we improving the situation ?
+				for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+					WireLength = GetWiresLength.call(this);
+					this.Components[i][6].dy(1);
+					GenerateAllWires.call(this); 
+				}
 
-	for (i = 1; i <= this.Constants[0]; i++) {
+				if (n < MaxDif) {
+					this.Components[i][6].dy(-1);
+					GenerateAllWires.call(this); 
+				}
+			}
+			
+			else { // We have to go reverse
+				WireLength = GetWiresLength.call(this);
+				this.Components[i][6].dy(-2);
+				
+				GenerateAllWires.call(this); 
+				
+				if ((GetWiresLength.call(this) - WireLength) > 0) {
+					this.Components[i][6].dy(1);
+				}
+				
+				else {
+					for (n = 0; n < MaxDif && (GetWiresLength.call(this) - WireLength) < 0; n++) {
+						WireLength = GetWiresLength.call(this);
+						this.Components[i][6].dy(-1);
+						GenerateAllWires.call(this); 
+					}
+
+					if (n < MaxDif) {
+						this.Components[i][6].dy(1);
+						GenerateAllWires.call(this); 
+					}
+				}
+			}
+		}
+	}
+	
+	for (i = 1; i <= this.Constants[0]; i++) { // Constants
 		WireLength = GetWiresLength.call(this); // Get the current WireLength
 		
 		this.Constants[i][1].dy(1);
