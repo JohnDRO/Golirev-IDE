@@ -65,6 +65,8 @@ function GenerateJSON() { // Verilog -> JSON
 }
 
 function GenerateSVG() { // JSON -> SVG element
+	var Arr;
+	
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
 	if (current_JSON != previous_JSON || current_Type != previous_Type) {
@@ -73,10 +75,14 @@ function GenerateSVG() { // JSON -> SVG element
 			schematic.UpdateGate(Number(current_Type));
 		}
 		else {
-			log('[GOLIREV] Generating SVG file from the JSON file');
+			log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
 
 			json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
-			schematic.DisplayJson(json_yosysJS2, Number(current_Type));
+			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
+			
+			log('[GOLIREV] Module name : '+ Arr[2]);
+			log('[GOLIREV] Created with : '+ Arr[3]);
+			log('[GOLIREV] '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
 		}
 		
 		previous_JSON = current_JSON;
