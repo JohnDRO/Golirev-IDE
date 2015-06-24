@@ -127,7 +127,8 @@ function Golirev(svg_id, sizeX, sizeY) {
 	Components[Components[0]][3] = Parameters
 	Components[Components[0]][4] = Attributes
 	Components[Components[0]][5] = Connections
-	Components[Components[0]][6] = Svg element
+	Components[Components[0]][6] = Svg element of the component (the gate)
+	Components[Components[0]][7] = Is this component in reverse mode ? (0 == nupe, 1 == yup)
 	*/
 
 	this.NetList = new Array();
@@ -142,6 +143,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 			[n][1][3] = OffsetY;
 			[n][1][4] = Size of the port;
 			[n][1][5] = index of element;
+			[n][1][6] = Input/Output; // 0 = input, 1 = output;
 	NetList[n][2] = Array (Second Object)
 	NetList[n][y] = Array (ynd Object)
 	*/
@@ -356,6 +358,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 					this.NetList[meh2[l]][1][4] = meh2.length; 
 					this.NetList[meh2[l]][1][5] = l; 
 					
+					this.NetList[meh2[l]][1][6] = !this.Components[this.Components[0]][1]; 
+					
 					this.NetList[0]++;
 				}
 				
@@ -371,6 +375,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 					
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][4] = meh2.length; 
 					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][5] = l; 
+					
+					this.NetList[meh2[l]][this.NetList[meh2[l]][0]][6] = !this.Components[this.Components[0]][1]; 
 				}
 			}
 		}
@@ -416,6 +422,9 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 				this.NetList[meh][1][3] = 0; // y
 				this.NetList[meh][1][4] = 1;
 				this.NetList[meh][1][5] = -1; 
+				
+				this.NetList[meh][1][6] = GetConnection.call(this, this.Components[this.Components[0]][1], cell_io_name[k]); 
+				
 				this.NetList[0]++;
 			}
 		
@@ -431,6 +440,8 @@ function ParseJson(json_yosysJS) { // Read the JSON file produced by yosysJS and
 								
 				this.NetList[meh][this.NetList[meh][0]][4] = 1; 
 				this.NetList[meh][this.NetList[meh][0]][5] = -1; 
+				
+				this.NetList[meh][this.NetList[meh][0]][6] = GetConnection.call(this, this.Components[this.Components[0]][1], cell_io_name[k]); ; 
 			}							
 		}
 	}
@@ -1340,8 +1351,9 @@ function MoveToGrid(gate, x, y) {
 
 // Simulated Annealing : Optimisations functions
 function OptimizePlacement () { // Run the 3 functions to optimize the placement
-	var obj = this;
-		
+	OptimizeConnectionSwitching.call(this);
+	
+	var obj = this;	
 	setTimeout(function(){OptimizePlacementSwitching.call(obj)}, 10);
 }
 
@@ -1597,8 +1609,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 				}
 				
 				else {
-					Offset1 = GetOffset.call(this, this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1]);
-					Offset2 = GetOffset.call(this, this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1]);
+					Offset1 = GetOffset.call(this, this.Components[this.NetList[i][1][0]][1], this.NetList[i][1][1], this.Components[this.NetList[i][1][0]][7]);
+					Offset2 = GetOffset.call(this, this.Components[this.NetList[i][2][0]][1], this.NetList[i][2][1], this.Components[this.NetList[i][2][0]][7]);
 
 					xa = this.Components[this.NetList[i][1][0]][6].x() + Offset1[0];
 					this.Wires[n][6] = xa;
@@ -1614,6 +1626,14 @@ function GenerateAllWires() { // This function generates wires between elements 
 					
 					this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb); // There is only two this.Components so I only have to make a wire between the componant A and the componant B.
 					this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
+					
+						
+					
+					if (this.NetList[i][1][6] == 1 && xa > xb)
+						this.WireLength[n] += 200 ;
+					
+					if (this.NetList[i][2][6] == 1 && xb > xa)
+						this.WireLength[n] +=200;
 					
 									
 					this.Wires[0]++;
@@ -1712,8 +1732,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 							id1 = this.NetList[i][m][0];
 							id2 = this.NetList[i][index1][0];
 							
-							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
-							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index1][1]);
+							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
+							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index1][1], this.Components[id2][7]);
 							
 							xa = this.Components[id1][6].x() + Offset1[0];
 							this.Wires[n][6] = xa;
@@ -1790,8 +1810,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 								id1 = this.NetList[i][m][0];
 								id2 = this.NetList[i][index2][0];
 								
-								Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
-								Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index2][1]);
+								Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
+								Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index2][1], this.Components[id2][7]);
 								
 								xa = this.Components[id1][6].x() + Offset1[0];
 								this.Wires[n][6] = xa;
@@ -1869,8 +1889,8 @@ function GenerateAllWires() { // This function generates wires between elements 
 								id1 = this.NetList[i][m][0];
 								id2 = this.NetList[i][index3][0];
 								
-								Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1]);
-								Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index3][1]);
+								Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
+								Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index3][1], this.Components[id2][7]);
 								
 								xa = this.Components[id1][6].x() + Offset1[0];
 								this.Wires[n][6] = xa;
@@ -1948,7 +1968,7 @@ function GenerateAllWires() { // This function generates wires between elements 
 	// 3. Constants
 	for (i = 1; i <= this.Constants[0]; i++) {
 		Offset1 = GetOffset.call(this, 0, 0);
-		Offset2 = GetOffset.call(this, this.Components[this.Constants[i][2]][1], this.Constants[i][3]);
+		Offset2 = GetOffset.call(this, this.Components[this.Constants[i][2]][1], this.Constants[i][3], this.Components[this.Constants[i][2]][7]);
 
 		xa = this.Constants[i][1].x() + Offset1[0];
 		ya = this.Constants[i][1].y() + Offset1[1];
@@ -2017,8 +2037,11 @@ function GetWiresLength() {
 	return TotalLength;
 }
 
-function GetOffset(Gate_Type, IO_Name) { // Get the offset for the connection point
+function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the connection point
 	var Varx = 0, Vary = 0;
+	
+	if (typeof Reverse === 'undefined')
+		Reverse = 0;
 
 	if (typeof this.gate_type == 'undefined')
 		this.gate_type = 0;
@@ -2077,92 +2100,192 @@ function GetOffset(Gate_Type, IO_Name) { // Get the offset for the connection po
 			}
 		break;
 		case 4: // And
-			if (this.gate_type == 0) {
-				if (IO_Name === 'A') {
-					Varx = 17;
-					Vary = 35;
+			if (Reverse == 0) {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'A') {
+						Varx = 17;
+						Vary = 35;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 17;
+						Vary = 65;	
+					}
+					else {
+						Varx = 83;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 17;
-					Vary = 65;	
-				}
-				else {
-					Varx = 83;
-					Vary = 50;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
 			}
-			else if (this.gate_type == 1) {
-				if (IO_Name === 'A') {
-					Varx = 11;
-					Vary = 34;
+			
+			else {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'B') {
+						Varx = 17;
+						Vary = 35;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 17;
+						Vary = 65;	
+					}
+					else {
+						Varx = 83;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 11;
-					Vary = 66;	
-				}
-				else {
-					Varx = 90;
-					Vary = 50;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
 			}
 		break;
 		case 5: // OR
-			if (this.gate_type == 0) {
-				if (IO_Name === 'A') {
-					Varx = 17;
-					Vary = 34;
+			if (Reverse == 0) {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'A') {
+						Varx = 17;
+						Vary = 34;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 17;
+						Vary = 66;	
+					}
+					else {
+						Varx = 84;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 17;
-					Vary = 66;	
-				}
-				else {
-					Varx = 84;
-					Vary = 50;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
 			}
-			else if (this.gate_type == 1) {
-				if (IO_Name === 'A') {
-					Varx = 11;
-					Vary = 34;
+			
+			else {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'B') {
+						Varx = 17;
+						Vary = 34;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 17;
+						Vary = 66;	
+					}
+					else {
+						Varx = 84;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 11;
-					Vary = 66;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
-				else {
-					Varx = 90;
-					Vary = 50;	
-				}
+			
 			}
 		break;
 		case 6: // XOR
-			if (this.gate_type == 0) {
-				if (IO_Name === 'A') {
-					Varx = 10;
-					Vary = 34;
+			if (Reverse == 0) {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'A') {
+						Varx = 10;
+						Vary = 34;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 10;
+						Vary = 66;	
+					}
+					else {
+						Varx = 82;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 10;
-					Vary = 66;	
-				}
-				else {
-					Varx = 82;
-					Vary = 50;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
 			}
-			else if (this.gate_type == 1) {
-				if (IO_Name === 'A') {
-					Varx = 11;
-					Vary = 34;
+			
+			else {
+				if (this.gate_type == 0) {
+					if (IO_Name === 'B') {
+						Varx = 10;
+						Vary = 34;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 10;
+						Vary = 66;	
+					}
+					else {
+						Varx = 82;
+						Vary = 50;	
+					}
 				}
-				else if (IO_Name === 'B') {
-					Varx = 11;
-					Vary = 66;	
-				}
-				else {
-					Varx = 90;
-					Vary = 50;	
+				else if (this.gate_type == 1) {
+					if (IO_Name === 'B') {
+						Varx = 11;
+						Vary = 34;
+					}
+					else if (IO_Name === 'A') {
+						Varx = 11;
+						Vary = 66;	
+					}
+					else {
+						Varx = 90;
+						Vary = 50;	
+					}
 				}
 			}
 		break;
@@ -2307,10 +2430,106 @@ function GetConnectionType(Component_ID) {
 		
 	return type;
 }
+
+function GetConnection (Gate_Type, Connection_Name) {
+	switch(Gate_Type) { // return 0 for an recepter and 1 for an emetter
+		case 0:
+			return 1;
+		break;
+		case 1:
+			return 0;
+		break;
+		case 2:
+			if(Connection_Name == 'A')
+				return 0;
+			else
+				return 1;
+		break;
+		case 3:
+			if(Connection_Name == 'A')
+				return 0;
+			else
+				return 1;
+		break;
+		case 4:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		case 5:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		case 6:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		/* todo: finish other components
+		case 7:
+			return 1;
+		break;
+		case 8:
+			return 1;
+		break;
+		case 9:
+			return 1;
+		break;
+		case 10:
+			return 1;
+		break;
+		case 11:
+			return 1;
+		break;
+		case 12:
+			return 1;
+		break;
+		case 13:
+			return 1;
+		break;
+		*/
+		default: // Error
+			return 0;
+		break;
+	}
+}
 // --
 
 // Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
+}
+// --
+
+// Tests
+function OptimizeConnectionSwitching () {
+	var i = 0;
+	var WireLength = 0;
+	
+	for (i = 1; i <= this.Components[0]; i++) {
+		if (this.Components[i][1] == 4 || this.Components[i][1] == 5 || this.Components[i][1] == 6) {
+			WireLength = GetWiresLength.call(this); // Get the current state
+			
+			this.Components[i][7] = 1; // Reverse this component
+			
+			GenerateAllWires.call(this); // Update the circuit
+			
+			if (WireLength > GetWiresLength.call(this)) { // We are decreasing the wirelength (good)
+				;
+				//
+				//
+			}
+			
+			else { // We are increasing the wirelength (bad)
+				this.Components[i][7] = 0;
+			}
+		}
+	}
+	
+	GenerateAllWires.call(this);
 }
 // --
