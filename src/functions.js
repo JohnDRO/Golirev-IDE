@@ -1357,6 +1357,31 @@ function OptimizePlacement () { // Run the 3 functions to optimize the placement
 	setTimeout(function(){OptimizePlacementSwitching.call(obj)}, 10);
 }
 
+function OptimizeConnectionSwitching () {
+	var i = 0;
+	var WireLength = 0;
+	
+	for (i = 1; i <= this.Components[0]; i++) {
+		if (this.Components[i][1] == 4 || this.Components[i][1] == 5 || this.Components[i][1] == 6) {
+			WireLength = GetWiresLength.call(this); // Get the current state
+			
+			this.Components[i][7] = 1; // Reverse this component
+			
+			GenerateAllWires.call(this); // Update the circuit
+			
+			if (WireLength > GetWiresLength.call(this)) { // We are decreasing the wirelength (good)
+				;
+			}
+			
+			else { // We are increasing the wirelength (bad)
+				this.Components[i][7] = 0;
+			}
+		}
+	}
+	
+	GenerateAllWires.call(this);
+}
+
 function OptimizePlacementSwitching () { // First function : Try to switch components in order to get a lower WireLength
 	var i = 0;
 	var n = 0;
@@ -2502,34 +2527,5 @@ function GetConnection (Gate_Type, Connection_Name) {
 // Other
 function isArray(obj) { // 1000 thanks to http://blog.caplin.com/2012/01/13/javascript-is-hard-part-1-you-cant-trust-arrays/
 	return Object.prototype.toString.apply(obj) === "[object Array]";
-}
-// --
-
-// Tests
-function OptimizeConnectionSwitching () {
-	var i = 0;
-	var WireLength = 0;
-	
-	for (i = 1; i <= this.Components[0]; i++) {
-		if (this.Components[i][1] == 4 || this.Components[i][1] == 5 || this.Components[i][1] == 6) {
-			WireLength = GetWiresLength.call(this); // Get the current state
-			
-			this.Components[i][7] = 1; // Reverse this component
-			
-			GenerateAllWires.call(this); // Update the circuit
-			
-			if (WireLength > GetWiresLength.call(this)) { // We are decreasing the wirelength (good)
-				;
-				//
-				//
-			}
-			
-			else { // We are increasing the wirelength (bad)
-				this.Components[i][7] = 0;
-			}
-		}
-	}
-	
-	GenerateAllWires.call(this);
 }
 // --
