@@ -101,6 +101,8 @@ function Golirev(svg_id, sizeX, sizeY) {
 	// Init variables
 	this.gate_type = 0;
 	
+	this.zoomSpeed = 5;
+	
 	this.PlacementDone = 0; // Is Placement done ?
 	this.LabelsDone = 0; // Are Labels done ?
 	
@@ -210,20 +212,26 @@ function ShowJSON(json_object, gate_type) {
 	ParseJson.call(this, json_object);
 	// Pan + zoom init
 	this.nodes = this.svgjs.group();
-	this.nodes.panZoom({zoomSpeed : 5});
+	this.nodes.panZoom({zoomSpeed : this.zoomSpeed});
 	// --
 	
 	GenerateAllGates.call(this);
+	
+	//CenterComponents.call(this); 
+	
+	
 	
 	if (!this.Async) { // blocking method
 		InitSimulatedAnnealing.call(this);
 		SimulatedAnnealing.call(this); 
 		
-		CenterComponents.call(this); 
+		//CenterComponents.call(this); 
 		GenerateAllWires.call(this); 
 		PlaceCircuitName.call(this);
 		
 		OptimizePlacement.call(this);
+		
+		CenterComponents.call(this); 
 	}
 	
 	else { // async with setTimeout
@@ -233,7 +241,7 @@ function ShowJSON(json_object, gate_type) {
 		
 		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10);
 	}	
-
+	
 	return this.CircuitInfo;
 }
 
@@ -1125,13 +1133,16 @@ function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
 			console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
 			this.PlacementDone = 1;
 			
-			CenterComponents.call(this); 
+			//CenterComponents.call(this); 
 			GenerateAllWires.call(this); 
 			PlaceCircuitName.call(this);
 			
 			OptimizePlacement.call(this);
+			CenterComponents.call(this); 
 		}
 	}
+	
+	CenterComponents.call(this); 
 	
 	if (!Out) { // Do we still have iterations to do (i == 100 but this.temperature >= this.epsilon).
 		var obj = this;
@@ -1227,6 +1238,8 @@ function ReverseChange(ID, x, y, type) {
 function CenterComponents() {
 	var MaxLeft = 0;
 	var MaxHeight = 0;
+	var MaxRight = 0;
+	var MaxBot = 0;
 	
 	var i = 0;
 	
@@ -1236,7 +1249,9 @@ function CenterComponents() {
 	for (i = 1; i <= this.Components[0]; i++) {
 		if (i == 1) {
 			MaxLeft = this.Components[i][6].x();
+			MaxRight = MaxLeft;
 			MaxHeight = this.Components[i][6].y();
+			MaxBot = MaxHeight;
 		}
 		
 		x = this.Components[i][6].x();
@@ -1245,11 +1260,20 @@ function CenterComponents() {
 		if (MaxLeft > x) {
 			MaxLeft = x;
 		}
-		if (MaxHeight < y) {
+		
+		if (MaxHeight > y) {
 			MaxHeight = y;
 		}
+		
+		if (MaxRight < x) {
+			MaxRight = x;
+		}
+		
+		if (MaxBot < y) {
+			MaxBot = y;
+		}
 	}
-	
+
 	for (i = 1; i <= this.Constants[0]; i++) {
 		x = this.Constants[i][1].x();
 		y = this.Constants[i][1].y();
@@ -1257,14 +1281,23 @@ function CenterComponents() {
 		if (MaxLeft > x) {
 			MaxLeft = x;
 		}
-		if (MaxHeight < y) {
+		
+		if (MaxHeight > y) {
 			MaxHeight = y;
 		}
+		
+		if (MaxRight < x) {
+			MaxRight = x;
+		}
+		
+		if (MaxBot < y) {
+			MaxBot = y;
+		}
 	}
-	
-	x = x / 100;
-	y = y / 100;
 
+
+	
+	/*
 	for (i = 1; i <= this.Components[0]; i++) {
 		MoveToGrid(this.Components[i][6], this.Components[i][6].x()/100 - x + 1, this.Components[i][6].y()/100 - y + 1);
 	}
@@ -1272,6 +1305,53 @@ function CenterComponents() {
 	for (i = 1; i <= this.Constants[0]; i++) {
 		MoveToGrid(this.Constants[i][1], this.Constants[i][1].x()/100 - x + 1, this.Constants[i][1].y()/100 - y + 1);
 	}
+
+	
+	this.Components[1][6].y(0)
+	this.Components[2][6].y(0)
+	this.Components[3][6].y(300)
+	this.Components[4][6].y(0)
+	
+	this.Components[1][6].x(0)
+	this.Components[2][6].x(0)
+	this.Components[3][6].x(250)
+	this.Components[4][6].x(0)
+	
+	this.Components[4][6].scale(1)
+	
+	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-250, -300);
+	
+	this.Components[2][6].x(100);
+	this.Components[2][6].y(0);
+	
+	this.Components[3][6].x(0);
+	this.Components[3][6].y(0);
+	
+	this.Components[1][6].x(200);
+	this.Components[1][6].y(0);
+	*/
+	
+
+	
+	
+	
+	if (MaxLeft > 0 && MaxHeight > 0) { // Cadran 1
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
+	}
+	
+	else if (MaxLeft > 0 && MaxHeight < 0) { // Cadran 2
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, MaxHeight);
+	}
+	
+	else if (MaxLeft < 0 && MaxHeight > 0) { // Cadran 3
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, -MaxHeight);
+	}
+	
+	else { // Cadran 4
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, MaxHeight);
+	}
+	
+	
 }
 
 function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') correctly (under the schematic).
