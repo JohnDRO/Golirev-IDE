@@ -222,9 +222,12 @@ function ShowJSON(json_object, gate_type, Async, Stayfocus) {
 		this.Stayfocus = Stayfocus;
 	
 	ParseJson.call(this, json_object);
+	
 	// Pan + zoom init
-	this.nodes = this.svgjs.group();
-	this.nodes.panZoom({zoomSpeed : this.zoomSpeed});
+	if (typeof this.nodes == 'undefined') {
+		this.nodes = this.svgjs.group();
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed});	
+	}
 	// --
 	
 	GenerateAllGates.call(this);
@@ -1386,7 +1389,7 @@ function OptimizeConnectionSwitching () {
 			GenerateAllWires.call(this); // Update the circuit
 			
 			if (WireLength > GetWiresLength.call(this)) { // We are decreasing the wirelength (good)
-				;
+				; // I have to modify Netlist[..] and Wires[]. Or I will have incorrect netlabels
 			}
 			
 			else { // We are increasing the wirelength (bad)
