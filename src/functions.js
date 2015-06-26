@@ -102,6 +102,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.gate_type = 0;
 	
 	this.zoomSpeed = 5;
+	this.Stayfocus = 0;
 	
 	this.PlacementDone = 0; // Is Placement done ?
 	this.LabelsDone = 0; // Are Labels done ?
@@ -207,8 +208,19 @@ function Golirev(svg_id, sizeX, sizeY) {
 	// --
 }
  
-function ShowJSON(json_object, gate_type) {
+function ShowJSON(json_object, gate_type, Async, Stayfocus) {
 	this.gate_type = gate_type;
+	
+	if(typeof Async === 'undefined')
+		this.Async = 1;
+	else
+		this.Async = Async;
+	
+	if(typeof Stayfocus === 'undefined')
+		this.Stayfocus = 1;
+	else
+		this.Stayfocus = Stayfocus;
+	
 	ParseJson.call(this, json_object);
 	// Pan + zoom init
 	this.nodes = this.svgjs.group();
@@ -1135,7 +1147,8 @@ function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
 		}
 	}
 	
-	CenterComponents.call(this); // Focus the SVG element while doing Simulated Annealing.
+	if (this.Stayfocus)
+		CenterComponents.call(this); // Focus the SVG element while doing Simulated Annealing.
 	
 	if (!Out) { // Do we still have iterations to do (i == 100 but this.temperature >= this.epsilon).
 		var obj = this;
