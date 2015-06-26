@@ -217,20 +217,14 @@ function ShowJSON(json_object, gate_type) {
 	
 	GenerateAllGates.call(this);
 	
-	//CenterComponents.call(this); 
-	
-	
-	
 	if (!this.Async) { // blocking method
 		InitSimulatedAnnealing.call(this);
 		SimulatedAnnealing.call(this); 
 		
-		//CenterComponents.call(this); 
 		GenerateAllWires.call(this); 
 		PlaceCircuitName.call(this);
 		
 		OptimizePlacement.call(this);
-		
 		CenterComponents.call(this); 
 	}
 	
@@ -1133,7 +1127,6 @@ function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
 			console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
 			this.PlacementDone = 1;
 			
-			//CenterComponents.call(this); 
 			GenerateAllWires.call(this); 
 			PlaceCircuitName.call(this);
 			
@@ -1142,7 +1135,7 @@ function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
 		}
 	}
 	
-	CenterComponents.call(this); 
+	CenterComponents.call(this); // Focus the SVG element while doing Simulated Annealing.
 	
 	if (!Out) { // Do we still have iterations to do (i == 100 but this.temperature >= this.epsilon).
 		var obj = this;
@@ -1238,120 +1231,50 @@ function ReverseChange(ID, x, y, type) {
 function CenterComponents() {
 	var MaxLeft = 0;
 	var MaxHeight = 0;
-	var MaxRight = 0;
-	var MaxBot = 0;
 	
 	var i = 0;
 	
 	var x = 0;
 	var y = 0;
 	
-	for (i = 1; i <= this.Components[0]; i++) {
-		if (i == 1) {
-			MaxLeft = this.Components[i][6].x();
-			MaxRight = MaxLeft;
-			MaxHeight = this.Components[i][6].y();
-			MaxBot = MaxHeight;
-		}
-		
+	// First : I compute the MaxLeft and MaxHeight point.
+	for (i = 1, MaxLeft = this.Components[i][6].x(), MaxHeight = this.Components[i][6].y(); i <= this.Components[0]; i++) {
 		x = this.Components[i][6].x();
 		y = this.Components[i][6].y();
 		
-		if (MaxLeft > x) {
+		if (MaxLeft > x)
 			MaxLeft = x;
-		}
 		
-		if (MaxHeight > y) {
+		if (MaxHeight > y)
 			MaxHeight = y;
-		}
-		
-		if (MaxRight < x) {
-			MaxRight = x;
-		}
-		
-		if (MaxBot < y) {
-			MaxBot = y;
-		}
 	}
 
 	for (i = 1; i <= this.Constants[0]; i++) {
 		x = this.Constants[i][1].x();
 		y = this.Constants[i][1].y();
 		
-		if (MaxLeft > x) {
+		if (MaxLeft > x)
 			MaxLeft = x;
-		}
-		
-		if (MaxHeight > y) {
+
+		if (MaxHeight > y)
 			MaxHeight = y;
-		}
-		
-		if (MaxRight < x) {
-			MaxRight = x;
-		}
-		
-		if (MaxBot < y) {
-			MaxBot = y;
-		}
 	}
-
-
+	// --
 	
-	/*
-	for (i = 1; i <= this.Components[0]; i++) {
-		MoveToGrid(this.Components[i][6], this.Components[i][6].x()/100 - x + 1, this.Components[i][6].y()/100 - y + 1);
-	}
-	
-	for (i = 1; i <= this.Constants[0]; i++) {
-		MoveToGrid(this.Constants[i][1], this.Constants[i][1].x()/100 - x + 1, this.Constants[i][1].y()/100 - y + 1);
-	}
-
-	
-	this.Components[1][6].y(0)
-	this.Components[2][6].y(0)
-	this.Components[3][6].y(300)
-	this.Components[4][6].y(0)
-	
-	this.Components[1][6].x(0)
-	this.Components[2][6].x(0)
-	this.Components[3][6].x(250)
-	this.Components[4][6].x(0)
-	
-	this.Components[4][6].scale(1)
-	
-	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-250, -300);
-	
-	this.Components[2][6].x(100);
-	this.Components[2][6].y(0);
-	
-	this.Components[3][6].x(0);
-	this.Components[3][6].y(0);
-	
-	this.Components[1][6].x(200);
-	this.Components[1][6].y(0);
-	*/
-	
-
-	
-	
-	
-	if (MaxLeft > 0 && MaxHeight > 0) { // Cadran 1
+	// Then I focus the SVG element from this point. 
+	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
+	if (MaxLeft > 0 && MaxHeight > 0) // Cadran 1
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
-	}
 	
-	else if (MaxLeft > 0 && MaxHeight < 0) { // Cadran 2
+	else if (MaxLeft > 0 && MaxHeight < 0) // Cadran 2
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, MaxHeight);
-	}
 	
-	else if (MaxLeft < 0 && MaxHeight > 0) { // Cadran 3
+	else if (MaxLeft < 0 && MaxHeight > 0) // Cadran 3
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, -MaxHeight);
-	}
 	
-	else { // Cadran 4
+	else // Cadran 4
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, MaxHeight);
-	}
-	
-	
+	// --
 }
 
 function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') correctly (under the schematic).
