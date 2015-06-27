@@ -156,9 +156,6 @@ function GenerateSVG() { // JSON -> SVG element
 	textarea {
 		resize: none;
 	}
-	html, body {
-		overflow: hidden;
-	}
 </style>
 </head>
 <body>
@@ -189,6 +186,8 @@ endmodule
 		   <option value="1">Rectangular shape</option>
 		</select><br /><br />
 		<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()"><br /><br />
+		
+		<input type="button" value="Focus to schematic" name="FocusToSchematic" onClick="schematic.focus()"><br /><br />
 	</form>
 	</div>
 </div>

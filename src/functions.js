@@ -205,6 +205,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.DisplayJson = ShowJSON;
 	this.ParseJSON = ParseJson;
 	this.UpdateGate = UpdateGate;
+	this.focus = CenterComponents;
 	// --
 }
  
@@ -1252,6 +1253,8 @@ function CenterComponents() {
 	
 	var x = 0;
 	var y = 0;
+	
+	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).zoom(1);
 	
 	// First : I compute the MaxLeft and MaxHeight point.
 	for (i = 1, MaxLeft = this.Components[i][6].x(), MaxHeight = this.Components[i][6].y(); i <= this.Components[0]; i++) {
