@@ -485,7 +485,7 @@ function GenerateAllGates() {
 		this.Constants[i][1] = GenerateGate.call(this, 0, this.Constants[i][0], 0);
 	}
 
-	this.CircuitInfo[4] = this.svgjs.text('Circuit : ' + this.CircuitInfo[2]).draggable(function(x, y) { return { x: x < 1000, y: y < 500 } }).fill('#000').stroke({ width: 0.1 }).center(100, 100);
+	this.CircuitInfo[4] = this.svgjs.text('Circuit : ' + this.CircuitInfo[2]).draggable().fill('#000').stroke({ width: 0.1 }).center(100, 100);
 	this.nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
@@ -514,7 +514,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			group.add(rect);
 			group.add(text);
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -529,7 +529,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			group.add(rect);	
 			group.add(text);
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -562,7 +562,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -597,7 +597,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -631,7 +631,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -665,7 +665,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -701,7 +701,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -730,7 +730,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text3);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -761,7 +761,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -791,7 +791,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text3);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -825,7 +825,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -858,7 +858,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -891,7 +891,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -923,7 +923,7 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable(function(x, y) { return { x: x < MAXX, y: y < MAXY } })
+			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
 			group.dragmove = function() {
 				GenerateAllWires.call(obj);
@@ -1279,13 +1279,13 @@ function CenterComponents() {
 	
 	// Then I focus the SVG element from this point. 
 	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
-	if (MaxLeft > 0 && MaxHeight > 0) // Cadran 1
+	if (MaxLeft >= 0 && MaxHeight >= 0) // Cadran 1
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
 	
-	else if (MaxLeft > 0 && MaxHeight < 0) // Cadran 2
+	else if (MaxLeft >= 0 && MaxHeight <= 0) // Cadran 2
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, MaxHeight);
 	
-	else if (MaxLeft < 0 && MaxHeight > 0) // Cadran 3
+	else if (MaxLeft <= 0 && MaxHeight >= 0) // Cadran 3
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, -MaxHeight);
 	
 	else // Cadran 4
