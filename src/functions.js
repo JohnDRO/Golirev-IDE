@@ -1279,17 +1279,7 @@ function CenterComponents() {
 	
 	// Then I focus the SVG element from this point. 
 	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
-	if (MaxLeft >= 0 && MaxHeight >= 0) // Cadran 1
-		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
-	
-	else if (MaxLeft >= 0 && MaxHeight <= 0) // Cadran 2
-		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, MaxHeight);
-	
-	else if (MaxLeft <= 0 && MaxHeight >= 0) // Cadran 3
-		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, -MaxHeight);
-	
-	else // Cadran 4
-		this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(MaxLeft, MaxHeight);
+	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
 	// --
 }
 
