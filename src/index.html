@@ -170,33 +170,35 @@ endmodule
 </textarea>
 </div>
 
-<div id="Logs" style="border: 2px solid #ccc; width: 49%; float: left">
-<textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
+<div id="Settings" style="width: 24%; height: 50%; border: 2px solid #ccc; float: left">
+	<div align="center">
+	<form name="Settings">
+		<br /><br />
+		<input type="checkbox" name="splitnets" checked="checked">
+		Splinets -ports<br /><br />
+		<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()"><br /><br />
+		<input type="checkbox" name="async" checked="checked">
+		Async placement<br /><br />
+		<input type="checkbox" name="stayfocus" checked="checked">
+		Stay focused<br /><br />
+		<select name="Gate_Type" id="Gate_Type">
+		   <option value="0" selected>Distinctive shape</option>
+		   <option value="1">Rectangular shape</option>
+		</select><br /><br />
+		<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()"><br /><br />
+	</form>
+	</div>
 </div>
-
-<div id="drawing" style="border: 2px solid #ccc; width: 14%; height: 50%; float: left"></div>
 
 <div id="JSON_div" style="border: 2px solid #ccc; width: 25%; height: 50%; float: left">
 <textarea id="JSON" style="width: 100%; height: 100%;">JSON Here.
 </textarea>
 </div> 
 
-<div id="Settings" style="width: 24%; height: 50%; border: 2px solid #ccc; float: left">
-	<form name="Settings">
-		<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()"><br />
-		<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()"><br />
-		<input type="checkbox" name="splitnets" checked="checked">
-		Splinets -ports<br />
-		<input type="checkbox" name="async" checked="checked">
-		Async placement<br />
-		<input type="checkbox" name="stayfocus" checked="checked">
-		Stay focused<br />
-		
-		<select name="Gate_Type" id="Gate_Type">
-			   <option value="0" selected>Distinctive shape</option>
-			   <option value="1">Rectangular shape</option>
-		</select>
-	</form>
+<div id="drawing" style="border: 2px solid #ccc; width: 14%; height: 50%; float: left"></div>
+
+<div id="Logs" style="border: 2px solid #ccc; width: 49%; float: left">
+<textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
 </div>
 
 <script>
