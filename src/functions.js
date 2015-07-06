@@ -101,7 +101,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	// Init variables
 	this.gate_type = 0;
 	
-	this.zoomSpeed = 5;
+	this.zoomSpeed = 2;
 	this.Stayfocus = 0;
 	
 	this.PlacementDone = 0; // Is Placement done ?
@@ -201,15 +201,99 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.iteration;
 	// --
 	
+	
+	
 	// Methods
 	this.DisplayJson = ShowJSON;
 	this.ParseJSON = ParseJson;
 	this.UpdateGate = UpdateGate;
 	this.focus = CenterComponents;
 	// --
+	
+	this.webworker;
+	
+	this.webworker = new Worker('webworker.js'); 
+	
+	this.GlobalComponentsGroup = this.svgjs.group();
+	
+	obj = this;
+	
+	this.testCompo = new Array();
+	this.testCompo[0] = 0;
+
+	this.webworker.onmessage = function (event) {
+		var messageSent = event.data;
+		var i = 0;
+
+		switch (messageSent.cmd) {
+			case 'log':  
+				window.log('[GOLIREV] ' + messageSent.data);
+			break;
+			case 'place_components':  
+				log('[GOLIREV] je recois les composants');
+				log('[GOLIREV] ' + messageSent.data[0]);
+				// I remove previous components
+				obj.GlobalComponentsGroup.remove();
+				obj.GlobalComponentsGroup = obj.svgjs.group();
+				
+				obj.testCompo[0] = 0;
+				
+				for (i = 1; i <= messageSent.data[0]; i++) {
+					log(messageSent.data[i][8] + ' ' + messageSent.data[i][9]);
+					// Generating the component
+					messageSent.data[i][6] = GenerateGate.call(obj, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
+					
+					// Placing the component correctly
+					MoveToGrid(messageSent.data[i][6], messageSent.data[i][8], messageSent.data[i][9]);
+					
+					// Adding the component to the global group
+					obj.GlobalComponentsGroup.add(messageSent.data[i][6]);
+					// I will need to save some data here
+					obj.testCompo[0]++;
+					obj.testCompo[obj.testCompo[0]] = [messageSent.data[i][8], messageSent.data[i][9], messageSent.data[i][6]];
+				}
+				
+				// I add the global group to the pan-zoom.
+				obj.nodes.add(obj.GlobalComponentsGroup);
+				CenterComponents.call(obj);
+				log('[GOLIREV] fin');
+			break;
+			case 'place_wires':  
+				// 1. Je retire les anciens fils
+				// ..
+				// 2. Je place les nouveaux fils
+				
+				for (i = 1; i <= messageSent.data[0]; i++) {
+					GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
+				}
+			break;
+			case 'place_netlabel':  
+				// 1. Je retire les anciens netlabels
+				// ..
+				
+				// 2. Je place les nouveaux netlabels
+				// ..
+			break;
+		}
+	}
+	
 }
  
 function ShowJSON(json_object, gate_type, Async, Stayfocus) {
+	
+
+	// We send the JSON Object to the worker
+	this.webworker.postMessage({
+		'cmd': 'parse_json',
+		'data': json_object
+	});
+	
+	if (typeof this.nodes == 'undefined') {
+		this.nodes = this.svgjs.group();
+		this.nodes.panZoom({zoomSpeed : this.zoomSpeed});	
+	}
+
+	/*
 	this.gate_type = gate_type;
 	
 	if(typeof Async === 'undefined')
@@ -253,6 +337,7 @@ function ShowJSON(json_object, gate_type, Async, Stayfocus) {
 	}	
 	
 	return this.CircuitInfo;
+	*/
 }
 
 function UpdateGate(gate_type) {
@@ -1257,9 +1342,9 @@ function CenterComponents() {
 	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).zoom(1);
 	
 	// First : I compute the MaxLeft and MaxHeight point.
-	for (i = 1, MaxLeft = this.Components[i][6].x(), MaxHeight = this.Components[i][6].y(); i <= this.Components[0]; i++) {
-		x = this.Components[i][6].x();
-		y = this.Components[i][6].y();
+	for (i = 1, MaxLeft = this.testCompo[i][0], MaxHeight = this.testCompo[i][1]; i <= this.testCompo[0]; i++) {
+		x = this.testCompo[i][0]
+		y = this.testCompo[i][1]
 		
 		if (MaxLeft > x)
 			MaxLeft = x;
@@ -1268,21 +1353,10 @@ function CenterComponents() {
 			MaxHeight = y;
 	}
 
-	for (i = 1; i <= this.Constants[0]; i++) {
-		x = this.Constants[i][1].x();
-		y = this.Constants[i][1].y();
-		
-		if (MaxLeft > x)
-			MaxLeft = x;
-
-		if (MaxHeight > y)
-			MaxHeight = y;
-	}
-	// --
-	
+	console.log(this.testCompo);
 	// Then I focus the SVG element from this point. 
 	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
-	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft, -MaxHeight);
+	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft*100, -MaxHeight*100);
 	// --
 }
 
@@ -2040,8 +2114,8 @@ function GenerateOneWire(xa, xb, ya, yb) {
 	
 	average = (xa + xb) / 2;
 	
-	//wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 }); // Straight lines (point to point)
-	wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0}); // Trivial orthogonal wire (bend at mid point)
+	wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 }); // Straight lines (point to point)
+	//wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0}); // Trivial orthogonal wire (bend at mid point)
 	
 	return wire;
 }	
