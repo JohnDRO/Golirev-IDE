@@ -40,6 +40,8 @@ this.addEventListener('message', messageHandler, false);
 
 var Components = new Array();
 var Connections = new Array();
+var Wires = new Array();
+var savewires = 0;
 	
 Grid = new Array();
 var a, b;
@@ -54,8 +56,6 @@ var WireLength = 0;
 // --
 
 function ParseJson(json) {
-	
-
 	var Connections_tmp = new Array();
 	
 	var Circuit_Name = '';
@@ -468,32 +468,6 @@ function GetPortType (Gate_Type, Connection_Name) {
 	}
 }
 
-function SendElementsPositions() {
-	SendComponentsPositions();
-	SendWiresPositions();
-}
-
-function SendComponentsPositions() {
-	postMessage({
-		'cmd': 'place_components',
-		'data': Components
-	});
-}
-
-function SendWiresPositions() { // GenerateOneWire(xa, xb, ya, yb);
-	/*
-	var test = new Array();
-	
-	test[0] = 1;
-	test[1] = [5, 0, 500, 0];
-
-	postMessage({
-		'cmd': 'place_wires',
-		'data': test
-	});
-	
-	*/
-}
 
 function SimulatedAnnealing() {
 	// Init
@@ -627,6 +601,7 @@ function GetWiresLength() {
 
 function UpdateWireLength() {
 	WireLength = 0;
+	Wires[0] = 0;
 
 	// Wires
 	
@@ -662,7 +637,12 @@ function UpdateWireLength() {
 					WireLength += 200 ;
 				
 				if (Connections[i][3][4] == 1 && xb > xa)
-					WireLength +=200;
+					WireLength += 200;
+				
+				if (savewires) {				
+					Wires[0]++;
+					Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+				}
 				
 				n++;
 			}
@@ -806,13 +786,6 @@ function UpdateWireLength() {
 	}
 
 	
-}
-
-function log(string) {
-	postMessage({
-		'cmd': 'log',
-		'data': string
-	});
 }
 
 function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the connection point
@@ -1193,3 +1166,35 @@ function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the conn
 
 	return [Varx, Vary];
 }
+
+// Send Data
+function SendElementsPositions() {
+	SendComponentsPositions();
+	SendWiresPositions();
+}
+
+function SendComponentsPositions() {
+	postMessage({
+		'cmd': 'place_components',
+		'data': Components
+	});
+}
+
+function SendWiresPositions() { // GenerateOneWire(xa, xb, ya, yb);
+	savewires = 1;
+	UpdateWireLength();
+	savewires = 0;
+
+	postMessage({
+		'cmd': 'place_wires',
+		'data': Wires
+	});
+}
+
+function log(string) {
+	postMessage({
+		'cmd': 'log',
+		'data': string
+	});
+}
+// --

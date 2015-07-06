@@ -220,6 +220,9 @@ function Golirev(svg_id, sizeX, sizeY) {
 	
 	this.testCompo = new Array();
 	this.testCompo[0] = 0;
+	
+	this.testWire = new Array();
+	this.testWire[0] = 0;
 
 	this.webworker.onmessage = function (event) {
 		var messageSent = event.data;
@@ -237,9 +240,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 				obj.GlobalComponentsGroup = obj.svgjs.group();
 				
 				obj.testCompo[0] = 0;
-				
 				for (i = 1; i <= messageSent.data[0]; i++) {
-					log(messageSent.data[i][8] + ' ' + messageSent.data[i][9]);
 					// Generating the component
 					messageSent.data[i][6] = GenerateGate.call(obj, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
 					
@@ -262,10 +263,14 @@ function Golirev(svg_id, sizeX, sizeY) {
 				// 1. Je retire les anciens fils
 				// ..
 				// 2. Je place les nouveaux fils
-				
+				log('je recois des data wires ' + messageSent.data[0]);
+				log(messageSent.data[1][0] + ' ' + messageSent.data[1][1] + ' ' + messageSent.data[1][2] + ' ' + messageSent.data[1][3]);
+
 				for (i = 1; i <= messageSent.data[0]; i++) {
-					GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
+					obj.testWire[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
+					obj.nodes.add(obj.testWire[i]);
 				}
+				
 			break;
 			case 'place_netlabel':  
 				// 1. Je retire les anciens netlabels
