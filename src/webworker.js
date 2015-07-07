@@ -30,7 +30,10 @@ function messageHandler(event) {
 			// --
 		break;
 		
-		case 'write_wires':
+		case 'write_wires': // [ID, new x, new y]
+			Components[messageSent.data[0]][8] = messageSent.data[1] / 100;
+			Components[messageSent.data[0]][9] = messageSent.data[2] / 100;
+			SendWiresPositions();
 		break;
 	}
 }
@@ -646,7 +649,7 @@ function UpdateWireLength() {
 				
 				n++;
 			}
-				
+			/*
 			else { // More than 2 this.Components on the same line.
 				// There is 3 mains cases :
 				// Case 1 : One circuit input and the rest is circuit output / cell input
@@ -782,6 +785,7 @@ function UpdateWireLength() {
 					;
 				}
 			}
+			*/
 		}
 	}
 
@@ -1198,3 +1202,11 @@ function log(string) {
 	});
 }
 // --
+
+function ResetVars() {
+	// Components
+	// --	
+	
+	// Connections
+	// --
+}

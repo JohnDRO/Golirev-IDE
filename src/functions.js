@@ -221,6 +221,9 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.testCompo = new Array();
 	this.testCompo[0] = 0;
 	
+	this.testCompo2 = new Array();
+	this.testCompo[0] = 0;
+	
 	this.testWire = new Array();
 	this.testWire[0] = 0;
 
@@ -240,9 +243,10 @@ function Golirev(svg_id, sizeX, sizeY) {
 				obj.GlobalComponentsGroup = obj.svgjs.group();
 				
 				obj.testCompo[0] = 0;
+				obj.testCompo2[0] = 0;
 				for (i = 1; i <= messageSent.data[0]; i++) {
 					// Generating the component
-					messageSent.data[i][6] = GenerateGate.call(obj, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
+					messageSent.data[i][6] = GenerateGate.call(obj, i, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
 					
 					// Placing the component correctly
 					MoveToGrid(messageSent.data[i][6], messageSent.data[i][8], messageSent.data[i][9]);
@@ -251,6 +255,8 @@ function Golirev(svg_id, sizeX, sizeY) {
 					obj.GlobalComponentsGroup.add(messageSent.data[i][6]);
 					// I will need to save some data here
 					obj.testCompo[0]++;
+					obj.testCompo2[0]++;
+					obj.testCompo2[i] = messageSent.data[i][6];
 					obj.testCompo[obj.testCompo[0]] = [messageSent.data[i][8], messageSent.data[i][9], messageSent.data[i][6]];
 				}
 				
@@ -260,17 +266,22 @@ function Golirev(svg_id, sizeX, sizeY) {
 				log('[GOLIREV] fin');
 			break;
 			case 'place_wires':  
-				// 1. Je retire les anciens fils
-				// ..
-				// 2. Je place les nouveaux fils
-				log('je recois des data wires ' + messageSent.data[0]);
-				log(messageSent.data[1][0] + ' ' + messageSent.data[1][1] + ' ' + messageSent.data[1][2] + ' ' + messageSent.data[1][3]);
-
+				// Removing old wires
+				
+				for (i = 1; i <= obj.testWire[0]; i++) {
+					obj.testWire[i].remove();
+				}
+				obj.testWire[0] = 0;
+				
+				// --
+				
+				// Creating new wires
 				for (i = 1; i <= messageSent.data[0]; i++) {
+					obj.testWire[0]++;
 					obj.testWire[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
 					obj.nodes.add(obj.testWire[i]);
 				}
-				
+				// --
 			break;
 			case 'place_netlabel':  
 				// 1. Je retire les anciens netlabels
@@ -580,7 +591,7 @@ function GenerateAllGates() {
 	this.nodes.add(this.CircuitInfo[4]); // Circuit name is in the spannable and zoomable
 }
 
-function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and return the svgjs element created.
+function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and return the svgjs element created.
 	var group = this.svgjs.group(), text, text1, text2, text3, text4, longeur = 0, rect;
 	var MAXX = 5000, MAXY = 5000;
 	
@@ -607,9 +618,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 		break;
 		case 1: // Output
 			rect = this.svgjs.rect(60, 10).center(50, 50);
@@ -622,9 +630,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 		break;
 		case 2: // YES
 			if (this.gate_type == 0) {
@@ -655,9 +660,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 		break;
 		case 3: // NOT
 			if (this.gate_type == 0) {
@@ -690,9 +692,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 		break;			
 		case 4: // AND
 			if (this.gate_type == 0) {
@@ -724,9 +723,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}		
 		break;		
 		case 5: // OR
 			if (this.gate_type == 0) {
@@ -758,10 +754,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 6: // XOR
 			if (this.gate_type == 0) {
@@ -794,10 +786,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 7: // DFF_P
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -823,10 +811,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 8: // MUX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -854,10 +838,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 9: // DFF_N
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -884,10 +864,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 10: // DFF_NNX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -918,10 +894,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 11: // DFF_NPX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -951,10 +923,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
-			
 		break;
 		case 12: // DFF_PNX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -983,10 +951,6 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 			
 		break;
 		case 13: // DFF_PPX
@@ -1015,16 +979,23 @@ function GenerateGate(Gate_Type, Label, hide_label) { // Generate a gate and ret
 			}
 			
 			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
-			group.dragmove = function() {
-				GenerateAllWires.call(obj);
-			}
 			
 		break;
 		default: // Error
 			return -1;
 		break;
 	} 
+	
+	var obj = this;
+	
+	group.dragmove = function(event, z) {
+		console.log(event);
+		console.log(z);
+		obj.webworker.postMessage({
+			'cmd': 'write_wires',
+			'data': [ID, obj.testCompo2[ID].x(), obj.testCompo2[ID].y()]
+		});
+	}
 	
 	group.style('cursor', 'move'); // Change the cursor style
 	
@@ -2114,13 +2085,21 @@ function GenerateAllWires() { // This function generates wires between elements 
 }
 
 function GenerateOneWire(xa, xb, ya, yb) {
-	var wire = 0;
+	var wire;
 	var average = 0;
 	
 	average = (xa + xb) / 2;
 	
-	wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 }); // Straight lines (point to point)
-	//wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }).attr({'fill-opacity': 0}); // Trivial orthogonal wire (bend at mid point)
+	wire = this.svgjs.group()
+	//wire = this.svgjs.line(xa, ya, xb, yb).stroke({ width: 1 }); // Straight lines (point to point)
+	//wire = this.svgjs.polyline(''+xa+','+ya+' ' +average+','+ya+' '+average+','+yb+' '+xb+','+yb).stroke({ width: 1 }) // .attr({'fill-opacity': 0}); // Trivial orthogonal wire (bend at mid point)
+	
+	// it is better to use a group of multiple lines instead of a polyline.
+	wire.add(this.svgjs.line(xa, ya, average, ya));
+	wire.add(this.svgjs.line(average, ya, average, yb));
+	wire.add(this.svgjs.line(average, yb, xb, yb));
+	
+	wire.stroke({ width: 1 });
 	
 	return wire;
 }	
