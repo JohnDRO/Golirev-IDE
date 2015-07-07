@@ -221,8 +221,8 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.testCompo = new Array();
 	this.testCompo[0] = 0;
 	
-	this.testCompo2 = new Array();
-	this.testCompo[0] = 0;
+	this.ComponentsSVG = new Array();
+	this.ComponentsSVG[0] = 0;
 	
 	this.testWire = new Array();
 	this.testWire[0] = 0;
@@ -236,34 +236,31 @@ function Golirev(svg_id, sizeX, sizeY) {
 				window.log('[GOLIREV] ' + messageSent.data);
 			break;
 			case 'place_components':  
-				log('[GOLIREV] je recois les composants');
-				log('[GOLIREV] ' + messageSent.data[0]);
 				// I remove previous components
 				obj.GlobalComponentsGroup.remove();
 				obj.GlobalComponentsGroup = obj.svgjs.group();
 				
 				obj.testCompo[0] = 0;
-				obj.testCompo2[0] = 0;
+				obj.ComponentsSVG[0] = 0;
 				for (i = 1; i <= messageSent.data[0]; i++) {
 					// Generating the component
-					messageSent.data[i][6] = GenerateGate.call(obj, i, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
+					obj.ComponentsSVG[0]++;
+					obj.ComponentsSVG[i] = GenerateGate.call(obj, i, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
 					
 					// Placing the component correctly
-					MoveToGrid(messageSent.data[i][6], messageSent.data[i][8], messageSent.data[i][9]);
+					MoveToGrid(obj.ComponentsSVG[i], messageSent.data[i][8], messageSent.data[i][9]);
 					
 					// Adding the component to the global group
-					obj.GlobalComponentsGroup.add(messageSent.data[i][6]);
+					obj.GlobalComponentsGroup.add(obj.ComponentsSVG[i]);
 					// I will need to save some data here
 					obj.testCompo[0]++;
-					obj.testCompo2[0]++;
-					obj.testCompo2[i] = messageSent.data[i][6];
+					
 					obj.testCompo[obj.testCompo[0]] = [messageSent.data[i][8], messageSent.data[i][9], messageSent.data[i][6]];
 				}
 				
 				// I add the global group to the pan-zoom.
 				obj.nodes.add(obj.GlobalComponentsGroup);
 				CenterComponents.call(obj);
-				log('[GOLIREV] fin');
 			break;
 			case 'place_wires':  
 				// Removing old wires
@@ -297,12 +294,15 @@ function Golirev(svg_id, sizeX, sizeY) {
  
 function ShowJSON(json_object, gate_type, Async, Stayfocus) {
 	
-
+	
 	// We send the JSON Object to the worker
 	this.webworker.postMessage({
 		'cmd': 'parse_json',
-		'data': json_object
+		'data': json_object,
+		'data2': gate_type
 	});
+	
+	this.gate_type = gate_type;
 	
 	if (typeof this.nodes == 'undefined') {
 		this.nodes = this.svgjs.group();
@@ -310,7 +310,7 @@ function ShowJSON(json_object, gate_type, Async, Stayfocus) {
 	}
 
 	/*
-	this.gate_type = gate_type;
+	
 	
 	if(typeof Async === 'undefined')
 		this.Async = 1;
@@ -604,8 +604,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 	if (typeof this.gate_type == 'undefined')
 		this.gate_type = 0; // Distinctive shape by default 
 	
-	var obj = this;
-
 	switch(Gate_Type) {
 		case 0: // Input
 			rect = this.svgjs.rect(60, 10).center(50, 50);
@@ -616,8 +614,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 			group.add(rect);
 			group.add(text);
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-			
 		break;
 		case 1: // Output
 			rect = this.svgjs.rect(60, 10).center(50, 50);
@@ -627,8 +623,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 			
 			group.add(rect);	
 			group.add(text);
-			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 		break;
 		case 2: // YES
@@ -657,8 +651,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 					group.add(text);
 				}
 			}
-			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
 			
 		break;
 		case 3: // NOT
@@ -690,8 +682,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-			
 		break;			
 		case 4: // AND
 			if (this.gate_type == 0) {
@@ -721,8 +711,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;		
 		case 5: // OR
 			if (this.gate_type == 0) {
@@ -752,8 +740,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(150, 150).draggable();
-		
 		break;
 		case 6: // XOR
 			if (this.gate_type == 0) {
@@ -784,8 +770,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				}
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 7: // DFF_P
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -809,8 +793,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text3);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 8: // MUX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -836,8 +818,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 9: // DFF_N
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -862,8 +842,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text3);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 10: // DFF_NNX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -892,8 +870,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 11: // DFF_NPX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -921,8 +897,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-		
 		break;
 		case 12: // DFF_PNX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -950,8 +924,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-			
 		break;
 		case 13: // DFF_PPX
 			if (this.gate_type == 0 || this.gate_type == 1) {
@@ -978,22 +950,20 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 				group.add(text4);
 			}
 			
-			group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
-			
 		break;
 		default: // Error
 			return -1;
 		break;
 	} 
 	
+	group.stroke({ width: 1 }).fill('#FFF').center(0, 0).draggable();
+
 	var obj = this;
 	
 	group.dragmove = function(event, z) {
-		console.log(event);
-		console.log(z);
 		obj.webworker.postMessage({
 			'cmd': 'write_wires',
-			'data': [ID, obj.testCompo2[ID].x(), obj.testCompo2[ID].y()]
+			'data': [ID, obj.ComponentsSVG[ID].x(), obj.ComponentsSVG[ID].y()]
 		});
 	}
 	
@@ -1329,7 +1299,6 @@ function CenterComponents() {
 			MaxHeight = y;
 	}
 
-	console.log(this.testCompo);
 	// Then I focus the SVG element from this point. 
 	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
 	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft*100, -MaxHeight*100);

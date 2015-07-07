@@ -1,4 +1,8 @@
-var Gate_Norm = 0; // Le set dans parse_json
+/*
+ * Golirev : webworker.js
+ * Details : ...
+ *
+*/
 
 function messageHandler(event) {
     
@@ -6,34 +10,34 @@ function messageHandler(event) {
 	
 	switch (messageSent.cmd) {
 		case 'parse_json': // Penser à set Gate_Norm
-
-			log('Parse of the JSON Data : starting');
+			// I parse the JSON
+			log('Parsing of the JSON Data...');
 			
+			Gate_Norm = messageSent.data2;
 			ParseJson(messageSent.data);
+			// --
 
-			log('Parse of the JSON Data : done');
-			
-			// Ici je fais le simulated annealing'
-			log('Placement of components : starting');
+			// I correctly place components
+			log('Placement of components...');
 			
 			SimulatedAnnealing();
-			
-			log('Placement of components : done');
 			// --
 			
-			// Ici j'envoie les elements
-			log('Sending back the positions of components : starting');
-			
+			// I send back data
+			log('Sending back the positions of components...');
+		
 			SendElementsPositions();
-			
-			log('Sending back the positions of components : done');
 			// --
 		break;
 		
-		case 'write_wires': // [ID, new x, new y]
-			Components[messageSent.data[0]][8] = messageSent.data[1] / 100;
-			Components[messageSent.data[0]][9] = messageSent.data[2] / 100;
-			SendWiresPositions();
+		case 'write_wires': 
+			// If the user drag a component, we will have to compute the new wires
+			// data contains the ID of the dragged component and his new X and Y
+			// messageSent.data : [ID, new x, new y]
+			Components[messageSent.data[0]][8] = messageSent.data[1] / 100; // set the new x
+			Components[messageSent.data[0]][9] = messageSent.data[2] / 100; // set the new y
+			
+			SendWiresPositions(); // send back data
 		break;
 	}
 }
@@ -41,34 +45,30 @@ function messageHandler(event) {
 // On définit la fonction à appeler lorsque la page principale nous sollicite
 this.addEventListener('message', messageHandler, false);
 
-var Components = new Array();
-var Connections = new Array();
-var Wires = new Array();
-var savewires = 0;
-	
-Grid = new Array();
-var a, b;
-for (a = -500; a < 500; a++) {
-	Grid[a] = new Array();
-	
-	for (b = -500; b < 500; b++)
-		Grid[a][b] = 0;
-}
-			
+var Components; // Contains informations concerning components of the circuit
+var Connections; // Contains the netlist
+var Wires; // Contains wires (lines).
+var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangular shapes, default : distinctive
+var Grid; // Contains the grid information	
 var WireLength = 0;
 // --
 
+// Json related
 function ParseJson(json) {
-	var Connections_tmp = new Array();
+	// Init
+	Components = new Array();
+	Connections = new Array();
+	Wires = new Array();
+	savewires = 0;
+	
+	var Connections_tmp = new Array(); // 
 	
 	var Circuit_Name = '';
 	var Nbr_Cste = 0;
-	
-	// Init des variables
-	// 1. Boucle à travers les compo pour les retirer (soit faire une fct soit mettre dans le code, à voir)
-	Components[0] = 0;
-	Connections[0] = 0;
-	Connections_tmp[0] = 0;
+
+	Components[0] = 0; // Set the number of components to 0
+	Connections[0] = 0; // Set the number of connections to 0
+	Connections_tmp[0] = 0; // Set the number of connections to 0
 	// --
 	
 	// boucle JSON Parsing
@@ -344,7 +344,9 @@ function ParseJson(json) {
 
 	return Components[1][0];
 }
+// --	
 
+// Components and wires
 function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
 	var GateNumber = -1; // -1 is undefined here
 	
@@ -471,124 +473,6 @@ function GetPortType (Gate_Type, Connection_Name) {
 	}
 }
 
-
-function SimulatedAnnealing() {
-	// Init
-	var alpha = 0.999;
-    var temperature = 400.0;
-    var epsilon = 0.001;
-	
-	var iteration = 0;
-	
-	for (i = 1; i <= Components[0]; i++) {
-		//log(messageSent.data[i][8] + ' ' + messageSent.data[i][9]);
-		Grid[5][i] = 1;
-		MoveToGrid(i, 5, i);
-	}
-	
-	var a, b;
-	for (a = -500; a < 500; a++) {
-		Grid[a] = new Array();
-		
-		for (b = -500; b < 500; b++)
-			Grid[a][b] = 0;
-	}
-	
-	log('WL Avant : ' + GetWiresLength());
-	UpdateWireLength();
-	distance = GetWiresLength();
-
-	// --
-	
-	// Boucle principale
-	var Arr;
-	var delta;
-	var proba;
-	
-		log('---');
-		log('id : ' + Date());
-		log('iteration : ' + iteration);
-		log('---');
-	
-	// While the temperature did not reach epsilon
-    while (temperature > epsilon) {
-        iteration++;
-
-		// Make a random change
-        Arr = RandomChange();
-		UpdateWireLength();
-		
-		// Get the new delta
-        delta = GetWiresLength() - distance;
-        if (delta < 0)
-            distance = delta + distance;
-        
-		else {
-            proba = Math.random();
-			
-            if (proba < Math.exp(-delta/temperature))
-                distance = delta + distance;
-			
-			else 
-				ReverseChange(Arr[0], Arr[1], Arr[2]);
-        }
-        
-		// Cooling process on every iteration
-        temperature *= alpha;
-    }
-		log('WL Apres : ' + GetWiresLength());
-		log('---');
-		log('id : ' + Date());
-		log('iteration : ' + iteration);
-		log('---');
-	
-	// --
-	
-}
-// --	
-
-function RandomChange() { // Make a random change, must return ID_Compo, x and y.
-	// Random component ID
-	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
-	//alert(RandomID + ' : ' + this.Components[0] + ' : ' + this.Constants[0]);
-	
-	// Get x and y of this component
-	var x = Components[RandomID][8];
-	var y = Components[RandomID][9];
-	// --
-	
-	// Random axis (x or y) and gain (-1 or 1)
-	var axis = Math.floor((Math.random() * 2) + 1);
-	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
-	
-	//log(x + ' ' + gain + ' ' + y + ' ' + RandomID);
-	if (axis == 1) { // axis : x
-		if (Grid[x + gain][y] == 0) {
-			MoveToGrid(RandomID, x + gain, y);
-
-			Grid[x][y] = 0;				
-			Grid[x + gain][y] = 1; 				
-		}
-	}
-	
-	else { // axis : y
-		if (Grid[x][y + gain] == 0) {
-			MoveToGrid(RandomID, x, y + gain);
-
-			Grid[x][y] = 0;				
-			Grid[x][y + gain] = 1; 				
-		}	
-	}
-	
-	return [RandomID, x, y];
-}
-
-function ReverseChange(ID, x, y) {
-	Grid[Components[ID][8]][Components[ID][9]] = 0;
-	Grid[x][y] = 1;
-	MoveToGrid(ID, x, y);
-}
-
 function MoveToGrid(ID, x, y) {
 	if (typeof ID == 'undefined' || typeof x == 'undefined' || typeof y == 'undefined') return -1;
 
@@ -602,7 +486,10 @@ function GetWiresLength() {
 	return WireLength;
 }
 
-function UpdateWireLength() {
+function UpdateWireLength(SaveWires) {
+	if (typeof SaveWires == 'undefined')
+		SaveWires = 0;
+	
 	WireLength = 0;
 	Wires[0] = 0;
 
@@ -642,7 +529,7 @@ function UpdateWireLength() {
 				if (Connections[i][3][4] == 1 && xb > xa)
 					WireLength += 200;
 				
-				if (savewires) {				
+				if (SaveWires) {				
 					Wires[0]++;
 					Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
 				}
@@ -1171,6 +1058,127 @@ function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the conn
 	return [Varx, Vary];
 }
 
+// --
+
+
+// Simulated Annealing
+function SimulatedAnnealing() {
+	// Init
+	var alpha = 0.999;
+    var temperature = 400.0;
+    var epsilon = 0.001;
+	
+	var iteration = 0;
+	
+	var Date1;
+	var Date2;
+	
+
+	
+	var a, b;
+	Grid = new Array();
+	for (a = -500; a < 500; a++) {
+		Grid[a] = new Array();
+		
+		for (b = -500; b < 500; b++)
+			Grid[a][b] = 0;
+	}
+	
+	for (i = 1; i <= Components[0]; i++) {
+		Grid[5][i] = 1;
+		MoveToGrid(i, 5, i);
+	}
+	console.log(Components);
+	
+	log('Initial WireLength : ' + GetWiresLength());
+	UpdateWireLength();
+	distance = GetWiresLength();
+
+	// --
+	
+	// Boucle principale
+	var Arr;
+	var delta;
+	var proba;
+	
+		date1 = Date();
+	
+	// While the temperature did not reach epsilon
+    while (temperature > epsilon) {
+        iteration++;
+
+		// Make a random change
+        Arr = RandomChange();
+		UpdateWireLength();
+		
+		// Get the new delta
+        delta = GetWiresLength() - distance;
+        if (delta < 0)
+            distance = delta + distance;
+        
+		else {
+            proba = Math.random();
+			
+            if (proba < Math.exp(-delta/temperature))
+                distance = delta + distance;
+			
+			else 
+				ReverseChange(Arr[0], Arr[1], Arr[2]);
+        }
+        
+		// Cooling process on every iteration
+        temperature *= alpha;
+    }
+		log('Final WireLength : ' + Math.round(GetWiresLength()));
+		log('Number of iterations : ' + iteration);
+	
+	// --
+	
+}
+
+function RandomChange() { // Make a random change, must return ID_Compo, x and y.
+	// Random component ID
+	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
+	//alert(RandomID + ' : ' + this.Components[0] + ' : ' + this.Constants[0]);
+	
+	// Get x and y of this component
+	var x = Components[RandomID][8];
+	var y = Components[RandomID][9];
+	// --
+	
+	// Random axis (x or y) and gain (-1 or 1)
+	var axis = Math.floor((Math.random() * 2) + 1);
+	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
+	
+	//log(x + ' ' + gain + ' ' + y + ' ' + RandomID);
+	if (axis == 1) { // axis : x
+		if (Grid[x + gain][y] == 0) {
+			MoveToGrid(RandomID, x + gain, y);
+
+			Grid[x][y] = 0;				
+			Grid[x + gain][y] = 1; 				
+		}
+	}
+	
+	else { // axis : y
+		if (Grid[x][y + gain] == 0) {
+			MoveToGrid(RandomID, x, y + gain);
+
+			Grid[x][y] = 0;				
+			Grid[x][y + gain] = 1; 				
+		}	
+	}
+	
+	return [RandomID, x, y];
+}
+
+function ReverseChange(ID, x, y) {
+	Grid[Components[ID][8]][Components[ID][9]] = 0;
+	Grid[x][y] = 1;
+	MoveToGrid(ID, x, y);
+}
+// --
+
 // Send Data
 function SendElementsPositions() {
 	SendComponentsPositions();
@@ -1185,9 +1193,7 @@ function SendComponentsPositions() {
 }
 
 function SendWiresPositions() { // GenerateOneWire(xa, xb, ya, yb);
-	savewires = 1;
-	UpdateWireLength();
-	savewires = 0;
+	UpdateWireLength(1);
 
 	postMessage({
 		'cmd': 'place_wires',
@@ -1202,11 +1208,3 @@ function log(string) {
 	});
 }
 // --
-
-function ResetVars() {
-	// Components
-	// --	
-	
-	// Connections
-	// --
-}
