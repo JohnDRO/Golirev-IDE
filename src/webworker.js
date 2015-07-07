@@ -4,6 +4,18 @@
  *
 */
 
+// Global var
+var Components; // Contains informations concerning components of the circuit
+var Connections; // Contains the netlist
+var Wires; // Contains wires (lines).
+var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangular shapes, default : distinctive
+var Grid; // Contains the grid information	
+var WireLength = 0;
+// --
+
+// Event Callback
+this.addEventListener('message', messageHandler, false);
+
 function messageHandler(event) {
     
     var messageSent = event.data;
@@ -41,16 +53,6 @@ function messageHandler(event) {
 		break;
 	}
 }
-
-// On définit la fonction à appeler lorsque la page principale nous sollicite
-this.addEventListener('message', messageHandler, false);
-
-var Components; // Contains informations concerning components of the circuit
-var Connections; // Contains the netlist
-var Wires; // Contains wires (lines).
-var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangular shapes, default : distinctive
-var Grid; // Contains the grid information	
-var WireLength = 0;
 // --
 
 // Json related
@@ -173,6 +175,15 @@ function ParseJson(json) {
 			Components[Components[0]][6] = ''; // svg element
 			Components[Components[0]][7] = false; // reverse
 			
+			Components[Components[0]][5] = new Array();
+			Components[Components[0]][5][0] = 1; // Since this is an input or an output, it has only one port.
+			
+			Components[Components[0]][5][1] = new Array();
+			
+			Components[Components[0]][5][1][0] = Components[Components[0]][0];
+			Components[Components[0]][5][1][1] = const_value.length;
+			Components[Components[0]][5][1][2] = Components[Components[0]][2];
+			
 			Nbr_Cste++;
 			
 			// Connections_tmp
@@ -291,7 +302,7 @@ function ParseJson(json) {
 					else { // Not the first element : the array already exist
 						Connections[index[a]][0]++;
 							
-						Connections[index[a]][Connections[index[a]][0] + 1] = [Components[0], cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j])]; // [Id of the element, Name of the port, Net position, Input/Output]
+						Connections[index[a]][Connections[index[a]][0] + 1] = [CompoValue, cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j])]; // [Id of the element, Name of the port, Net position, Input/Output]
 					}
 				}
 			}
@@ -315,6 +326,15 @@ function ParseJson(json) {
 				
 				Components[Components[0]][6] = ''; // svg element
 				Components[Components[0]][7] = false; // reverse
+				
+				Components[Components[0]][5] = new Array();
+				Components[Components[0]][5][0] = 1; // Since this is an input or an output, it has only one port.
+				Components[Components[0]][5][1] = new Array();
+			
+				Components[Components[0]][5][1][0] = Components[Components[0]][0];
+				Components[Components[0]][5][1][1] = const_value.length;
+				Components[Components[0]][5][1][2] = Components[Components[0]][2];
+				
 				Nbr_Cste++;
 				
 				// Connections_tmp
@@ -333,15 +353,15 @@ function ParseJson(json) {
 	for (a = 1; a <= Connections_tmp[0]; a++) {
 		Connections[0]++;
 		
-		Connections[Connections[0]] = new Array();
-		Connections[Connections[0]][0] = 2;
-		Connections[Connections[0]][1] = '';
+		Connections[Connections[0] + 1] = new Array();
+		Connections[Connections[0] + 1][0] = 2;
+		Connections[Connections[0] + 1][1] = '';
 		
-		Connections[Connections[0]][2] = [Connections_tmp[Connections_tmp[0]][0][0], Connections_tmp[Connections_tmp[0]][0][1], Connections_tmp[Connections_tmp[0]][0][2]];
-		Connections[Connections[0]][3] = [Connections_tmp[Connections_tmp[0]][1][0], Connections_tmp[Connections_tmp[0]][1][1], Connections_tmp[Connections_tmp[0]][1][2]];
+		Connections[Connections[0] + 1][2] = [Connections_tmp[a][0][0], Connections_tmp[a][0][1], Connections_tmp[a][0][2]];
+		Connections[Connections[0] + 1][3] = [Connections_tmp[a][1][0], Connections_tmp[a][1][1], Connections_tmp[a][1][2]];
 	}
 	// --
-
+	
 	return Components[1][0];
 }
 // --	
@@ -494,14 +514,13 @@ function UpdateWireLength(SaveWires) {
 	Wires[0] = 0;
 
 	// Wires
-	
 	var i = 0, n = 0, k = 0, v = 0; // loops index
 	
 	var xa = 0, ya = 0, xb = 0, yb = 0; // Lines points.
 	var Offset1 = 0, Offset2 = 0; // Points offset (see function GetOffset)
 
 	// 2. Making new wires
-	for (i = 1, n = 1; (n - v) <= Connections[0] && i <= 300; i++) {
+	for (i = 2, n = 1; i <= (Connections[0] + 1); i++) {
 	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof Connections[i] != 'undefined') {
 			if (Connections[i][0] == 2) { // Only two this.Components on the same line.
@@ -511,14 +530,14 @@ function UpdateWireLength(SaveWires) {
 				
 				Offset1 = GetOffset(Components[ID1][2], Connections[i][2][1], Components[ID1][7]); // GetOffset(Gate_Type, IO_Name, Reverse) 
 				Offset2 = GetOffset(Components[ID2][2], Connections[i][3][1], Components[ID2][7]);
-				
+
 				xa = Components[ID1][8]*100 + Offset1[0];
 				ya = Components[ID1][9]*100 + Offset1[1];
 
 				
 				xb = Components[ID2][8]*100 + Offset2[0];
 				yb = Components[ID2][9]*100 + Offset2[1];
-				
+
 				// I have to add xa, xb, ya, yb in order to send data
 				//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 				WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
@@ -673,10 +692,10 @@ function UpdateWireLength(SaveWires) {
 				}
 			}
 			*/
+		
+
 		}
 	}
-
-	
 }
 
 function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the connection point
@@ -1057,7 +1076,6 @@ function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the conn
 
 	return [Varx, Vary];
 }
-
 // --
 
 
@@ -1069,11 +1087,6 @@ function SimulatedAnnealing() {
     var epsilon = 0.001;
 	
 	var iteration = 0;
-	
-	var Date1;
-	var Date2;
-	
-
 	
 	var a, b;
 	Grid = new Array();
@@ -1088,20 +1101,16 @@ function SimulatedAnnealing() {
 		Grid[5][i] = 1;
 		MoveToGrid(i, 5, i);
 	}
-	console.log(Components);
 	
-	log('Initial WireLength : ' + GetWiresLength());
 	UpdateWireLength();
 	distance = GetWiresLength();
-
+	log('Initial WireLength : ' + distance);
 	// --
 	
 	// Boucle principale
 	var Arr;
 	var delta;
 	var proba;
-	
-		date1 = Date();
 	
 	// While the temperature did not reach epsilon
     while (temperature > epsilon) {
@@ -1113,7 +1122,8 @@ function SimulatedAnnealing() {
 		
 		// Get the new delta
         delta = GetWiresLength() - distance;
-        if (delta < 0)
+       
+	   if (delta < 0)
             distance = delta + distance;
         
 		else {
@@ -1129,11 +1139,10 @@ function SimulatedAnnealing() {
 		// Cooling process on every iteration
         temperature *= alpha;
     }
-		log('Final WireLength : ' + Math.round(GetWiresLength()));
-		log('Number of iterations : ' + iteration);
-	
 	// --
 	
+	log('Final WireLength : ' + Math.round(GetWiresLength()));
+	log('Number of iterations : ' + iteration);
 }
 
 function RandomChange() { // Make a random change, must return ID_Compo, x and y.
