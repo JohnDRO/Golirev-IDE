@@ -33,6 +33,7 @@ function messageHandler(event) {
 			log('Placement of components...');
 			
 			SimulatedAnnealing();
+			OptimizePlacement();
 			// --
 			
 			// I send back data
@@ -1079,7 +1080,7 @@ function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the conn
 // --
 
 
-// Simulated Annealing
+// Simulated Annealing && optimizing
 function SimulatedAnnealing() {
 	// Init
 	var alpha = 0.999;
@@ -1159,13 +1160,25 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 	var axis = Math.floor((Math.random() * 2) + 1);
 	var gain = Math.floor((Math.random() * 2)) ? -1 : 1;
 	
+	var SwitchID = 0;
+	
 	//log(x + ' ' + gain + ' ' + y + ' ' + RandomID);
 	if (axis == 1) { // axis : x
 		if (Grid[x + gain][y] == 0) {
 			MoveToGrid(RandomID, x + gain, y);
 
 			Grid[x][y] = 0;				
-			Grid[x + gain][y] = 1; 				
+			Grid[x + gain][y] = RandomID; 				
+		}
+		
+		else { // switch
+			SwitchID = Grid[x + gain][y];
+			
+			MoveToGrid(RandomID, x + gain, y);
+			MoveToGrid(SwitchID, x, y);
+
+			Grid[x][y] = SwitchID;				
+			Grid[x + gain][y] = RandomID; 	
 		}
 	}
 	
@@ -1174,17 +1187,215 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 			MoveToGrid(RandomID, x, y + gain);
 
 			Grid[x][y] = 0;				
-			Grid[x][y + gain] = 1; 				
+			Grid[x][y + gain] = RandomID; 				
 		}	
+		
+		else { // switch
+			SwitchID = Grid[x][y + gain];
+			
+			MoveToGrid(RandomID, x, y + gain);
+			MoveToGrid(SwitchID, x, y);
+
+			Grid[x][y] = SwitchID;				
+			Grid[x][y + gain] = RandomID; 	
+		}
 	}
 	
 	return [RandomID, x, y];
 }
 
 function ReverseChange(ID, x, y) {
-	Grid[Components[ID][8]][Components[ID][9]] = 0;
-	Grid[x][y] = 1;
-	MoveToGrid(ID, x, y);
+	var SwitchID = 0;
+
+	if (Grid[x][y] == 0) {
+		Grid[Components[ID][8]][Components[ID][9]] = 0;
+		Grid[x][y] = ID;
+		
+		MoveToGrid(ID, x, y);
+	}
+	
+	else {
+		SwitchID = Grid[x][y];
+		
+		Grid[Components[ID][8]][Components[ID][9]] = SwitchID;
+		Grid[x][y] = ID;
+		
+		MoveToGrid(SwitchID, Components[ID][8], Components[ID][9]);
+		MoveToGrid(ID, x, y);
+	}
+}
+
+function OptimizePlacement() {
+	var LocalWireLength = 0;
+	var gain = 1 / 100;
+	
+	// 1. Port connection Switching
+	// The main idea is to switch ports of a gate (AND/OR/XOR) and to check if this improves the WireLength
+	UpdateWireLength(0);
+	for (i = 1; i <= Components[0]; i++) {
+		if (Components[i][2] == 4 || Components[i][2] == 5 || Components[i][2] == 6) {
+			LocalWireLength = GetWiresLength(); // Get the current state
+			
+			Components[i][7] = 1; // Reverse this component
+			
+			UpdateWireLength(0); // Update the circuit
+			
+			if (LocalWireLength > GetWiresLength()) { // We are decreasing the wirelength (good)
+				; // I have to modify Connections[]
+
+			}
+			
+			else { // We are increasing the wirelength (bad)
+				Components[i][7] = 0;
+			}
+		}
+	}
+	
+	UpdateWireLength(0);
+	// --
+	
+	// 2. Placement Switching
+	// The main idea is to switch two components and to check if this improves the WireLength
+	/*
+	var MaxDif = 10;
+	
+	for (i = 1; i <= Components[0]; i++) {
+		for (n = 1; n <= Components[0]; n++) {
+			if (n != i) {
+				// Save the current configuration
+				xa = Components[i][8];
+				ya = Components[i][9];
+				
+				xb = Components[n][8];
+				yb = Components[n][9];
+				
+				WireLength = GetWiresLength();
+				// --
+				
+				// I switch and check the results
+				MoveToGrid(i, xb, yb);
+				MoveToGrid(n, xa, ya);
+
+				UpdateWireLength(0);
+				
+				if ((WireLength - GetWiresLength()) > 0) { // Are we improving the system ?
+					; // Nothing to do.
+				}
+				
+				else { // We have to put it back, it is not improving the system
+					MoveToGrid(i, xa, ya);
+					MoveToGrid(n, xb, yb);
+					
+					UpdateWireLength(0);
+				}
+			}
+		}
+	}
+	// --
+	
+	// 3. Placement Delta
+	for (i = 1; i <= Components[0]; i++) { // Cells
+		if (Components[i][2] != 0 || Components[i][2] != 1) {
+			LocalWireLength = GetWiresLength(); // Get the current WireLength
+			
+			Components[i][9] += gain;
+			
+			UpdateWireLength(0);
+			
+			if ((GetWiresLength() - LocalWireLength) < 0) { // Are we improving the situation ?
+				for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
+					LocalWireLength = GetWiresLength();
+					Components[i][9] += gain;
+					UpdateWireLength(0);
+				}
+
+				if (n < MaxDif) {
+					Components[i][9] -= gain;
+					UpdateWireLength(0);
+				}
+			}
+			
+			else { // We have to go reverse
+				LocalWireLength = GetWiresLength();
+				Components[i][9] -= 2*gain;
+				
+				UpdateWireLength(0);
+				
+				if ((GetWiresLength() - LocalWireLength) > 0) {
+					Components[i][9] += gain;
+				}
+				
+				else {
+					for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
+						LocalWireLength = GetWiresLength();
+						Components[i][9] -= gain;
+						UpdateWireLength(0);
+					}
+
+					if (n < MaxDif) {
+						Components[i][9] += gain;
+						UpdateWireLength(0);
+					}
+				}
+			}
+		}
+	}
+
+	UpdateWireLength(0);
+	
+	MaxDif = 50;
+	
+	for (i = 1; i <= Components[0]; i++) { // I/O
+		if (Components[i][1] == 0 || Components[i][1] == 1) {
+			LocalWireLength = GetWiresLength(); // Get the current WireLength
+			
+			Components[i][9] += gain;
+			
+			UpdateWireLength(0);
+			
+			if ((GetWiresLength() - LocalWireLength) < 0) { // Are we improving the situation ?
+				for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
+					LocalWireLength = GetWiresLength();
+					Components[i][9] += gain;
+					UpdateWireLength(0);
+				}
+
+				if (n < MaxDif) {
+					Components[i][9] -= gain;
+					UpdateWireLength(0);
+				}
+			}
+			
+			else { // We have to go reverse
+				LocalWireLength = GetWiresLength();
+				Components[i][9] -= 2*gain;
+				
+				UpdateWireLength(0);
+				
+				if ((GetWiresLength() - LocalWireLength) > 0) {
+					Components[i][9] += gain;
+				}
+				
+				else {
+					for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
+						LocalWireLength = GetWiresLength();
+						Components[i][9] -= gain;
+						UpdateWireLength(0);
+					}
+
+					if (n < MaxDif) {
+						Components[i][9] += gain;
+						UpdateWireLength(0);
+					}
+				}
+			}
+		}
+	}
+	*/
+	// --
+	
+	// 4. Overlapping Wires
+	// --
 }
 // --
 
