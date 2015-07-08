@@ -368,145 +368,6 @@ function ParseJson(json) {
 // --	
 
 // Components and wires
-function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
-	var GateNumber = -1; // -1 is undefined here
-	
-	switch (GateString) {
-		case '$_NOT_':
-			GateNumber = 3;
-		break;
-		case '$_AND_':
-			GateNumber = 4;
-		break;
-		case '$_OR_':
-			GateNumber = 5;
-		break;
-		case '$_XOR_':
-			GateNumber = 6;
-		break;
-		case '$_DFF_P_':
-			GateNumber = 7;
-		break;
-		case '$_MUX_':
-			GateNumber = 8;
-		break;
-		case '$_DFF_N_':
-			GateNumber = 9;
-		break;
-		case '$_DFF_NN0_':
-			GateNumber = 10;
-		break;
-		case '$_DFF_NN1_':
-			GateNumber = 10;
-		break;
-		case '$_DFF_NP0_':
-			GateNumber = 11;
-		break;
-		case '$_DFF_NP1_':
-			GateNumber = 11;
-		break;
-		case '$_DFF_PN0_':
-			GateNumber = 12;
-		break;
-		case '$_DFF_PN1_':
-			GateNumber = 12;
-		break;
-		case '$_DFF_PP0_':
-			GateNumber = 13;
-		break;
-		case '$_DFF_PP1_':
-			GateNumber = 13;
-		break;
-		/*
-		case '$_DLATCH_P_':
-			GateNumber = 9;
-		break;
-		*/
-	}
-	
-	return GateNumber;
-}
-
-function GetPortType (Gate_Type, Connection_Name) {
-	switch(Gate_Type) { // return 0 for an recepter and 1 for an emetter
-		case 0:
-			return 1;
-		break;
-		case 1:
-			return 0;
-		break;
-		case 2:
-			if(Connection_Name == 'A')
-				return 0;
-			else
-				return 1;
-		break;
-		case 3:
-			if(Connection_Name == 'A')
-				return 0;
-			else
-				return 1;
-		break;
-		case 4:
-			if(Connection_Name == 'A' || Connection_Name == 'B')
-				return 0;
-			else
-				return 1;
-		break;
-		case 5:
-			if(Connection_Name == 'A' || Connection_Name == 'B')
-				return 0;
-			else
-				return 1;
-		break;
-		case 6:
-			if(Connection_Name == 'A' || Connection_Name == 'B')
-				return 0;
-			else
-				return 1;
-		break;
-		/* todo: finish other components
-		case 7:
-			return 1;
-		break;
-		case 8:
-			return 1;
-		break;
-		case 9:
-			return 1;
-		break;
-		case 10:
-			return 1;
-		break;
-		case 11:
-			return 1;
-		break;
-		case 12:
-			return 1;
-		break;
-		case 13:
-			return 1;
-		break;
-		*/
-		default: // Error
-			return 0;
-		break;
-	}
-}
-
-function MoveToGrid(ID, x, y) {
-	if (typeof ID == 'undefined' || typeof x == 'undefined' || typeof y == 'undefined') return -1;
-
-	Components[ID][8] = x;
-	Components[ID][9] = y;
-	
-	return 1;
-}
-
-function GetWiresLength() {
-	return WireLength;
-}
-
 function UpdateWireLength(SaveWires) {
 	if (typeof SaveWires == 'undefined')
 		SaveWires = 0;
@@ -544,10 +405,11 @@ function UpdateWireLength(SaveWires) {
 				WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 
 				if (Connections[i][2][4] == 1 && xa > xb)
-					WireLength += 200 ;
+					WireLength += 300 ;
+					
 				
 				if (Connections[i][3][4] == 1 && xb > xa)
-					WireLength += 200;
+					WireLength += 300;
 				
 				if (SaveWires) {				
 					Wires[0]++;
@@ -697,6 +559,145 @@ function UpdateWireLength(SaveWires) {
 
 		}
 	}
+}
+
+function GateToEqNumber(GateString) { // Gate to equivalent number. ex : input : '$_NOT_', output : 3
+	var GateNumber = -1; // -1 is undefined here
+	
+	switch (GateString) {
+		case '$_NOT_':
+			GateNumber = 3;
+		break;
+		case '$_AND_':
+			GateNumber = 4;
+		break;
+		case '$_OR_':
+			GateNumber = 5;
+		break;
+		case '$_XOR_':
+			GateNumber = 6;
+		break;
+		case '$_DFF_P_':
+			GateNumber = 7;
+		break;
+		case '$_MUX_':
+			GateNumber = 8;
+		break;
+		case '$_DFF_N_':
+			GateNumber = 9;
+		break;
+		case '$_DFF_NN0_':
+			GateNumber = 10;
+		break;
+		case '$_DFF_NN1_':
+			GateNumber = 10;
+		break;
+		case '$_DFF_NP0_':
+			GateNumber = 11;
+		break;
+		case '$_DFF_NP1_':
+			GateNumber = 11;
+		break;
+		case '$_DFF_PN0_':
+			GateNumber = 12;
+		break;
+		case '$_DFF_PN1_':
+			GateNumber = 12;
+		break;
+		case '$_DFF_PP0_':
+			GateNumber = 13;
+		break;
+		case '$_DFF_PP1_':
+			GateNumber = 13;
+		break;
+		/*
+		case '$_DLATCH_P_':
+			GateNumber = 9;
+		break;
+		*/
+	}
+	
+	return GateNumber;
+}
+
+function GetPortType (Gate_Type, Connection_Name) {
+	switch(Gate_Type) { // return 0 for an recepter and 1 for an emetter
+		case 0:
+			return 1;
+		break;
+		case 1:
+			return 0;
+		break;
+		case 2:
+			if(Connection_Name == 'A')
+				return 0;
+			else
+				return 1;
+		break;
+		case 3:
+			if(Connection_Name == 'A')
+				return 0;
+			else
+				return 1;
+		break;
+		case 4:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		case 5:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		case 6:
+			if(Connection_Name == 'A' || Connection_Name == 'B')
+				return 0;
+			else
+				return 1;
+		break;
+		/* todo: finish other components
+		case 7:
+			return 1;
+		break;
+		case 8:
+			return 1;
+		break;
+		case 9:
+			return 1;
+		break;
+		case 10:
+			return 1;
+		break;
+		case 11:
+			return 1;
+		break;
+		case 12:
+			return 1;
+		break;
+		case 13:
+			return 1;
+		break;
+		*/
+		default: // Error
+			return 0;
+		break;
+	}
+}
+
+function MoveToGrid(ID, x, y) {
+	if (typeof ID == 'undefined' || typeof x == 'undefined' || typeof y == 'undefined') return -1;
+
+	Components[ID][8] = x;
+	Components[ID][9] = y;
+	
+	return 1;
+}
+
+function GetWiresLength() {
+	return WireLength;
 }
 
 function GetOffset(Gate_Type, IO_Name, Reverse) { // Get the offset for the connection point
@@ -1116,6 +1117,12 @@ function SimulatedAnnealing() {
 	// While the temperature did not reach epsilon
     while (temperature > epsilon) {
         iteration++;
+		if (iteration === 320) // Currently hard-coded, I will have to modify it.
+			log('Placement : 25%')
+		else if (iteration === 640)
+			log('Placement : 50%')
+		else if (iteration === 960)
+			log('Placement : 75%')
 
 		// Make a random change
         Arr = RandomChange();
@@ -1234,6 +1241,8 @@ function OptimizePlacement() {
 	UpdateWireLength(0);
 	for (i = 1; i <= Components[0]; i++) {
 		if (Components[i][2] == 4 || Components[i][2] == 5 || Components[i][2] == 6) {
+			UpdateWireLength(0);
+			
 			LocalWireLength = GetWiresLength(); // Get the current state
 			
 			Components[i][7] = 1; // Reverse this component
@@ -1242,10 +1251,11 @@ function OptimizePlacement() {
 			
 			if (LocalWireLength > GetWiresLength()) { // We are decreasing the wirelength (good)
 				; // I have to modify Connections[]
+				
 
 			}
 			
-			else { // We are increasing the wirelength (bad)
+			else { // We are increasing the wirelength (bad)	
 				Components[i][7] = 0;
 			}
 		}
@@ -1253,10 +1263,10 @@ function OptimizePlacement() {
 	
 	UpdateWireLength(0);
 	// --
-	
+	/*
 	// 2. Placement Switching
 	// The main idea is to switch two components and to check if this improves the WireLength
-	/*
+	
 	var MaxDif = 10;
 	
 	for (i = 1; i <= Components[0]; i++) {
@@ -1340,10 +1350,10 @@ function OptimizePlacement() {
 			}
 		}
 	}
-
+	
 	UpdateWireLength(0);
 	
-	MaxDif = 50;
+	MaxDif = 70;
 	
 	for (i = 1; i <= Components[0]; i++) { // I/O
 		if (Components[i][1] == 0 || Components[i][1] == 1) {
@@ -1391,11 +1401,33 @@ function OptimizePlacement() {
 			}
 		}
 	}
-	*/
+	
+	
 	// --
 	
-	// 4. Overlapping Wires
+	// 4. Overlapping Wires : to implement
+	/*
+	function OptimizePlacementOverlappingWires () { // Modify components position on the X axis in order to remove some overlapping Wires
+	var Arr = Array();
+	var i = 0;
+	var x = 0;
+	
+	for (i = 1; i <= this.Components[0]; i++) {
+		x = this.Components[i][6].x();
+		
+		if (typeof Arr[x] == 'undefined') 
+			Arr[x] = 1;
+		else
+			Arr[x]++;
+		
+		this.Components[i][6].dx((Arr[x] * 10) % 50);	
+	}
+	
+	GenerateAllWires.call(this); 	
+	*/
+
 	// --
+	log('Placement : 100%')
 }
 // --
 
