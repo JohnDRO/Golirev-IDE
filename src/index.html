@@ -92,37 +92,35 @@ function GenerateSVG() { // JSON -> SVG element
 }
 
 function handle_run_errors(logmsg, errmsg) {
-	if (errmsg == "") {
-		log('[GOLIREV] Synthesis : ');
-		log(logmsg);
-		
-		// Error Check
-		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
-		panels[BotPanelID].clear();
+	log('[GOLIREV] Synthesis : ');
+	log(logmsg);
+	
+	// Error Check
+	myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+	panels[BotPanelID].clear();
 
-		lines = logmsg.split(/\r\n|\r|\n/); 
-		result = CheckVerilogError(lines[lines.length - 2]);
-		if (result) {
-			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
-			log('[GOLIREV] Couldn\'t generate the JSON Netlist.');
+	lines = logmsg.split(/\r\n|\r|\n/); 
+	result = CheckVerilogError(lines[lines.length - 2]);
+	if (result) {
+		log('[GOLIREV] Errors in your Verilog code, line : ' + result);
+		log('[GOLIREV] Couldn\'t generate the JSON Netlist.');
+	
+		// Panels && Gutter Note
+		myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
+		ErrorLine = result;
+	
+		BotPanelID = addPanel("bottom", lines[lines.length - 2]);
+	}
+	
+	else {
+		// Panels
+		panels[BotPanelID].clear();
+		BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
+		log('[GOLIREV] No errors in your Verilog code : Generating the JSON Netlist.');
 		
-			// Panels && Gutter Note
-			myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
-			ErrorLine = result;
-		
-			BotPanelID = addPanel("bottom", lines[lines.length - 2]);
-		}
-		
-		else {
-			// Panels
-			panels[BotPanelID].clear();
-			BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
-			log('[GOLIREV] No errors in your Verilog code : Generating the JSON Netlist.');
-			
-			// Generate JSON
-			ys.run('write_json', JSON_CallBack);
-			// --
-		}
+		// Generate JSON
+		ys.run('write_json', JSON_CallBack);
+		// --
 	}
 }
 
@@ -280,9 +278,6 @@ endmodule
 
 	// Yosys init
 	var ys = YosysJS.create_worker();
-	ys.verbose = true;
-	ys.logprint = true;
-	ys.echo = true;
 	// --
 
 	// Make the group pannable and zoomable
