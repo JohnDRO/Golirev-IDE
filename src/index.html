@@ -39,19 +39,15 @@ function GenerateSVG() { // JSON -> SVG element
 	// Init var
 	var current_JSON = '';
 	var current_Type = 0; 
-	var current_Async = 0; 
-	var current_Focus = 0;  
 	// --
 	
 	// Updating current values
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
-	current_Async = document.Settings.async.checked;
-	current_Focus = document.Settings.stayfocus.checked;
 	// --
 	
-	if (current_JSON != previous_JSON || current_Type != previous_Type || current_Async != previous_Async || previous_Focus != current_Focus) {
-		if (current_JSON == previous_JSON && current_Async == previous_Async && previous_Focus == current_Focus) { // The user only wants to change gate type. No needs to re-parse the JSON
+	if (current_JSON != previous_JSON || current_Type != previous_Type) {
+		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('------------------------------------');
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON Netlist).');
 			schematic.UpdateGate(Number(current_Type));
@@ -60,12 +56,10 @@ function GenerateSVG() { // JSON -> SVG element
 		else {
 			log('------------------------------------');
 			log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
-			log('[GOLIREV] Async : ' + (current_Async == 1 ? 'True' : 'False'));
-			log('[GOLIREV] Focus : ' + (current_Focus == 1 ? 'Stay on schematic' : 'Do not stay on schematic'));
 			log('[GOLIREV] GateType : ' + (Number(current_Type) == 0 ? 'Distinctive shapes' : 'Rectangular shapes'));
 
 			json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
-			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type), current_Async, current_Focus);
+			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
 			
 			//log('[GOLIREV] Module name : '+ Arr[2]);
 			//log('[GOLIREV] Created with : '+ Arr[3]);
@@ -75,8 +69,6 @@ function GenerateSVG() { // JSON -> SVG element
 		// Updating previous values
 		previous_JSON = current_JSON;
 		previous_Type = current_Type;
-		previous_Async = current_Async;
-		previous_Focus = current_Focus;
 		// --
 		
 		return 1;
@@ -189,10 +181,6 @@ endmodule
 		<input type="checkbox" name="splitnets" checked="checked">
 		Splinets -ports<br /><br />
 		<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()"><br /><br />
-		<input type="checkbox" name="async" checked="checked">
-		Async placement<br /><br />
-		<input type="checkbox" name="stayfocus" checked="checked">
-		Stay focused<br /><br />
 		<select name="Gate_Type" id="Gate_Type">
 		   <option value="0" selected>Distinctive shapes</option>
 		   <option value="1">Rectangular shapes</option>
