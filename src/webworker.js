@@ -466,6 +466,10 @@ function UpdateWireLength(SaveWires) {
 							xb = Components[ID2][8]*100 + Offset2[0];
 							yb = Components[ID2][9]*100 + Offset2[1];
 							
+							// I have to add xa, xb, ya, yb in order to send data
+							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
+							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
+							
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += 300 ;
 								
@@ -495,6 +499,10 @@ function UpdateWireLength(SaveWires) {
 							xb = Components[ID2][8]*100 + Offset2[0];
 							yb = Components[ID2][9]*100 + Offset2[1];
 							
+							// I have to add xa, xb, ya, yb in order to send data
+							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
+							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
+							
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += 300 ;
 								
@@ -523,6 +531,10 @@ function UpdateWireLength(SaveWires) {
 
 							xb = Components[ID2][8]*100 + Offset2[0];
 							yb = Components[ID2][9]*100 + Offset2[1];
+							
+							// I have to add xa, xb, ya, yb in order to send data
+							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
+							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += 300 ;
