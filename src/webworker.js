@@ -31,11 +31,11 @@ function messageHandler(event) {
 
 			// I correctly place components
 			log('Placement of components...');
-			
+
 			SimulatedAnnealing();
 			OptimizePlacement();
 			// --
-			
+
 			// I send back data
 			log('Sending back the positions of components...');
 		
@@ -383,10 +383,8 @@ function UpdateWireLength(SaveWires) {
 
 	// 2. Making new wires
 	for (i = 2, n = 1; i <= (Connections[0] + 1); i++) {
-	//for (i = 1, n = 1; (n - v) <= 300 && i < 300; i++) {
 		if (typeof Connections[i] != 'undefined') {
 			if (Connections[i][0] == 2) { // Only two this.Components on the same line.
-				
 				ID1 = Connections[i][2][0];
 				ID2 = Connections[i][3][0];
 				
@@ -396,7 +394,6 @@ function UpdateWireLength(SaveWires) {
 				xa = Components[ID1][8]*100 + Offset1[0];
 				ya = Components[ID1][9]*100 + Offset1[1];
 
-				
 				xb = Components[ID2][8]*100 + Offset2[0];
 				yb = Components[ID2][9]*100 + Offset2[1];
 
@@ -407,7 +404,6 @@ function UpdateWireLength(SaveWires) {
 				if (Connections[i][2][4] == 1 && xa > xb)
 					WireLength += 300 ;
 					
-				
 				if (Connections[i][3][4] == 1 && xb > xa)
 					WireLength += 300;
 				
@@ -415,10 +411,8 @@ function UpdateWireLength(SaveWires) {
 					Wires[0]++;
 					Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
 				}
-				
-				n++;
 			}
-			/*
+			
 			else { // More than 2 this.Components on the same line.
 				// There is 3 mains cases :
 				// Case 1 : One circuit input and the rest is circuit output / cell input
@@ -436,116 +430,110 @@ function UpdateWireLength(SaveWires) {
 				
 				var id1 = 0, id2 = 0;
 
-				for (k = 1; k <= this.NetList[i][0]; k++) { // I count the number of circuit input, circuit output and cell output
-					result = GetConnectionType.call(this, this.NetList[i][k][0]);
-					if (result == 1) { // input circuit
-						input_circuit_number++;
-						index1 = k;
+				for (k = 2; k <= (Connections[i][0] + 1); k++) { // I count the number of circuit input, circuit output and cell output
+					ID = Connections[i][k][0];
+					
+					if (Connections[i][k][2] == 0) { // input
+						if (Components[ID][2] == 0) {
+							input_circuit_number++;
+							index1 = k;
+						}
 					}
-					else if (result == 2) { // output circuit 
-						output_circuit_number++;
-						index2 = k;
-					}
-					else if (result == 3) { // input/output cell
-						if (this.NetList[i][k][1] === 'Y' || this.NetList[i][k][1] === 'Q')
+					else { // output
+						if (Components[ID][2] == 1) {
+							output_circuit_number++;
+							index2 = k;
+						}
+						else {
+							output_cell_number++;
 							index3 = k;
-						
-						output_cell_number++;
+						}
 					}
 				}
 				
 				if (input_circuit_number >= 1) { // case 1
-					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the circuit input to the other elements
+					for (var m = 2; m <= (Connections[i][0] + 1); m++) { // I connect the circuit input to the other elements
 						if (m != index1) {
-							id1 = this.NetList[i][m][0];
-							id2 = this.NetList[i][index1][0];
-							
-							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
-							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index1][1], this.Components[id2][7]);
-							
-							xa = this.Components[id1][6].x() + Offset1[0];
-							this.Wires[n][6] = xa;
-							ya = this.Components[id1][6].y() + Offset1[1];
-							this.Wires[n][7] = ya;
+							ID1 = Connections[i][m][0];
+							ID2 = Connections[i][index1][0];
 
-							xb = this.Components[id2][6].x() + Offset2[0];
-							this.Wires[n][8] = xb;
-							yb = this.Components[id2][6].y() + Offset2[1];
-							this.Wires[n][9] = yb;
+							Offset1 = GetOffset(Components[ID1][2], Connections[i][m][1], Components[ID1][7]); // GetOffset(Gate_Type, IO_Name, Reverse) 
+							Offset2 = GetOffset(Components[ID2][2], Connections[i][index1][1], Components[ID2][7])
+
+							xa = Components[ID1][8]*100 + Offset1[0];
+							ya = Components[ID1][9]*100 + Offset1[1];
+
+							xb = Components[ID2][8]*100 + Offset2[0];
+							yb = Components[ID2][9]*100 + Offset2[1];
 							
-							this.Wires[n][2] = this.NetList[i][m][4];
-							this.Wires[n][3] = this.NetList[i][index1][4];
+							if (Connections[i][m][4] == 1 && xa > xb)
+								WireLength += 300 ;
+								
+							if (Connections[i][index1][4] == 1 && xb > xa)
+								WireLength += 300;
 							
-							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-							this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
-							
-							this.Wires[0]++;
-							n++;
-							v++;
+							if (SaveWires) {				
+								Wires[0]++;
+								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+							}
 						}
 					}
 				}
 				
 				else if (output_circuit_number >= 1) { // case 2
-					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the circuit output to the other elements
+					for (var m = 2; m <= (Connections[i][0] + 1); m++) { // I connect the circuit output to the other elements
 						if (m != index2) {
-							id1 = this.NetList[i][m][0];
-							id2 = this.NetList[i][index2][0];
+							ID1 = Connections[i][m][0];
+							ID2 = Connections[i][index2][0];
 							
-							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
-							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index2][1], this.Components[id2][7]);
+							Offset1 = GetOffset(Components[ID1][2], Connections[i][m][1], Components[ID1][7]); // GetOffset(Gate_Type, IO_Name, Reverse) 
+							Offset2 = GetOffset(Components[ID2][2], Connections[i][index2][1], Components[ID2][7])
 							
-							xa = this.Components[id1][6].x() + Offset1[0];
-							this.Wires[n][6] = xa;
-							ya = this.Components[id1][6].y() + Offset1[1];
-							this.Wires[n][7] = ya;
+							xa = Components[ID1][8]*100 + Offset1[0];
+							ya = Components[ID1][9]*100 + Offset1[1];
 
-							xb = this.Components[id2][6].x() + Offset2[0];
-							this.Wires[n][8] = xb;
-							yb = this.Components[id2][6].y() + Offset2[1];
-							this.Wires[n][9] = yb;
+							xb = Components[ID2][8]*100 + Offset2[0];
+							yb = Components[ID2][9]*100 + Offset2[1];
 							
-							this.Wires[n][2] = this.NetList[i][m][4];
-							this.Wires[n][3] = this.NetList[i][index2][4];
+							if (Connections[i][m][4] == 1 && xa > xb)
+								WireLength += 300 ;
+								
+							if (Connections[i][index2][4] == 1 && xb > xa)
+								WireLength += 300;
 							
-							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-							this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
-							
-							this.Wires[0]++;
-							n++;
-							v++;
+							if (SaveWires) {				
+								Wires[0]++;
+								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+							}
 						}
 					}
 				}
 				
 				else if (output_cell_number >= 1) { // case 3
-					for (var m = 1; m <= this.NetList[i][0]; m++) { // I connect the cell output to the other elements
-						if (m != index3) { // problème source/emetteur ici.
-							id1 = this.NetList[i][m][0];
-							id2 = this.NetList[i][index3][0];
+					for (var m = 2; m <= (Connections[i][0] + 1); m++) { // I connect the cell output to the other elements
+						if (m != index3) {
+							ID1 = Connections[i][m][0];
+							ID2 = Connections[i][index3][0];
 							
-							Offset1 = GetOffset.call(this, this.Components[id1][1], this.NetList[i][m][1], this.Components[id1][7]);
-							Offset2 = GetOffset.call(this, this.Components[id2][1], this.NetList[i][index3][1], this.Components[id2][7]);
+							Offset1 = GetOffset(Components[ID1][2], Connections[i][m][1], Components[ID1][7]); // GetOffset(Gate_Type, IO_Name, Reverse) 
+							Offset2 = GetOffset(Components[ID2][2], Connections[i][index3][1], Components[ID2][7])
 							
-							xa = this.Components[id1][6].x() + Offset1[0];
-							this.Wires[n][6] = xa;
-							ya = this.Components[id1][6].y() + Offset1[1];
-							this.Wires[n][7] = ya;
+							xa = Components[ID1][8]*100 + Offset1[0];
+							ya = Components[ID1][9]*100 + Offset1[1];
 
-							xb = this.Components[id2][6].x() + Offset2[0];
-							this.Wires[n][8] = xb;
-							yb = this.Components[id2][6].y() + Offset2[1];
-							this.Wires[n][9] = yb;
+							xb = Components[ID2][8]*100 + Offset2[0];
+							yb = Components[ID2][9]*100 + Offset2[1];
 							
-							this.Wires[n][2] = this.NetList[i][m][4];
-							this.Wires[n][3] = this.NetList[i][index3][4];
+							if (Connections[i][m][4] == 1 && xa > xb)
+								WireLength += 300 ;
+								
+							if (Connections[i][index3][4] == 1 && xb > xa)
+								WireLength += 300;
 							
-							this.Wires[n][0] = GenerateOneWire.call(this, xa, xb, ya, yb);
-							this.WireLength[n] = 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
-							
-							this.Wires[0]++;
-							n++;
-							v++;						
+							if (SaveWires) {				
+								Wires[0]++;
+								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+							}				
 						}
 					}
 				}
@@ -554,9 +542,6 @@ function UpdateWireLength(SaveWires) {
 					;
 				}
 			}
-			*/
-		
-
 		}
 	}
 }
