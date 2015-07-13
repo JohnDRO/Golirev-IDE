@@ -4,87 +4,6 @@
  *
 */
 
-// Initial configuration
-function Init() {
-	// Init CircuitInfo
-	this.CircuitInfo[0] = 0;
-	this.CircuitInfo[1] = 0;
-	this.CircuitInfo[2] = "Default Name"
-	this.CircuitInfo[3] = "Default Creator"
-	if (typeof this.CircuitInfo[4] != 'undefined')
-		this.CircuitInfo[4].remove();
-	this.CircuitInfo[5] = 0;
-	this.CircuitInfo[6] = 0;
-	this.CircuitInfo[7] = 0;
-	// --
-	
-	this.PlacementDone = 0; // Is Placement done ?
-	this.LabelsDone = 0; // Are Labels done ?
-	
-	RemoveAllGates.call(this);
-
-	
-	// Remove Netlist
-	for (i = 1, n = 1; n <= this.NetList[0]; i++) {
-		if (typeof this.NetList[i] != 'undefined') {
-			delete this.NetList[i];
-			n++;
-		}
-	} 
-	
-	// Reset Wires data
-	for (i = 1, n = 1; n <= this.Wires[0]; i++) {
-		if (typeof this.Wires[i] != 'undefined') {
-			if (typeof this.Wires[i][0] != 'undefined')
-				this.Wires[i][0].remove();
-			
-			if (typeof this.Wires[i][1] != 'undefined')
-				this.Wires[i][1].remove();
-			n++;
-		}
-	} 
-	
-	this.Wires = new Array();
-	this.Wires[0] = 0;
-	
-	for (i = 1; i <= 300; i++)
-		this.Wires[i] = new Array();
-
-
-	// --
-	
-	// Remove Constants
-	for (i = 1; i <= this.Constants[0]; i++) {
-		this.Constants[i][1].remove();
-	}
-	// --
-	
-	// Reset vars
-	this.Components[0] = 0; // Init components to 0
-	this.NetList[0] = 0; // Init links to 0
-	this.Constants[0] = 0;
-	
-	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
-	for (l = 0; l <= 300; l++) {
-		for (m = 0; m <= 300; m++) {
-			this.Connections[l][m] = 0;
-		}
-	}
-	
-	this.Grid = new Array();
-	var a, b;
-	for (a = -500; a < 500; a++) {
-		this.Grid[a] = new Array();
-			for (b = -500; b < 500; b++) {
-				this.Grid[a][b] = 0;
-		}
-	}
-	// --
-	
-	return 1;
-}
-// --
-
 // Golirev object
 function Golirev(svg_id, sizeX, sizeY) {
 	// Check that sizeX and sizeY are not undefined
@@ -100,111 +19,12 @@ function Golirev(svg_id, sizeX, sizeY) {
 	
 	// Init variables
 	this.gate_type = 0;
-	
 	this.zoomSpeed = 2;
-	this.Stayfocus = 0;
-	
-	this.PlacementDone = 0; // Is Placement done ?
-	this.LabelsDone = 0; // Are Labels done ?
-	
-	this.CircuitInfo = new Array(); // Informations concerning the circuits
-	/*
-	Details about Circuit Info
-	CircuitInfo[0] = rect x of the svg element
-	CircuitInfo[1] = rect y of the svg element
-	CircuitInfo[2] = name of the circuit
-	CircuitInfo[3] = "Creator"
-	CircuitInfo[4] = Text svg element.
-	CircuitInfo[5] = Number of Inputs
-	CircuitInfo[6] = Number of Outputs
-	CircuitInfo[7] = Number of Cells.
-	*/
-
-	this.Components = new Array(); // variable globale
-	/*
-	Details about Components
-	Components[0] = Number of components;
-	Components[Components[0]][0] = Label of component number Components[0]
-	Components[Components[0]][1] = Type of component number Components[0]
-	Components[Components[0]][2] = Hide Label ?
-	Components[Components[0]][3] = Parameters
-	Components[Components[0]][4] = Attributes
-	Components[Components[0]][5] = Connections
-	Components[Components[0]][6] = Svg element of the component (the gate)
-	Components[Components[0]][7] = Is this component in reverse mode ? (0 == nupe, 1 == yup)
-	*/
-
-	this.NetList = new Array();
-	/*
-	Details about NetList
-	NetList[0] = Number of connections;
-	NetList[n][0] = Number of elements on that connection;
-	NetList[n][1] = Array (First Object)
-			[n][1][0] = ID on the component var;
-			[n][1][1] = Name of the port;
-			[n][1][2] = OffsetX;
-			[n][1][3] = OffsetY;
-			[n][1][4] = Size of the port;
-			[n][1][5] = index of element;
-			[n][1][6] = Input/Output; // 0 = input, 1 = output;
-	NetList[n][2] = Array (Second Object)
-	NetList[n][y] = Array (ynd Object)
-	*/
-
-	this.Constants = new Array();
-	/*
-	Details about Constants
-	Constants[0] - Number of constants
-	Constants[n][0] = valeur
-	Constants[n][1] = elem svg
-	Constants[n][2] = id du composant
-	Constants[n][3] = nom de la porte (A/B/Y/S/..)
-	*/
-
-	this.Wires = new Array();
-	/*
-	Details about Wires
-	Wires[0] = Number of wires;
-	Wires[n][0] = svg element of the wire
-	Wires[n][1] = svg element of the text label
-	Wires[n][2] = size of element 1
-	Wires[n][3] = size of element 2
-	Wires[n][4] = label of input
-	Wires[n][5] = label of output
-	Wires[n][6] = PosX element 1
-	Wires[n][7] = PosY element 1
-	Wires[n][8] = PosX element 2
-	Wires[n][9] = PosY element 2
-	*/
-	this.Wires[0] = 0;
-	
-	for (i = 1; i <= 300; i++)
-		this.Wires[i] = new Array();
-
-	this.WireLength = new Array();
-	
-	// Set connections to 0. I currently use 300 as a MAX limit, but we should use this.Components[0] since this is the number of components in the circuit.
-	this.Connections = new Array();
-	for (l = 0; l <= 300; l++) {
-		this.Connections[l] = new Array();
-		for (m = 0; m <= 300; m++) {
-			this.Connections[l][m] = 0;
-		}
-	}
-	
-	// Simulated Annealing parameters
-	this.Async = 1; // 0 means that we will use the blocking function, 1 means that we will use the window.setTimeout method.
-	this.distance;
-	this.alpha;
-	this.temperature;
-	this.epsilon;
-	this.iteration;
-	// --
 
 	// Methods
 	this.DisplayJson = ShowJSON;
 	this.UpdateGate = UpdateGate;
-	this.focus = CenterComponents;
+	this.focus = FocusOnSchematic;
 	// --
 	
 	this.webworker;
@@ -230,7 +50,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 
 		switch (messageSent.cmd) {
 			case 'log':  
-				window.log('[GOLIREV] ' + messageSent.data);
+				log('[GOLIREV] ' + messageSent.data);
 			break;
 			case 'place_components':  
 				// I remove previous components
@@ -245,7 +65,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 					obj.ComponentsSVG[i] = GenerateGate.call(obj, i, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
 					
 					// Placing the component correctly
-					MoveToGrid(obj.ComponentsSVG[i], messageSent.data[i][8], messageSent.data[i][9]);
+					MoveGateXY(obj.ComponentsSVG[i], messageSent.data[i][8] * 100, messageSent.data[i][9] * 100);
 					
 					// Adding the component to the global group
 					obj.GlobalComponentsGroup.add(obj.ComponentsSVG[i]);
@@ -257,16 +77,15 @@ function Golirev(svg_id, sizeX, sizeY) {
 				
 				// I add the global group to the pan-zoom.
 				obj.nodes.add(obj.GlobalComponentsGroup);
-				CenterComponents.call(obj);
+				FocusOnSchematic.call(obj);
 			break;
 			case 'place_wires':  
 				// Removing old wires
-				
 				for (i = 1; i <= obj.testWire[0]; i++) {
 					obj.testWire[i].remove();
 				}
-				obj.testWire[0] = 0;
 				
+				obj.testWire[0] = 0;
 				// --
 				
 				// Creating new wires
@@ -289,7 +108,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 	
 }
  
-function ShowJSON(json_object, gate_type, Async, Stayfocus) {
+function ShowJSON(json_object, gate_type) {
 	// We send the JSON Object to the worker
 	this.webworker.postMessage({
 		'cmd': 'parse_json',
@@ -748,7 +567,7 @@ function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape t
 		this.Components[i][6] = GenerateGate.call(this, this.Components[i][1], this.Components[i][0], this.Components[i][2]);
 	
 		// Replace the component
-		MoveToGrid(this.Components[i][6], x, y);
+		MoveGateXY(this.Components[i][6], x * 100, y * 100);
 	}
 	
 	RemoveAllWires.call(this);
@@ -756,130 +575,7 @@ function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape t
 // --
 
 // Placement
-// Tests Simulated Annealing
-function InitSimulatedAnnealing() { // Initialisation of Simulated annealing
-	var i = 0;
-	var n = 0;
-	
-	// Initial parameters settings
-	this.alpha = 0.999;
-    this.temperature = 400.0;
-    this.epsilon = 0.001;
-	
-	this.iteration = 0;
-	
-	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
-	//
-	
-	// Initial components placement : currently we are just placing components in a column
-	for (i = 1; i <= this.Components[0]; i++) {
-		this.Grid[5][i] = 1;
-		MoveToGrid(this.Components[i][6], 5, i);
-	}
-	
-	for (i, n = 1; n <= this.Constants[0]; i++, n++) {
-		this.Grid[5][i] = 1;
-		MoveToGrid(this.Constants[n][1], 5, i);
-	}
-	// --
-	
-	GenerateAllWires.call(this);
-	this.distance = GetWiresLength.call(this);
-}
-
-function SimulatedAnnealing() { // Simulated Annealing, blocking function (http://www.codeproject.com/Articles/13789/Simulated-Annealing-Example-in-C)
-	var Arr;
-	var delta;
-	var proba;
-
-    // While the temperature did not reach epsilon
-    while (this.temperature > this.epsilon) {
-        this.iteration++;
-		// Make a random change
-        Arr = RandomChange.call(this);
-		GenerateAllWires.call(this);
-		
-		// Get the new delta
-        delta = GetWiresLength.call(this) - this.distance;
-		
-        if(delta < 0)
-            this.distance = delta + this.distance;
-        
-		else {
-            proba = Math.random();
-			
-            if(proba < Math.exp(-delta/this.temperature))
-                this.distance = delta + this.distance;
-			
-			else 
-				ReverseChange.call(this, Arr[0], Arr[1], Arr[2], Arr[3]);
-        }
-        
-		// Cooling process on every iteration
-        this.temperature *= this.alpha;
-    }
-	
-	this.PlacementDone = 1;
-	
-	console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
-}
-
-function RunSimulatedAnnealing() { //  Simulated Annealing (window.setTimeout)
-	var Arr;
-	var delta;
-	var proba;
-	var Out = 0;
-	
-	for (var i = 0; i <= 100 && !Out; i++) {
-		this.iteration++;
-		
-		// Make a random change
-		Arr = RandomChange.call(this);
-		GenerateAllWires.call(this);
-		
-		// Get the new delta
-		delta = GetWiresLength.call(this) - this.distance;
-		
-		if(delta < 0)
-			this.distance = delta + this.distance;
-		
-		else {
-			proba = Math.random();
-			
-			if(proba < Math.exp(-delta/this.temperature))
-				this.distance = delta + this.distance;
-			
-			else 
-				ReverseChange.call(this, Arr[0], Arr[1], Arr[2], Arr[3]);
-		}
-		
-		// Cooling process on every iteration
-		this.temperature *= this.alpha;
-		// --
-		
-		if (this.temperature <= this.epsilon) { // Did we reach the end of the placement
-			Out = 1;
-			console.log(this.iteration + ' : ' + this.temperature + ' : ' + Date());
-			this.PlacementDone = 1;
-			
-			GenerateAllWires.call(this); 
-			PlaceCircuitName.call(this);
-			
-			OptimizePlacement.call(this);
-			CenterComponents.call(this); 
-		}
-	}
-	
-	if (this.Stayfocus)
-		CenterComponents.call(this); // Focus the SVG element while doing Simulated Annealing.
-	
-	if (!Out) { // Do we still have iterations to do (i == 100 but this.temperature >= this.epsilon).
-		var obj = this;
-		setTimeout(function(){RunSimulatedAnnealing.call(obj)}, 10); // We are calling again this function in order to do more iterations.
-	}
-}
-
-function CenterComponents() {
+function FocusOnSchematic() {
 	var MaxLeft = 0;
 	var MaxHeight = 0;
 	
@@ -908,76 +604,11 @@ function CenterComponents() {
 	// --
 }
 
-function PlaceCircuitName() { // Place the circuit name (i.e. 'counter_2bit') correctly (under the schematic).
-	var i = 0;
-	
-	var max_left = 0;
-	var max_right = 0;
-	var max_height = 0;
-	
-	var resultx = 0;
-	var resulty = 0;
-	
-	var Offset = +100;
-	
-	for (i = 1; i <= this.Components[0]; i++) { // this.Components (IO + Cells)
-		if (i == 1) {
-			max_left = this.Components[1][6].x();
-			max_right = max_left;
-			max_height = this.Components[1][6].y();
-		}
-		
-		else {
-			if (max_left > this.Components[i][6].x()) {
-				max_left = this.Components[i][6].x();
-			}
-			
-			if (max_right < this.Components[i][6].x()) {
-				max_right = this.Components[i][6].x();
-			}
-			
-			if (max_height < this.Components[i][6].y()) {
-				max_height = this.Components[i][6].y();
-			}
-		}
-	}
-	
-	for (i = 1; i <= this.Constants[0]; i++) { // Constants
-		if (max_left > this.Constants[i][1].x()) {
-			max_left = this.Constants[i][1].x();
-		}
-		
-		if (max_right < this.Constants[i][1].x()) {
-			max_right = this.Constants[i][1].x();
-		}
-		
-		if (max_height < this.Constants[i][1].y()) {
-			max_height = this.Constants[i][1].y();
-		}
-	}
-	
-	
-	resultx = (max_right + max_left) / 2;
-	resulty = max_height + Offset;
-	
-	MoveGateXY(this.CircuitInfo[4], resultx, resulty);
-	
-	return 1;
-}
-
 function MoveGateXY(gate, x, y) {
 	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
 	
 	gate.x(x);
 	gate.y(y);
-	
-	return 1;
-}
-
-function MoveToGrid(gate, x, y) {
-	if (typeof gate == 'undefined' || typeof y == 'undefined' || typeof y == 'undefined') return -1;
-	
-	MoveGateXY(gate, x * 100, y * 100);
 	
 	return 1;
 }
@@ -1004,3 +635,13 @@ function GenerateOneWire(xa, xb, ya, yb) {
 	return wire;
 }	
 // --
+
+function log (string) {
+	if (typeof window.log == 'undefined') {
+		console.log(string);
+	}
+	
+	else {
+		window.log(string);
+	}
+}
