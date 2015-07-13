@@ -23,7 +23,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 
 	// Methods
 	this.DisplayJson = ShowJSON;
-	this.UpdateGate = UpdateGate;
+	this.UpdateGate = UpdateGateType;
 	this.focus = FocusOnSchematic;
 	// --
 	
@@ -122,14 +122,6 @@ function ShowJSON(json_object, gate_type) {
 		this.nodes = this.svgjs.group();
 		this.nodes.panZoom({zoomSpeed : this.zoomSpeed});	
 	}
-}
-
-function UpdateGate(gate_type) {
-	 this.gate_type = gate_type;
-	 
-	 UpdateGateType.call(this);
-	 GenerateAllWires.call(this);
-	 PlaceCircuitName.call(this);
 }
 
 function PlaceLabelsName() { // Place labels on wires
@@ -540,7 +532,8 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 	group.dragmove = function(event, z) {
 		obj.webworker.postMessage({
 			'cmd': 'write_wires',
-			'data': [ID, obj.ComponentsSVG[ID].x(), obj.ComponentsSVG[ID].y()]
+			'data': [ID, obj.ComponentsSVG[ID].x(), obj.ComponentsSVG[ID].y()],
+			'data2': obj.gate_type
 		});
 	}
 	
@@ -552,25 +545,13 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 }
 
 function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
-	var i = 0;
+	this.gate_type = !this.gate_type;
+	console.log(this.gate_type);
 	
-	var x = 0;
-	var y = 0;
-	
-	for (i = 1; i <= this.Components[0]; i++) {
-		// Save coords
-		x = this.Components[i][6].x() / 100;
-		y = this.Components[i][6].y() / 100;
-		
-		// Remove the SVG component and then remake it.
-		this.Components[i][6].remove();
-		this.Components[i][6] = GenerateGate.call(this, this.Components[i][1], this.Components[i][0], this.Components[i][2]);
-	
-		// Replace the component
-		MoveGateXY(this.Components[i][6], x * 100, y * 100);
-	}
-	
-	RemoveAllWires.call(this);
+	obj.webworker.postMessage({
+		'cmd': 'switch_gatetype',
+		'data': this.gate_type
+	});
 }
 // --
 

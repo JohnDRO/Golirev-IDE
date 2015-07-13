@@ -52,6 +52,12 @@ function messageHandler(event) {
 			
 			SendWiresPositions(); // send back data
 		break;
+		
+		case 'switch_gatetype': 
+			Gate_Norm = messageSent.data;
+			SendElementsPositions();
+			SendWiresPositions();
+		break;
 	}
 }
 // --
@@ -1087,6 +1093,7 @@ function SimulatedAnnealing() {
 	
 	var iteration = 0;
 	
+	// Grid Init
 	var a, b;
 	Grid = new Array();
 	for (a = -500; a < 500; a++) {
@@ -1095,11 +1102,21 @@ function SimulatedAnnealing() {
 		for (b = -500; b < 500; b++)
 			Grid[a][b] = 0;
 	}
+	// --
 	
-	for (i = 1; i <= Components[0]; i++) {
-		Grid[5][i] = 1;
-		MoveToGrid(i, 5, i);
+	// Inital Placement
+	var Ceil = Math.ceil(Math.sqrt(Components[0]));
+	
+	for (i = 1, a = 0, b = 0; i <= Components[0]; i++, a++) { // a == lines, b = columns
+		if (a >= Ceil) {
+			b++;
+			a = 0;
+		}
+		
+		Grid[a][b] = i;
+		MoveToGrid(i, a, b);
 	}
+	// --
 	
 	UpdateWireLength();
 	distance = GetWiresLength();
