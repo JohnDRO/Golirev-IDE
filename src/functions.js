@@ -120,7 +120,7 @@ function ShowJSON(json_object, gate_type) {
 	
 	if (typeof this.nodes == 'undefined') {
 		this.nodes = this.svgjs.group();
-		this.nodes.panZoom({zoomSpeed : this.zoomSpeed});	
+		this.nodes.panZoom({zoom : [0.5, 1.5], zoomSpeed : this.zoomSpeed});	
 	}
 }
 
@@ -565,7 +565,7 @@ function FocusOnSchematic() {
 	var x = 0;
 	var y = 0;
 	
-	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).zoom(1);
+	this.nodes.panZoom({zoom : [0.5, 1.5], zoomSpeed : this.zoomSpeed}).zoom(1);
 	
 	// First : I compute the MaxLeft and MaxHeight point.
 	for (i = 1, MaxLeft = this.testCompo[i][0], MaxHeight = this.testCompo[i][1]; i <= this.testCompo[0]; i++) {
@@ -581,7 +581,7 @@ function FocusOnSchematic() {
 
 	// Then I focus the SVG element from this point. 
 	// I have to be careful using .setPosition() since the .setPosition() axis and the SVG element axis are different : this is why I have to use some minus signs.
-	this.nodes.panZoom({zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft*100, -MaxHeight*100);
+	this.nodes.panZoom({zoom : [0.5, 1.5], zoomSpeed : this.zoomSpeed}).setPosition(-MaxLeft*100, -MaxHeight*100);
 	// --
 }
 
