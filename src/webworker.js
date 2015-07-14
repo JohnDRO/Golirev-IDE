@@ -1107,14 +1107,20 @@ function SimulatedAnnealing() {
 	// Inital Placement
 	var Ceil = Math.ceil(Math.sqrt(Components[0]));
 	
-	for (i = 1, a = 0, b = 0; i <= Components[0]; i++, a++) { // a == lines, b = columns
-		if (a >= Ceil) {
-			b++;
+	var ComponentList = new Array();
+	for (i = 1; i <= Components[0]; i++) {
+		ComponentList[i - 1] = i;
+	}
+	ComponentList = shuffleArray(ComponentList);
+	
+	for (i = 1, a = 0, b = 0; i <= Components[0]; i++, a += 2) { // a == lines, b = columns
+		if (a >= 2 * Ceil) {
+			b = b + 2;
 			a = 0;
 		}
 		
-		Grid[a][b] = i;
-		MoveToGrid(i, a, b);
+		Grid[a][b] = ComponentList[i - 1];
+		MoveToGrid(ComponentList[i - 1], a, b);
 	}
 	// --
 	
@@ -1443,6 +1449,16 @@ function OptimizePlacement() {
 	// --
 	log('Placement : 100%')
 }
+
+function shuffleArray(d) {
+  for (var c = d.length - 1; c > 0; c--) {
+    var b = Math.floor(Math.random() * (c + 1));
+    var a = d[c];
+    d[c] = d[b];
+    d[b] = a;
+  }
+  return d
+};
 // --
 
 // Send Data
