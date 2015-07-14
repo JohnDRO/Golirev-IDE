@@ -1,6 +1,6 @@
 /*
  * Golirev : webworker.js
- * Details : ...
+ * Details : Contains javascript code needed to compute components placement, wires, labels, ..
  *
 */
 

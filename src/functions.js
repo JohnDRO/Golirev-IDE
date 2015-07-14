@@ -1,6 +1,6 @@
 ﻿/*
  * Golirev : function.js
- * Details : Contains functions used in this project.
+ * Details : Contains javascript code related to svgjs.
  *
 */
 
