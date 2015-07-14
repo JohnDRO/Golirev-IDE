@@ -41,8 +41,11 @@ function Golirev(svg_id, sizeX, sizeY) {
 	this.ComponentsSVG = new Array();
 	this.ComponentsSVG[0] = 0;
 	
-	this.testWire = new Array();
-	this.testWire[0] = 0;
+	this.Wires = new Array();
+	this.Wires[0] = 0;
+	
+	this.Labels = new Array();
+	this.Labels[0] = 0;
 
 	this.webworker.onmessage = function (event) {
 		var messageSent = event.data;
@@ -81,27 +84,37 @@ function Golirev(svg_id, sizeX, sizeY) {
 			break;
 			case 'place_wires':  
 				// Removing old wires
-				for (i = 1; i <= obj.testWire[0]; i++) {
-					obj.testWire[i].remove();
+				for (i = 1; i <= obj.Wires[0]; i++) {
+					obj.Wires[i].remove();
 				}
 				
-				obj.testWire[0] = 0;
+				obj.Wires[0] = 0;
 				// --
 				
 				// Creating new wires
 				for (i = 1; i <= messageSent.data[0]; i++) {
-					obj.testWire[0]++;
-					obj.testWire[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
-					obj.nodes.add(obj.testWire[i]);
+					obj.Wires[0]++;
+					obj.Wires[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
+					obj.nodes.add(obj.Wires[i]);
 				}
 				// --
 			break;
 			case 'place_netlabel':  
-				// 1. Je retire les anciens netlabels
-				// ..
+				// Removing old netlabels
+				for (i = 1; i <= obj.Labels[0]; i++) {
+					obj.Labels[i].remove();
+				}
 				
-				// 2. Je place les nouveaux netlabels
-				// ..
+				obj.Labels[0] = 0;
+				// --
+				
+				// Creating new labels
+				for (i = 1; i <= messageSent.data[0]; i++) {
+					obj.Labels[0]++;
+					obj.Labels[i] = obj.svgjs.text(messageSent.data[i][0]).center(messageSent.data[i][1], messageSent.data[i][2])
+					obj.nodes.add(obj.Labels[i]);
+				}
+				// --
 			break;
 		}
 	}
@@ -546,7 +559,6 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 
 function UpdateGateType() { // Update SVG components (i.e. : Distinctive shape to rectangular shape).
 	this.gate_type = !this.gate_type;
-	console.log(this.gate_type);
 	
 	obj.webworker.postMessage({
 		'cmd': 'switch_gatetype',
@@ -617,7 +629,8 @@ function GenerateOneWire(xa, xb, ya, yb) {
 }	
 // --
 
-function log (string) {
+// Other
+function log(string) {
 	if (typeof window.log == 'undefined') {
 		console.log(string);
 	}
@@ -626,3 +639,4 @@ function log (string) {
 		window.log(string);
 	}
 }
+// --
