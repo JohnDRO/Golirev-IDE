@@ -380,6 +380,10 @@ function UpdateWireLength(SaveWires) {
 	
 	WireLength = 0;
 	Wires[0] = 0;
+	
+	// Costs
+	var Cost1 = 300;
+	var Cost2 = -50;
 
 	// Wires
 	var i = 0, n = 0, k = 0, v = 0; // loops index
@@ -408,10 +412,13 @@ function UpdateWireLength(SaveWires) {
 				WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 
 				if (Connections[i][2][4] == 1 && xa > xb)
-					WireLength += 300 ;
+					WireLength += Cost1;
 					
-				if (Connections[i][3][4] == 1 && xb > xa)
-					WireLength += 300;
+				else if (Connections[i][3][4] == 1 && xb > xa)
+					WireLength += Cost1;
+				
+				else
+					WireLength += Cost2;
 				
 				if (SaveWires) {				
 					Wires[0]++;
@@ -477,10 +484,13 @@ function UpdateWireLength(SaveWires) {
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
 							if (Connections[i][m][4] == 1 && xa > xb)
-								WireLength += 300 ;
+								WireLength += Cost1;
 								
-							if (Connections[i][index1][4] == 1 && xb > xa)
-								WireLength += 300;
+							else if (Connections[i][index1][4] == 1 && xb > xa)
+								WireLength += Cost1;
+							
+							else
+								WireLength += Cost2;
 							
 							if (SaveWires) {				
 								Wires[0]++;
@@ -510,10 +520,13 @@ function UpdateWireLength(SaveWires) {
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
 							if (Connections[i][m][4] == 1 && xa > xb)
-								WireLength += 300 ;
+								WireLength += Cost1 ;
 								
-							if (Connections[i][index2][4] == 1 && xb > xa)
-								WireLength += 300;
+							else if (Connections[i][index2][4] == 1 && xb > xa)
+								WireLength += Cost1;
+							
+							else 
+								WireLength += Cost2;
 							
 							if (SaveWires) {				
 								Wires[0]++;
@@ -543,10 +556,13 @@ function UpdateWireLength(SaveWires) {
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
 							if (Connections[i][m][4] == 1 && xa > xb)
-								WireLength += 300 ;
+								WireLength += Cost1;
 								
-							if (Connections[i][index3][4] == 1 && xb > xa)
-								WireLength += 300;
+							else if (Connections[i][index3][4] == 1 && xb > xa)
+								WireLength += Cost1;
+							
+							else
+								WireLength += Cost2;
 							
 							if (SaveWires) {				
 								Wires[0]++;
