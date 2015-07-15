@@ -8,9 +8,11 @@
 var Components; // Contains informations concerning components of the circuit
 var Connections; // Contains the netlist
 var Wires; // Contains wires (lines).
+var Labels; // Contains labels (texts).
 var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangular shapes, default : distinctive
 var Grid; // Contains the grid information	
 var WireLength = 0;
+var CircuitName = '';
 // --
 
 // Event Callback
@@ -57,6 +59,7 @@ function messageHandler(event) {
 			Gate_Norm = messageSent.data;
 			SendElementsPositions();
 			SendWiresPositions();
+			SendLabelsPositions();
 		break;
 	}
 }
@@ -68,7 +71,7 @@ function ParseJson(json) {
 	Components = new Array();
 	Connections = new Array();
 	Wires = new Array();
-	savewires = 0;
+	Labels = new Array();
 	
 	var Connections_tmp = new Array(); // 
 	
@@ -369,17 +372,21 @@ function ParseJson(json) {
 	}
 	// --
 	
+	CircuitName = Circuit_Name;
 	return Components[1][0];
 }
 // --	
 
 // Components and wires
-function UpdateWireLength(SaveWires) {
-	if (typeof SaveWires == 'undefined')
+function UpdateWireLength(SaveWires, SaveLabels) {
+	if (typeof SaveWires == 'undefined' || typeof SaveLabels == 'undefined') {
 		SaveWires = 0;
+		SaveLabels = 0;
+	}
 	
 	WireLength = 0;
 	Wires[0] = 0;
+	Labels[0] = 0;
 	
 	// Costs
 	var Cost1 = 300;
@@ -423,6 +430,10 @@ function UpdateWireLength(SaveWires) {
 				if (SaveWires) {				
 					Wires[0]++;
 					Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+				}
+			
+				if (SaveLabels) {
+					// ..
 				}
 			}
 			
@@ -1140,7 +1151,7 @@ function SimulatedAnnealing() {
 	}
 	// --
 	
-	UpdateWireLength();
+	UpdateWireLength(0, 0);
 	distance = GetWiresLength();
 	log('Initial WireLength : ' + distance);
 	// --
@@ -1162,7 +1173,7 @@ function SimulatedAnnealing() {
 
 		// Make a random change
         Arr = RandomChange();
-		UpdateWireLength();
+		UpdateWireLength(0, 0);
 		
 		// Get the new delta
         delta = GetWiresLength() - distance;
@@ -1274,7 +1285,7 @@ function OptimizePlacement() {
 	
 	// 1. Port connection Switching
 	// The main idea is to switch ports of a gate (AND/OR/XOR) and to check if this improves the WireLength
-	UpdateWireLength(0);
+	UpdateWireLength(0, 0);
 	for (i = 1; i <= Components[0]; i++) {
 		if (Components[i][2] == 4 || Components[i][2] == 5 || Components[i][2] == 6) {
 			UpdateWireLength(0);
@@ -1297,7 +1308,7 @@ function OptimizePlacement() {
 		}
 	}
 	
-	UpdateWireLength(0);
+	UpdateWireLength(0, 0);
 	// --
 	/*
 	// 2. Placement Switching
@@ -1481,6 +1492,7 @@ function shuffleArray(d) {
 function SendElementsPositions() {
 	SendComponentsPositions();
 	SendWiresPositions();
+	SendLabelsPositions();	
 }
 
 function SendComponentsPositions() {
@@ -1491,11 +1503,40 @@ function SendComponentsPositions() {
 }
 
 function SendWiresPositions() { // GenerateOneWire(xa, xb, ya, yb);
-	UpdateWireLength(1);
+	UpdateWireLength(1, 0);
 
 	postMessage({
 		'cmd': 'place_wires',
 		'data': Wires
+	});
+}
+
+function SendLabelsPositions() {
+	var MinX, MaxX, MaxY;
+	
+	// Compute labels here.
+	// UpdateWireLength(0, 1)
+	// --
+	
+	// Add circuit name
+	for (i = 2, MinX = Components[1][8], MaxX = Components[1][8], MaxY = Components[1][9]; i <= Components[0]; i++) {
+		if (MinX > Components[i][8]) 
+			MinX = Components[i][8];
+			
+		if (MaxX < Components[i][8]) 
+			MaxX = Components[i][8];
+			
+		if (MaxY < Components[i][9]) 
+			MaxY = Components[i][9];
+	}
+	
+	Labels[0]++;
+	Labels[Labels[0]] = [CircuitName[0], (MinX + MaxX) / 2, MaxY + 1];
+	// --
+
+	postMessage({
+		'cmd': 'place_netlabels',
+		'data': Labels
 	});
 }
 
