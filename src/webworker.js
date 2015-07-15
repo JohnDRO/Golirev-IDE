@@ -13,12 +13,22 @@ var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangula
 var Grid; // Contains the grid information	
 var WireLength = 0;
 var CircuitName = '';
+
+var previous = new Date(), current = new Date();
 // --
 
 // Event Callback
 this.addEventListener('message', messageHandler, false);
 
 function messageHandler(event) {
+	current = new Date();
+	console.log(current - previous)
+	dif = current - previous;
+	previous = current;
+	
+	if (dif < 3)
+		return 0;
+	
     
     var messageSent = event.data;
 	
