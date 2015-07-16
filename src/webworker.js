@@ -452,17 +452,35 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 						
 						// left side (emitter)
 						if (Connections[i][2][3] == 1) {
-							local_label += Connections[i][3][1];
+							if (Components[Connections[i][2][0]][2] <= 1) {
+								local_label += Connections[i][2][1];
+								
+								if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+									local_label += '[' + Connections[i][2][2] + ']';
+							}
 							
-							if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
-								local_label += '[' + Connections[i][3][2] + ']';
+							else {
+								local_label += Connections[i][3][1];
+								
+								if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+									local_label += '[' + Connections[i][3][2] + ']';
+							}
 						}
 						
 						else {
-							local_label += Connections[i][2][1];
+							if (Components[Connections[i][2][0]][2] <= 1) {
+								local_label += Connections[i][3][1];
+								
+								if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+									local_label += '[' + Connections[i][3][2] + ']';
+							}
 							
-							if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
-								local_label += '[' + Connections[i][2][2] + ']';
+							else {
+								local_label += Connections[i][2][1];
+							
+								if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+									local_label += '[' + Connections[i][2][2] + ']';
+							}
 						}
 						// --
 						
@@ -471,17 +489,35 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 						
 						// Right Side (receipter)
 						if (Connections[i][2][3] == 0) {
-							local_label += Connections[i][3][1];
-						
-						if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
-							local_label += '[' + Connections[i][3][2] + ']';
+							if (Components[Connections[i][2][0]][2] <= 1) {
+								local_label += Connections[i][2][1];
+								
+								if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+									local_label += '[' + Connections[i][2][2] + ']';
+							}
+							
+							else {
+								local_label += Connections[i][3][1];
+								
+								if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+									local_label += '[' + Connections[i][3][2] + ']';
+							}
 						}
 						
 						else {
-							local_label += Connections[i][2][1];
+							if (Components[Connections[i][2][0]][2] <= 1) {
+								local_label += Connections[i][3][1];
+								
+								if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+									local_label += '[' + Connections[i][3][2] + ']';
+							}
 							
-						if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
-							local_label += '[' + Connections[i][2][2] + ']';
+							else {
+								local_label += Connections[i][2][1];
+							
+								if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+									local_label += '[' + Connections[i][2][2] + ']';
+							}
 						}
 						// --
 						
@@ -510,23 +546,26 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 				for (k = 2; k <= (Connections[i][0] + 1); k++) { // I count the number of circuit input, circuit output and cell output
 					ID = Connections[i][k][0];
 					
-					if (Connections[i][k][2] == 0) { // input
+					if (Connections[i][k][3] == 0) { // input
 						if (Components[ID][2] == 0) {
 							input_circuit_number++;
 							index1 = k;
 						}
 					}
+					
 					else { // output
 						if (Components[ID][2] == 1) {
 							output_circuit_number++;
 							index2 = k;
 						}
+						
 						else {
 							output_cell_number++;
 							index3 = k;
 						}
 					}
 				}
+
 				
 				if (input_circuit_number >= 1) { // case 1
 					for (var m = 2; m <= (Connections[i][0] + 1); m++) { // I connect the circuit input to the other elements
@@ -1352,7 +1391,7 @@ function SimulatedAnnealing() {
 	distance = GetWiresLength();
 	log('Initial WireLength : ' + distance);
 	// --
-	
+
 	// Boucle principale
 	var Arr;
 	var delta;
@@ -1397,7 +1436,7 @@ function SimulatedAnnealing() {
         temperature *= alpha;
     }
 	// --
-	
+
 	log('Final WireLength : ' + Math.round(GetWiresLength()));
 	log('Number of iterations : ' + iteration);
 }
@@ -1406,7 +1445,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 	// Random component ID
 	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
 	//alert(RandomID + ' : ' + this.Components[0] + ' : ' + this.Constants[0]);
-
+	
 	// Get x and y of this component
 	var x = Components[RandomID][8];
 	var y = Components[RandomID][9];
@@ -1456,7 +1495,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 			Grid[x][y + gain] = RandomID; 	
 		}
 	}
-
+	
 	return [RandomID, x, y];
 }
 
