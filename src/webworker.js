@@ -1371,6 +1371,11 @@ function SimulatedAnnealing() {
 		// Make a random change
         Arr = RandomChange();
 		UpdateWireLength(0, 0);
+		// Tests
+		for (i = 1; i <= Components[0]; i++) {
+			WireLength += 25 * Math.sqrt(Components[i][8]*Components[i][8] + Components[i][9]*Components[i][9]);
+		}
+		// --
 		
 		// Get the new delta
         delta = GetWiresLength() - distance;
@@ -1401,7 +1406,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 	// Random component ID
 	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
 	//alert(RandomID + ' : ' + this.Components[0] + ' : ' + this.Constants[0]);
-	
+
 	// Get x and y of this component
 	var x = Components[RandomID][8];
 	var y = Components[RandomID][9];
@@ -1451,7 +1456,7 @@ function RandomChange() { // Make a random change, must return ID_Compo, x and y
 			Grid[x][y + gain] = RandomID; 	
 		}
 	}
-	
+
 	return [RandomID, x, y];
 }
 
