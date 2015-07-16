@@ -146,7 +146,6 @@ function ParseJson(json) {
 		//  = '';
 		//
 		
-		
 		for (a = 0; a < index.length; a++) {
 			if (typeof index[a] == 'string') {
 				constant = 1;
@@ -164,13 +163,13 @@ function ParseJson(json) {
 					
 					Connections[index[a]][0] = 1; // One element.
 					Connections[index[a]][1] = ''; // svg element
-					Connections[index[a]][2] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
+					Connections[index[a]][2] = [Components[0], Components[Components[0]][0], a, !Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 				}
 				
 				else { // Not the first element : the array already exist
 					Connections[index[a]][0]++;
 						
-					Connections[index[a]][Connections[index[a]][0] + 1] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
+					Connections[index[a]][Connections[index[a]][0] + 1] = [Components[0], !Components[Components[0]][0], a, Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 				}
 			}
 		}
@@ -399,8 +398,8 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 	Labels[0] = 0;
 	
 	// Costs
-	var Cost1 = 300;
-	var Cost2 = -50;
+	var Cost1 = 300; // 300
+	var Cost2 = -100; // -50
 
 	// Wires
 	var i = 0, n = 0, k = 0, v = 0; // loops index
@@ -428,10 +427,10 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 				//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 				WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 
-				if (Connections[i][2][4] == 1 && xa > xb)
+				if (Connections[i][2][3] == 0 && xa < xb)
 					WireLength += Cost1;
 					
-				else if (Connections[i][3][4] == 1 && xb > xa)
+				else if (Connections[i][3][3] == 0 && xa > xb)
 					WireLength += Cost1;
 				
 				else
