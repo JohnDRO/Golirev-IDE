@@ -22,7 +22,6 @@ this.addEventListener('message', messageHandler, false);
 
 function messageHandler(event) {
 	current = new Date();
-	console.log(current - previous)
 	dif = current - previous;
 	previous = current;
 	
@@ -63,6 +62,7 @@ function messageHandler(event) {
 			Components[messageSent.data[0]][9] = messageSent.data[2] / 100; // set the new y
 			
 			SendWiresPositions(); // send back data
+			SendLabelsPositions();
 		break;
 		
 		case 'switch_gatetype': 
@@ -127,8 +127,8 @@ function ParseJson(json) {
 		// Connections related
 		index = json.modules[Circuit_Name].ports[io_names[i]].bits;
 		
-		if (index.length > 1) // We check if this port is a single wire or a bus.
-			Components[Components[0]][0] += ' [' + (index.length - 1) + ':0]'; // If this is a bus, we add the size in the label.
+		//if (index.length > 1) // We check if this port is a single wire or a bus.
+		//	Components[Components[0]][0] += ' [' + (index.length - 1) + ':0]'; // If this is a bus, we add the size in the label.
 		
 		// I fill port informations
 		Components[Components[0]][5] = new Array();
@@ -154,7 +154,7 @@ function ParseJson(json) {
 			}
 			
 			else {
-				const_value += 'X';	
+				const_value += 'x';	
 				
 				// Code related to the connections var	
 				if (typeof Connections[index[a]] == 'undefined') { // First element : the array doesn't exist
@@ -164,13 +164,13 @@ function ParseJson(json) {
 					
 					Connections[index[a]][0] = 1; // One element.
 					Connections[index[a]][1] = ''; // svg element
-					Connections[index[a]][2] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2]]; // [Id of the element, Name of the port, Net position, Input/Output]
+					Connections[index[a]][2] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 				}
 				
 				else { // Not the first element : the array already exist
 					Connections[index[a]][0]++;
 						
-					Connections[index[a]][Connections[index[a]][0] + 1] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2]]; // [Id of the element, Name of the port, Net position, Input/Output]
+					Connections[index[a]][Connections[index[a]][0] + 1] = [Components[0], Components[Components[0]][0], a, Components[Components[0]][2], index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 				}
 			}
 		}
@@ -210,8 +210,8 @@ function ParseJson(json) {
 			Connections_tmp[0]++;
 			Connections_tmp[Connections_tmp[0]] = new Array();
 			
-			Connections_tmp[Connections_tmp[0]][0] = [Components[0] - 1, Components[Components[0] - 1][0], 0, Components[Components[0] - 1][2]]; // The Input/Output
-			Connections_tmp[Connections_tmp[0]][1] = [Components[0], const_value, 0, 1]; // The constant
+			Connections_tmp[Connections_tmp[0]][0] = [Components[0] - 1, Components[Components[0] - 1][0], 0, Components[Components[0] - 1][2], index.length]; // The Input/Output
+			Connections_tmp[Connections_tmp[0]][1] = [Components[0], const_value, 0, 1, 1]; // The constant
 			// --
 		}
 	}
@@ -316,13 +316,13 @@ function ParseJson(json) {
 						
 						Connections[index[a]][0] = 1; // One element.
 						Connections[index[a]][1] = ''; // svg element
-						Connections[index[a]][2] = [Components[0], cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j])]; // [Id of the element, Name of the port, Net position, Input/Output]
+						Connections[index[a]][2] = [Components[0], cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j]), index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 					}
 					
 					else { // Not the first element : the array already exist
 						Connections[index[a]][0]++;
 							
-						Connections[index[a]][Connections[index[a]][0] + 1] = [CompoValue, cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j])]; // [Id of the element, Name of the port, Net position, Input/Output]
+						Connections[index[a]][Connections[index[a]][0] + 1] = [CompoValue, cell_io_name[j], a, GetPortType (Components[Components[0]][2], cell_io_name[j]), index.length]; // [Id of the element, Name of the port, Net position, Input/Output]
 					}
 				}
 			}
@@ -361,8 +361,8 @@ function ParseJson(json) {
 				Connections_tmp[0]++;
 				Connections_tmp[Connections_tmp[0]] = new Array();
 				
-				Connections_tmp[Connections_tmp[0]][0] = [CompoValue, cell_io_name[j], 0, GetPortType (Components[CompoValue][2], cell_io_name[j])]; // The Input/Output
-				Connections_tmp[Connections_tmp[0]][1] = [Components[0], const_value, 0, 1]; // The constant
+				Connections_tmp[Connections_tmp[0]][0] = [CompoValue, cell_io_name[j], 0, GetPortType (Components[CompoValue][2], cell_io_name[j]), index.length]; // The Input/Output
+				Connections_tmp[Connections_tmp[0]][1] = [Components[0], const_value, 0, 1, 1]; // The constant
 				// --
 			}
 
@@ -377,8 +377,8 @@ function ParseJson(json) {
 		Connections[Connections[0] + 1][0] = 2;
 		Connections[Connections[0] + 1][1] = '';
 		
-		Connections[Connections[0] + 1][2] = [Connections_tmp[a][0][0], Connections_tmp[a][0][1], Connections_tmp[a][0][2]];
-		Connections[Connections[0] + 1][3] = [Connections_tmp[a][1][0], Connections_tmp[a][1][1], Connections_tmp[a][1][2]];
+		Connections[Connections[0] + 1][2] = [Connections_tmp[a][0][0], Connections_tmp[a][0][1], Connections_tmp[a][0][2], Connections_tmp[a][0][3], Connections_tmp[a][0][4]];
+		Connections[Connections[0] + 1][3] = [Connections_tmp[a][1][0], Connections_tmp[a][1][1], Connections_tmp[a][1][2], Connections_tmp[a][1][3], Connections_tmp[a][1][4]];
 	}
 	// --
 	
@@ -443,7 +443,51 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 				}
 			
 				if (SaveLabels) {
-					// ..
+					Labels[0]++;
+					
+					if (Connections[i][2][4] == 1 && Connections[i][3][4] == 1)
+						Labels[Labels[0]] = ['1', (xa + xb) / 200, (ya + yb) / 200];
+						
+					else {
+						var local_label = '';
+						
+						// left side (emitter)
+						if (Connections[i][2][3] == 1) {
+							local_label += Connections[i][3][1];
+							
+							if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+								local_label += '[' + Connections[i][3][2] + ']';
+						}
+						
+						else {
+							local_label += Connections[i][2][1];
+							
+							if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+								local_label += '[' + Connections[i][2][2] + ']';
+						}
+						// --
+						
+						
+						local_label += ' -> ';
+						
+						// Right Side (receipter)
+						if (Connections[i][2][3] == 0) {
+							local_label += Connections[i][3][1];
+						
+						if (Connections[i][3][2] != Connections[i][3][4] && Components[Connections[i][3][0]][2] <= 1)
+							local_label += '[' + Connections[i][3][2] + ']';
+						}
+						
+						else {
+							local_label += Connections[i][2][1];
+							
+						if (Connections[i][2][2] != Connections[i][2][4] && Components[Connections[i][2][0]][2] <= 1)
+							local_label += '[' + Connections[i][2][2] + ']';
+						}
+						// --
+						
+						Labels[Labels[0]] = [local_label, (xa + xb) / 200, (ya + yb) / 200];
+					}
 				}
 			}
 			
@@ -517,6 +561,54 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 								Wires[0]++;
 								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
 							}
+						
+							if (SaveLabels) {
+								Labels[0]++;
+								
+								if (Connections[i][m][4] == 1 && Connections[i][index1][4] == 1)
+									Labels[Labels[0]] = ['1', (xa + xb) / 200, (ya + yb) / 200];
+									
+								else {
+									var local_label = '';
+									
+									// left side (emitter)
+									if (Connections[i][m][3] == 1) {
+										local_label += Connections[i][3][1];
+										
+										if (Connections[i][index1][2] != Connections[i][index1][4] && Components[Connections[i][index1][0]][2] <= 1)
+											local_label += '[' + Connections[i][index1][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									
+									local_label += ' -> ';
+									
+									// Right Side (receipter)
+									if (Connections[i][m][3] == 0) {
+										local_label += Connections[i][3][1];
+									
+										if (Connections[i][index1][2] != Connections[i][index1][4] && Components[Connections[i][index1][0]][2] <= 1)
+											local_label += '[' + Connections[i][index1][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									Labels[Labels[0]] = [local_label, (xa + xb) / 200, (ya + yb) / 200];
+								}
+							}
 						}
 					}
 				}
@@ -552,6 +644,54 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 							if (SaveWires) {				
 								Wires[0]++;
 								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+							}
+						
+							if (SaveLabels) {
+								Labels[0]++;
+								
+								if (Connections[i][m][4] == 1 && Connections[i][index2][4] == 1)
+									Labels[Labels[0]] = ['1', (xa + xb) / 200, (ya + yb) / 200];
+									
+								else {
+									var local_label = '';
+									
+									// left side (emitter)
+									if (Connections[i][m][3] == 1) {
+										local_label += Connections[i][3][1];
+										
+										if (Connections[i][index2][2] != Connections[i][index2][4] && Components[Connections[i][index2][0]][2] <= 1)
+											local_label += '[' + Connections[i][index2][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									
+									local_label += ' -> ';
+									
+									// Right Side (receipter)
+									if (Connections[i][m][3] == 0) {
+										local_label += Connections[i][3][1];
+									
+										if (Connections[i][index2][2] != Connections[i][index2][4] && Components[Connections[i][index2][0]][2] <= 1)
+											local_label += '[' + Connections[i][index2][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									Labels[Labels[0]] = [local_label, (xa + xb) / 200, (ya + yb) / 200];
+								}
 							}
 						}
 					}
@@ -589,6 +729,54 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 								Wires[0]++;
 								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
 							}				
+						
+							if (SaveLabels) {
+								Labels[0]++;
+								
+								if (Connections[i][m][4] == 1 && Connections[i][index3][4] == 1)
+									Labels[Labels[0]] = ['1', (xa + xb) / 200, (ya + yb) / 200];
+									
+								else {
+									var local_label = '';
+									
+									// left side (emitter)
+									if (Connections[i][m][3] == 1) {
+										local_label += Connections[i][3][1];
+										
+										if (Connections[i][index3][2] != Connections[i][index3][4] && Components[Connections[i][index3][0]][2] <= 1)
+											local_label += '[' + Connections[i][index3][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									
+									local_label += ' -> ';
+									
+									// Right Side (receipter)
+									if (Connections[i][m][3] == 0) {
+										local_label += Connections[i][3][1];
+									
+										if (Connections[i][index3][2] != Connections[i][index3][4] && Components[Connections[i][index3][0]][2] <= 1)
+											local_label += '[' + Connections[i][index3][2] + ']';
+									}
+									
+									else {
+										local_label += Connections[i][m][1];
+										
+										if (Connections[i][m][2] != Connections[i][m][4] && Components[Connections[i][m][0]][2] <= 1)
+											local_label += '[' + Connections[i][m][2] + ']';
+									}
+									// --
+									
+									Labels[Labels[0]] = [local_label, (xa + xb) / 200, (ya + yb) / 200];
+								}
+							}
 						}
 					}
 				}
@@ -1525,7 +1713,7 @@ function SendLabelsPositions() {
 	var MinX, MaxX, MaxY;
 	
 	// Compute labels here.
-	// UpdateWireLength(0, 1)
+	UpdateWireLength(0, 1)
 	// --
 	
 	// Add circuit name
@@ -1541,7 +1729,7 @@ function SendLabelsPositions() {
 	}
 	
 	Labels[0]++;
-	Labels[Labels[0]] = [CircuitName[0], (MinX + MaxX) / 2, MaxY + 1];
+	Labels[Labels[0]] = ['Module : ' + CircuitName[0], (MinX + MaxX) / 2, MaxY + 1];
 	// --
 
 	postMessage({

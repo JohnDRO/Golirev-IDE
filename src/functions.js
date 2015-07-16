@@ -63,6 +63,12 @@ function Golirev(svg_id, sizeX, sizeY) {
 				obj.testCompo[0] = 0;
 				obj.ComponentsSVG[0] = 0;
 				for (i = 1; i <= messageSent.data[0]; i++) {
+					// Quick modification on the label (add : [N:0])
+					console.log('kk ' + messageSent.data[i][5][1][0]);
+					if ((messageSent.data[i][2] == 0 || messageSent.data[i][2] == 1) && messageSent.data[i][5][1][1] > 1)
+						messageSent.data[i][0] += ' [' + (messageSent.data[i][5][1][1] - 1) + ':0]';
+						
+					
 					// Generating the component
 					obj.ComponentsSVG[0]++;
 					obj.ComponentsSVG[i] = GenerateGate.call(obj, i, messageSent.data[i][2], messageSent.data[i][0], messageSent.data[i][1]); // Gate kind, Gate Label, Hide name
@@ -107,11 +113,11 @@ function Golirev(svg_id, sizeX, sizeY) {
 				
 				obj.Labels[0] = 0;
 				// --
-				
+				//console.log(messageSent.data);
 				// Creating new labels
 				for (i = 1; i <= messageSent.data[0]; i++) {
 					obj.Labels[0]++;
-					obj.Labels[i] = obj.svgjs.text(messageSent.data[i][0]).move(messageSent.data[i][1] * 100, messageSent.data[i][2] * 100).draggable();
+					obj.Labels[i] = obj.svgjs.text(messageSent.data[i][0]).move(messageSent.data[i][1] * 100, messageSent.data[i][2] * 100)
 					obj.nodes.add(obj.Labels[i]);
 				}
 				// --
