@@ -64,7 +64,6 @@ function Golirev(svg_id, sizeX, sizeY) {
 				obj.ComponentsSVG[0] = 0;
 				for (i = 1; i <= messageSent.data[0]; i++) {
 					// Quick modification on the label (add : [N:0])
-					console.log('kk ' + messageSent.data[i][5][1][0]);
 					if ((messageSent.data[i][2] == 0 || messageSent.data[i][2] == 1) && messageSent.data[i][5][1][1] > 1)
 						messageSent.data[i][0] += ' [' + (messageSent.data[i][5][1][1] - 1) + ':0]';
 						
