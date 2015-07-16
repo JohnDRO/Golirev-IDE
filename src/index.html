@@ -12,47 +12,13 @@ function GenerateJSON() { // Verilog -> JSON
 		ys.write_file("input.v", current_code);
 		if (current_button1 == true) { // Should we use splitnets -ports ? ( == no bus )
 			log('[GOLIREV] Generating the Netlist with splinets.');
-			output = ys.run('design -reset; read_verilog input.v; splitnets -ports; synth -run coarse; synth -run fine;');
+			output = ys.run('design -reset; read_verilog input.v; splitnets -ports; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = true;
 		}
 		else {
 			window.log('[GOLIREV] Generating the Netlist without splinets.');
-			output = ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;');
+			output = ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = false;
-		}
-		
-		log('[GOLIREV] Synthesis : ');
-		log(output);
-		
-		// Error Check
-		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
-		panels[BotPanelID].clear();
-	
-		lines = output.split(/\r\n|\r|\n/); 
-		result = CheckVerilogError(lines[lines.length - 2]);
-		if (result) {
-			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
-			log('[GOLIREV] Couldn\'t generate the JSON Netlist.');
-		
-			// Panels && Gutter Note
-			myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
-			ErrorLine = result;
-		
-			BotPanelID = addPanel("bottom", lines[lines.length - 2]);
-		}
-		
-		else {
-			// Panels
-			panels[BotPanelID].clear();
-			BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
-			log('[GOLIREV] No errors in your Verilog code : Generating the JSON Netlist.');
-			
-			// Generate JSON
-			output = ys.run('write_json');
-			index = output.indexOf('{');
-			output = output.substring(index); 
-			document.getElementById('JSON').value = output;
-			// --
 		}
 		// --
 
@@ -73,19 +39,15 @@ function GenerateSVG() { // JSON -> SVG element
 	// Init var
 	var current_JSON = '';
 	var current_Type = 0; 
-	var current_Async = 0; 
-	var current_Focus = 0;  
 	// --
 	
 	// Updating current values
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
-	current_Async = document.Settings.async.checked;
-	current_Focus = document.Settings.stayfocus.checked;
 	// --
 	
-	if (current_JSON != previous_JSON || current_Type != previous_Type || current_Async != previous_Async || previous_Focus != current_Focus) {
-		if (current_JSON == previous_JSON && current_Async == previous_Async && previous_Focus == current_Focus) { // The user only wants to change gate type. No needs to re-parse the JSON
+	if (current_JSON != previous_JSON || current_Type != previous_Type) {
+		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
 			log('------------------------------------');
 			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON Netlist).');
 			schematic.UpdateGate(Number(current_Type));
@@ -94,23 +56,19 @@ function GenerateSVG() { // JSON -> SVG element
 		else {
 			log('------------------------------------');
 			log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
-			log('[GOLIREV] Async : ' + (current_Async == 1 ? 'True' : 'False'));
-			log('[GOLIREV] Focus : ' + (current_Focus == 1 ? 'Stay on schematic' : 'Do not stay on schematic'));
 			log('[GOLIREV] GateType : ' + (Number(current_Type) == 0 ? 'Distinctive shapes' : 'Rectangular shapes'));
 
 			json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
-			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type), current_Async, current_Focus);
+			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
 			
-			log('[GOLIREV] Module name : '+ Arr[2]);
-			log('[GOLIREV] Created with : '+ Arr[3]);
-			log('[GOLIREV] This circuit has : '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
+			//log('[GOLIREV] Module name : '+ Arr[2]);
+			//log('[GOLIREV] Created with : '+ Arr[3]);
+			//log('[GOLIREV] This circuit has : '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
 		}
 		
 		// Updating previous values
 		previous_JSON = current_JSON;
 		previous_Type = current_Type;
-		previous_Async = current_Async;
-		previous_Focus = current_Focus;
 		// --
 		
 		return 1;
@@ -123,6 +81,47 @@ function GenerateSVG() { // JSON -> SVG element
 	}
 	
 	return 1;
+}
+
+function handle_run_errors(logmsg, errmsg) {
+	log('[GOLIREV] Synthesis : ');
+	log(logmsg);
+	
+	// Error Check
+	myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+	panels[BotPanelID].clear();
+
+	lines = logmsg.split(/\r\n|\r|\n/); 
+	result = CheckVerilogError(lines[lines.length - 2]);
+	if (result) {
+		log('[GOLIREV] Errors in your Verilog code, line : ' + result);
+		log('[GOLIREV] Couldn\'t generate the JSON Netlist.');
+	
+		// Panels && Gutter Note
+		myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
+		ErrorLine = result;
+	
+		BotPanelID = addPanel("bottom", lines[lines.length - 2]);
+	}
+	
+	else {
+		// Panels
+		panels[BotPanelID].clear();
+		BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
+		log('[GOLIREV] No errors in your Verilog code : Generating the JSON Netlist.');
+		
+		// Generate JSON
+		ys.run('write_json', JSON_CallBack);
+		// --
+	}
+}
+
+function JSON_CallBack(logmsg, errmsg) {
+	if (errmsg == "") {
+		index = logmsg.indexOf('{');
+		logmsg = logmsg.substring(index); 
+		document.getElementById('JSON').value = logmsg;
+	}
 }
 // --
 </script>
@@ -141,7 +140,6 @@ function GenerateSVG() { // JSON -> SVG element
 <script src="codemirror/verilog.js"></script>
 <script src="codemirror/closebrackets.js"></script>
 <script src="codemirror/panel.js"></script>
-<script src="codemirror/active-line.js"></script>
 
 <style type="text/css">
 	.CodeMirror {	
@@ -183,10 +181,6 @@ endmodule
 		<input type="checkbox" name="splitnets" checked="checked">
 		Splinets -ports<br /><br />
 		<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()"><br /><br />
-		<input type="checkbox" name="async" checked="checked">
-		Async placement<br /><br />
-		<input type="checkbox" name="stayfocus" checked="checked">
-		Stay focused<br /><br />
 		<select name="Gate_Type" id="Gate_Type">
 		   <option value="0" selected>Distinctive shapes</option>
 		   <option value="1">Rectangular shapes</option>
@@ -271,10 +265,7 @@ endmodule
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 
 	// Yosys init
-	var ys = YosysJS.create();
-	ys.verbose = false;
-	ys.logprint = false;
-	ys.echo = false;
+	var ys = YosysJS.create_worker();
 	// --
 
 	// Make the group pannable and zoomable
