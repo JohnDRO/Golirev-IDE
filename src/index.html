@@ -11,12 +11,12 @@ function GenerateJSON() { // Verilog -> JSON
 	if (current_code != previous_code || current_button1 != previous_button1) {
 		ys.write_file("input.v", current_code);
 		if (current_button1 == true) { // Should we use splitnets -ports ? ( == no bus )
-			log('[GOLIREV] Generating the Netlist with splinets.');
+			log('[GOLIREV] Generating the Netlist with splinets. Please wait.');
 			output = ys.run('design -reset; read_verilog input.v; splitnets -ports; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = true;
 		}
 		else {
-			window.log('[GOLIREV] Generating the Netlist without splinets.');
+			window.log('[GOLIREV] Generating the Netlist without splinets. Please wait.');
 			output = ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = false;
 		}
