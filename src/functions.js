@@ -56,6 +56,11 @@ function Golirev(svg_id, sizeX, sizeY) {
 				log('[GOLIREV] ' + messageSent.data);
 			break;
 			case 'place_components':  
+				// I remove wires
+				for (i = 1; i <= obj.Wires[0]; i++)
+					if (typeof obj.Wires[i] != 'undefined')
+						obj.Wires[i].remove();
+				
 				// I remove previous components
 				obj.GlobalComponentsGroup.remove();
 				obj.GlobalComponentsGroup = obj.svgjs.group();
