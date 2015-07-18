@@ -87,20 +87,20 @@ function Golirev(svg_id, sizeX, sizeY) {
 				obj.nodes.add(obj.GlobalComponentsGroup);
 				FocusOnSchematic.call(obj);
 			break;
-			case 'place_wires':  
-				// Removing old wires
-				for (i = 1; i <= obj.Wires[0]; i++) {
-					obj.Wires[i].remove();
-				}
-				
-				obj.Wires[0] = 0;
-				// --
-				
+			case 'place_wires':  			
 				// Creating new wires
+				obj.Wires[0] = 0;
 				for (i = 1; i <= messageSent.data[0]; i++) {
-					obj.Wires[0]++;
-					obj.Wires[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
-					obj.nodes.add(obj.Wires[i]);
+					if (messageSent.data[i][4] == 1) {
+						// Remove old wire
+						if (typeof obj.Wires[i] != 'undefined')
+							obj.Wires[i].remove();
+						
+						// Make a new wire
+						obj.Wires[0]++;
+						obj.Wires[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
+						obj.nodes.add(obj.Wires[i]);
+					}
 				}
 				// --
 			break;
@@ -123,6 +123,9 @@ function Golirev(svg_id, sizeX, sizeY) {
 			break;
 		}
 	}
+	
+	this.PreviousDate = new Date();
+	this.CurrentDate = new Date();
 	
 }
  
@@ -548,6 +551,13 @@ function GenerateGate(ID, Gate_Type, Label, hide_label) { // Generate a gate and
 	var obj = this;
 	
 	group.dragmove = function(event, z) {
+		obj.CurrentDate = new Date();
+		var dif = obj.CurrentDate - obj.PreviousDate;
+		obj.PreviousDate = obj.CurrentDate;
+		
+		if (dif < 5)
+			return 0;
+		
 		obj.webworker.postMessage({
 			'cmd': 'write_wires',
 			'data': [ID, obj.ComponentsSVG[ID].x(), obj.ComponentsSVG[ID].y()],

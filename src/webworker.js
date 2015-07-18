@@ -13,26 +13,17 @@ var Gate_Norm = 0; // Which norm are we using : distinctive shapes or rectangula
 var Grid; // Contains the grid information	
 var WireLength = 0;
 var CircuitName = '';
-
-var previous = new Date(), current = new Date();
 // --
 
 // Event Callback
 this.addEventListener('message', messageHandler, false);
 
 function messageHandler(event) {
-	current = new Date();
-	dif = current - previous;
-	previous = current;
-	
-	if (dif < 3)
-		return 0;
-	
     
     var messageSent = event.data;
 	
 	switch (messageSent.cmd) {
-		case 'parse_json': // Penser à set Gate_Norm
+		case 'parse_json': // Penser ? set Gate_Norm
 			// I parse the JSON
 			log('Parsing of the JSON Data...');
 			
@@ -61,14 +52,14 @@ function messageHandler(event) {
 			Components[messageSent.data[0]][8] = messageSent.data[1] / 100; // set the new x
 			Components[messageSent.data[0]][9] = messageSent.data[2] / 100; // set the new y
 			
-			SendWiresPositions(); // send back data
+			SendWiresPositions(messageSent.data[0]); // send back data
 			SendLabelsPositions();
 		break;
 		
 		case 'switch_gatetype': 
 			Gate_Norm = messageSent.data;
 			SendElementsPositions();
-			SendWiresPositions();
+			SendWiresPositions(-1);
 			SendLabelsPositions();
 		break;
 	}
@@ -387,10 +378,11 @@ function ParseJson(json) {
 // --	
 
 // Components and wires
-function UpdateWireLength(SaveWires, SaveLabels) {
-	if (typeof SaveWires == 'undefined' || typeof SaveLabels == 'undefined') {
+function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
+	if (typeof SaveWires == 'undefined' || typeof SaveLabels == 'undefined' || typeof CompoID == 'undefined') {
 		SaveWires = 0;
 		SaveLabels = 0;
+		CompoID = -1;
 	}
 	
 	WireLength = 0;
@@ -436,9 +428,14 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 				else
 					WireLength += Cost2;
 				
-				if (SaveWires) {				
+				if (SaveWires) {
 					Wires[0]++;
-					Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+					if (CompoID == ID1 || CompoID == ID2)
+						Wires[Wires[0]] = [xa, xb, ya, yb, 1]; // function GenerateOneWire(xa, xb, ya, yb)
+					else if (CompoID == -1)
+						Wires[Wires[0]] = [xa, xb, ya, yb, 1];
+					else
+						Wires[Wires[0]] = 0;
 				}
 			
 				if (SaveLabels) {
@@ -565,8 +562,7 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 						}
 					}
 				}
-
-				
+			
 				if (input_circuit_number >= 1) { // case 1
 					for (var m = 2; m <= (Connections[i][0] + 1); m++) { // I connect the circuit input to the other elements
 						if (m != index1) {
@@ -595,9 +591,14 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 							else
 								WireLength += Cost2;
 							
-							if (SaveWires) {				
+							if (SaveWires) {
 								Wires[0]++;
-								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+								if (CompoID == ID1 || CompoID == ID2)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1]; // function GenerateOneWire(xa, xb, ya, yb)
+								else if (CompoID == -1)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1];
+								else
+									Wires[Wires[0]] = 0;
 							}
 						
 							if (SaveLabels) {
@@ -679,9 +680,14 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 							else 
 								WireLength += Cost2;
 							
-							if (SaveWires) {				
+							if (SaveWires) {
 								Wires[0]++;
-								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
+								if (CompoID == ID1 || CompoID == ID2)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1]; // function GenerateOneWire(xa, xb, ya, yb)
+								else if (CompoID == -1)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1];
+								else
+									Wires[Wires[0]] = 0;
 							}
 						
 							if (SaveLabels) {
@@ -763,10 +769,15 @@ function UpdateWireLength(SaveWires, SaveLabels) {
 							else
 								WireLength += Cost2;
 							
-							if (SaveWires) {				
+							if (SaveWires) {
 								Wires[0]++;
-								Wires[Wires[0]] = [xa, xb, ya, yb]; // function GenerateOneWire(xa, xb, ya, yb)
-							}				
+								if (CompoID == ID1 || CompoID == ID2)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1]; // function GenerateOneWire(xa, xb, ya, yb)
+								else if (CompoID == -1)
+									Wires[Wires[0]] = [xa, xb, ya, yb, 1];
+								else
+									Wires[Wires[0]] = 0;
+							}	
 						
 							if (SaveLabels) {
 								Labels[0]++;
@@ -1387,7 +1398,7 @@ function SimulatedAnnealing() {
 	}
 	// --
 	
-	UpdateWireLength(0, 0);
+	UpdateWireLength(0, 0, 0);
 	distance = GetWiresLength();
 	log('Initial WireLength : ' + distance);
 	// --
@@ -1409,7 +1420,7 @@ function SimulatedAnnealing() {
 
 		// Make a random change
         Arr = RandomChange();
-		UpdateWireLength(0, 0);
+		UpdateWireLength(0, 0, 0);
 		// Tests
 		for (i = 1; i <= Components[0]; i++) {
 			WireLength += 25 * Math.sqrt(Components[i][8]*Components[i][8] + Components[i][9]*Components[i][9]);
@@ -1526,7 +1537,7 @@ function OptimizePlacement() {
 	
 	// 1. Port connection Switching
 	// The main idea is to switch ports of a gate (AND/OR/XOR) and to check if this improves the WireLength
-	UpdateWireLength(0, 0);
+	UpdateWireLength(0, 0, 0);
 	for (i = 1; i <= Components[0]; i++) {
 		if (Components[i][2] == 4 || Components[i][2] == 5 || Components[i][2] == 6) {
 			UpdateWireLength(0);
@@ -1549,7 +1560,7 @@ function OptimizePlacement() {
 		}
 	}
 	
-	UpdateWireLength(0, 0);
+	UpdateWireLength(0, 0, 0);
 	// --
 	/*
 	// 2. Placement Switching
@@ -1732,7 +1743,7 @@ function shuffleArray(d) {
 // Send Data
 function SendElementsPositions() {
 	SendComponentsPositions();
-	SendWiresPositions();
+	SendWiresPositions(-1);
 	SendLabelsPositions();	
 }
 
@@ -1743,9 +1754,9 @@ function SendComponentsPositions() {
 	});
 }
 
-function SendWiresPositions() { // GenerateOneWire(xa, xb, ya, yb);
-	UpdateWireLength(1, 0);
-
+function SendWiresPositions(CompoID) { // GenerateOneWire(xa, xb, ya, yb);
+	UpdateWireLength(1, 0, CompoID);
+	
 	postMessage({
 		'cmd': 'place_wires',
 		'data': Wires
@@ -1756,7 +1767,7 @@ function SendLabelsPositions() {
 	var MinX, MaxX, MaxY;
 	
 	// Compute labels here.
-	UpdateWireLength(0, 1)
+	UpdateWireLength(0, 1, 0)
 	// --
 	
 	// Add circuit name
