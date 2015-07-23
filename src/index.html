@@ -45,40 +45,34 @@ function GenerateSVG() { // JSON -> SVG element
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
 	// --
-	
-	if (current_JSON != previous_JSON || current_Type != previous_Type) {
-		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
-			log('------------------------------------');
-			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON Netlist).');
-			schematic.UpdateGate(Number(current_Type));
-		}
-		
-		else {
-			log('------------------------------------');
-			log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
-			log('[GOLIREV] GateType : ' + (Number(current_Type) == 0 ? 'Distinctive shapes' : 'Rectangular shapes'));
-
-			json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
-			Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
-			
-			//log('[GOLIREV] Module name : '+ Arr[2]);
-			//log('[GOLIREV] Created with : '+ Arr[3]);
-			//log('[GOLIREV] This circuit has : '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
-		}
-		
-		// Updating previous values
-		previous_JSON = current_JSON;
-		previous_Type = current_Type;
-		// --
+	/*
+	if (current_Type != previous_Type && current_JSON == previous_JSON) {
+	// The user only wants to change gate type. No needs to re-parse the JSON
+		log('------------------------------------');
+		log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON Netlist).');
+		schematic.UpdateGate(Number(current_Type));
 		
 		return 1;
 	}
 	
 	else {
-		log('------------------------------------');
-		log('[GOLIREV] No modifications to do.');
-		return 1;
-	}
+	*/
+	log('------------------------------------');
+	log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
+	log('[GOLIREV] GateType : ' + (Number(current_Type) == 0 ? 'Distinctive shapes' : 'Rectangular shapes'));
+
+	json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
+	Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
+			
+		//log('[GOLIREV] Module name : '+ Arr[2]);
+		//log('[GOLIREV] Created with : '+ Arr[3]);
+		//log('[GOLIREV] This circuit has : '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
+	//}
+	
+	// Updating previous values
+	previous_JSON = current_JSON;
+	previous_Type = current_Type;
+	// --
 	
 	return 1;
 }
