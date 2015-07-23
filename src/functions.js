@@ -95,6 +95,7 @@ function Golirev(svg_id, sizeX, sizeY) {
 			case 'place_wires':  			
 				// Creating new wires
 				obj.Wires[0] = 0;
+				
 				for (i = 1; i <= messageSent.data[0]; i++) {
 					if (messageSent.data[i][4] == 1) {
 						// Remove old wire
@@ -102,12 +103,12 @@ function Golirev(svg_id, sizeX, sizeY) {
 							obj.Wires[i].remove();
 						
 						// Make a new wire
-						obj.Wires[0]++;
 						obj.Wires[i] = GenerateOneWire.call(obj, messageSent.data[i][0], messageSent.data[i][1], messageSent.data[i][2], messageSent.data[i][3]);
 						obj.nodes.add(obj.Wires[i]);
 					}
+					
+					obj.Wires[0]++;
 				}
-				// --
 			break;
 			case 'place_netlabels':  
 				// Removing old netlabels
