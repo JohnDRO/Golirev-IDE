@@ -42,6 +42,8 @@ function messageHandler(event) {
 			log('Sending back the positions of components...');
 		
 			SendElementsPositions();
+			
+			log('DONE.')
 			// --
 		break;
 		
@@ -1534,7 +1536,9 @@ function ReverseChange(ID, x, y) {
 
 function OptimizePlacement() {
 	var LocalWireLength = 0;
-	var gain = 1 / 100;
+	var LocalWireLength2 = 0;
+	var InitalLocalWireLength = 0;
+	var gain = 1 / 1000;
 	
 	// 1. Port connection Switching
 	// The main idea is to switch ports of a gate (AND/OR/XOR) and to check if this improves the WireLength
@@ -1563,12 +1567,9 @@ function OptimizePlacement() {
 	
 	UpdateWireLength(0, 0, 0);
 	// --
-	/*
+	
 	// 2. Placement Switching
 	// The main idea is to switch two components and to check if this improves the WireLength
-	
-	var MaxDif = 10;
-	
 	for (i = 1; i <= Components[0]; i++) {
 		for (n = 1; n <= Components[0]; n++) {
 			if (n != i) {
@@ -1586,7 +1587,7 @@ function OptimizePlacement() {
 				MoveToGrid(i, xb, yb);
 				MoveToGrid(n, xa, ya);
 
-				UpdateWireLength(0);
+				UpdateWireLength(0, 0, 0);
 				
 				if ((WireLength - GetWiresLength()) > 0) { // Are we improving the system ?
 					; // Nothing to do.
@@ -1596,7 +1597,7 @@ function OptimizePlacement() {
 					MoveToGrid(i, xa, ya);
 					MoveToGrid(n, xb, yb);
 					
-					UpdateWireLength(0);
+					UpdateWireLength(0, 0, 0);
 				}
 			}
 		}
@@ -1604,105 +1605,50 @@ function OptimizePlacement() {
 	// --
 	
 	// 3. Placement Delta
-	for (i = 1; i <= Components[0]; i++) { // Cells
-		if (Components[i][2] != 0 || Components[i][2] != 1) {
-			LocalWireLength = GetWiresLength(); // Get the current WireLength
-			
-			Components[i][9] += gain;
-			
-			UpdateWireLength(0);
-			
-			if ((GetWiresLength() - LocalWireLength) < 0) { // Are we improving the situation ?
-				for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
-					LocalWireLength = GetWiresLength();
-					Components[i][9] += gain;
-					UpdateWireLength(0);
-				}
+	var alpha = 0.999;
+    var temperature = 400.0;
+    var epsilon = 0.0001;
+	
+	var iteration = 0;
+	UpdateWireLength(0, 0, 0);
+	distance = GetWiresLength();
+	log('Initial WireLength : ' + distance);
+	// --
 
-				if (n < MaxDif) {
-					Components[i][9] -= gain;
-					UpdateWireLength(0);
-				}
-			}
-			
-			else { // We have to go reverse
-				LocalWireLength = GetWiresLength();
-				Components[i][9] -= 2*gain;
-				
-				UpdateWireLength(0);
-				
-				if ((GetWiresLength() - LocalWireLength) > 0) {
-					Components[i][9] += gain;
-				}
-				
-				else {
-					for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
-						LocalWireLength = GetWiresLength();
-						Components[i][9] -= gain;
-						UpdateWireLength(0);
-					}
+	// Boucle principale
+	var Arr;
+	var delta;
+	var proba;
+	
+	// While the temperature did not reach epsilon
+    while (temperature > epsilon) {
+        iteration++;
 
-					if (n < MaxDif) {
-						Components[i][9] += gain;
-						UpdateWireLength(0);
-					}
-				}
-			}
-		}
-	}
-	
-	UpdateWireLength(0);
-	
-	MaxDif = 70;
-	
-	for (i = 1; i <= Components[0]; i++) { // I/O
-		if (Components[i][1] == 0 || Components[i][1] == 1) {
-			LocalWireLength = GetWiresLength(); // Get the current WireLength
+		// Make a random change
+        Arr = RandomChange_Opt();
+		UpdateWireLength(0, 0, 0);
+		
+		// Get the new delta
+        delta = GetWiresLength() - distance;
+       
+	   if (delta < 0)
+            distance = delta + distance;
+        
+		else {
+            proba = Math.random();
 			
-			Components[i][9] += gain;
+            if (proba < Math.exp(-delta/temperature))
+                distance = delta + distance;
 			
-			UpdateWireLength(0);
-			
-			if ((GetWiresLength() - LocalWireLength) < 0) { // Are we improving the situation ?
-				for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
-					LocalWireLength = GetWiresLength();
-					Components[i][9] += gain;
-					UpdateWireLength(0);
-				}
+			else 
+				ReverseChange_Opt(Arr[0], Arr[1]);
+        }
+        
+		// Cooling process on every iteration
+        temperature *= alpha;
+    }
 
-				if (n < MaxDif) {
-					Components[i][9] -= gain;
-					UpdateWireLength(0);
-				}
-			}
-			
-			else { // We have to go reverse
-				LocalWireLength = GetWiresLength();
-				Components[i][9] -= 2*gain;
-				
-				UpdateWireLength(0);
-				
-				if ((GetWiresLength() - LocalWireLength) > 0) {
-					Components[i][9] += gain;
-				}
-				
-				else {
-					for (n = 0; n < MaxDif && (GetWiresLength() - LocalWireLength) < 0; n++) {
-						LocalWireLength = GetWiresLength();
-						Components[i][9] -= gain;
-						UpdateWireLength(0);
-					}
-
-					if (n < MaxDif) {
-						Components[i][9] += gain;
-						UpdateWireLength(0);
-					}
-				}
-			}
-		}
-	}
-	
-	
+	UpdateWireLength(0, 0, 0);
 	// --
 	
 	// 4. Overlapping Wires : to implement
@@ -1799,4 +1745,64 @@ function log(string) {
 		'data': string
 	});
 }
+// --
+
+
+// Simulated Annealing : Optimisations (post-processing functions)
+function RandomChange_Opt() { // Make a random change, must return the ID and the direction
+	var gain = 1 / 1000;
+	var MaxDif = 20;
+	
+	// Random component ID
+	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
+	// --
+	
+	// Random direction (up or down)
+	var Direction = Math.floor((Math.random() * 2));
+	
+	if (Components[RandomID][10] != MaxDif) {
+		if (Components[RandomID][2] == 0 || Components[RandomID][2] == 1) { // Settings for IO
+			var gain = 1 / 1000;
+			var MaxDif = 20;
+		}
+		
+		else { // Settings for cells
+			var gain = 1 / 1000;
+			var MaxDif = 20;
+		}
+		
+		if (Direction == 0)
+			Components[RandomID][9] -= gain;
+		
+		else
+			Components[RandomID][9] += gain;
+			
+		Components[RandomID][10]++;
+	}
+		
+	return [RandomID, Direction];
+}
+
+function ReverseChange_Opt(ID, Direction) {
+	if (Components[ID][2] == 0 || Components[ID][2] == 1) {
+		var gain = 1 / 1000;
+		var MaxDif = 20;
+	}
+	
+	else {
+		var gain = 1 / 1000;
+		var MaxDif = 20;
+	}
+	
+	if (Direction == 0)
+		Components[ID][9] += gain;
+	
+	else
+		Components[ID][9] -= gain;
+	
+	Components[ID][10]--;
+	
+	UpdateWireLength(0, 0, 0);
+}
+
 // --
