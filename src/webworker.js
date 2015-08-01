@@ -392,8 +392,9 @@ function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
 	Labels[0] = 0;
 	
 	// Costs
-	var Cost1 = 300; // 300
-	var Cost2 = -100; // -50
+	var Cost1 = 300; // incorrect Emitter / Receipter position (300)
+	var Cost2 = -100; // correct Emitter / Receipter position (-50)
+	var Cost3 = 100; // different y positions (connections)
 
 	// Wires
 	var i = 0, n = 0, k = 0, v = 0; // loops index
@@ -420,6 +421,9 @@ function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
 				// I have to add xa, xb, ya, yb in order to send data
 				//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 				WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
+				
+				if (ya == yb)
+					WireLength -= Cost3;
 
 				if (Connections[i][2][3] == 0 && xa < xb)
 					WireLength += Cost1;
@@ -584,6 +588,9 @@ function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
 							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
+							if (ya == yb)
+								WireLength -= Cost3;
+								
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += Cost1;
 								
@@ -673,6 +680,9 @@ function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
 							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
 							
+							if (ya == yb)
+								WireLength -= Cost3;
+								
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += Cost1 ;
 								
@@ -761,6 +771,9 @@ function UpdateWireLength(SaveWires, SaveLabels, CompoID) {
 							// I have to add xa, xb, ya, yb in order to send data
 							//WireLength += 2 * Math.abs(xb - xa) + Math.abs(yb - ya);
 							WireLength += Math.sqrt((xb - xa)*(xb - xa) + (yb - ya)*(yb - ya));
+							
+							if (ya == yb)
+								WireLength -= Cost3;
 							
 							if (Connections[i][m][4] == 1 && xa > xb)
 								WireLength += Cost1;
@@ -1571,6 +1584,7 @@ function OptimizePlacement() {
 	// 2. Placement Switching
 	// The main idea is to switch two components and to check if this improves the WireLength
 	for (i = 1; i <= Components[0]; i++) {
+		Components[i][10] = 0;
 		for (n = 1; n <= Components[0]; n++) {
 			if (n != i) {
 				// Save the current configuration
@@ -1751,7 +1765,7 @@ function log(string) {
 // Simulated Annealing : Optimisations (post-processing functions)
 function RandomChange_Opt() { // Make a random change, must return the ID and the direction
 	var gain = 1 / 1000;
-	var MaxDif = 20;
+	var MaxDif = 20000;
 	
 	// Random component ID
 	var RandomID = Math.floor(Math.random() * (Components[0])) + 1;
@@ -1759,18 +1773,8 @@ function RandomChange_Opt() { // Make a random change, must return the ID and th
 	
 	// Random direction (up or down)
 	var Direction = Math.floor((Math.random() * 2));
-	
+
 	if (Components[RandomID][10] != MaxDif) {
-		if (Components[RandomID][2] == 0 || Components[RandomID][2] == 1) { // Settings for IO
-			var gain = 1 / 1000;
-			var MaxDif = 20;
-		}
-		
-		else { // Settings for cells
-			var gain = 1 / 1000;
-			var MaxDif = 20;
-		}
-		
 		if (Direction == 0)
 			Components[RandomID][9] -= gain;
 		
@@ -1784,15 +1788,7 @@ function RandomChange_Opt() { // Make a random change, must return the ID and th
 }
 
 function ReverseChange_Opt(ID, Direction) {
-	if (Components[ID][2] == 0 || Components[ID][2] == 1) {
-		var gain = 1 / 1000;
-		var MaxDif = 20;
-	}
-	
-	else {
-		var gain = 1 / 1000;
-		var MaxDif = 20;
-	}
+	var gain = 1 / 1000;
 	
 	if (Direction == 0)
 		Components[ID][9] += gain;
@@ -1804,5 +1800,4 @@ function ReverseChange_Opt(ID, Direction) {
 	
 	UpdateWireLength(0, 0, 0);
 }
-
 // --
