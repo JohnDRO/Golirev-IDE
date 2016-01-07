@@ -41,7 +41,8 @@ What is not working / not done :
     - A text editor implemented in JavaScript
 
 ## TODO
-* Improve placement performances, currently the placement is very slow.
+* Improve placement performances, currently the placement is very slow and sometimes innacurate.
+* Look at wire length placer (built-in yosys)
 * Finish  to add components (chapter 5 on the yosys manual)
 * Use AIG models and Wavedrom in order to evaluate circuits and display results
 
