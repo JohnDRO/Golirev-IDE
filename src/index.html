@@ -11,45 +11,14 @@ function GenerateJSON() { // Verilog -> JSON
 	if (current_code != previous_code || current_button1 != previous_button1) {
 		ys.write_file("input.v", current_code);
 		if (current_button1 == true) { // Should we use splitnets -ports ? ( == no bus )
-			output = ys.run('design -reset; read_verilog input.v; splitnets -ports; synth -run coarse; synth -run fine;');
+			log('[GOLIREV] Generating the Netlist with splinets. Please wait.');
+			output = ys.run('design -reset; read_verilog input.v; splitnets -ports; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = true;
 		}
 		else {
-			output = ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;');
+			window.log('[GOLIREV] Generating the Netlist without splinets. Please wait.');
+			output = ys.run('design -reset; read_verilog input.v; synth -run coarse; synth -run fine;', handle_run_errors);
 			previous_button1 = false;
-		}
-		
-		log('[GOLIREV] Synthesis : ');
-		log(output);
-		
-		// Error Check
-		myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
-		panels[BotPanelID].clear();
-	
-		lines = output.split(/\r\n|\r|\n/); 
-		result = CheckVerilogError(lines[lines.length - 2]);
-		if (result) {
-			log('[GOLIREV] Errors in your Verilog code, line : ' + result);
-		
-			// Panels && Gutter Note
-			myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
-			ErrorLine = result;
-		
-			BotPanelID = addPanel("bottom", lines[lines.length - 2]);
-		}
-		else {
-			// Panels
-			panels[BotPanelID].clear();
-			BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
-			log('[GOLIREV] No errors in your Verilog code');
-			
-			// Generate JSON
-			log('[GOLIREV] Generating JSON File');
-			output = ys.run('write_json');
-			index = output.indexOf('{');
-			output = output.substring(index); 
-			document.getElementById('JSON').value = output;
-			// --
 		}
 		// --
 
@@ -65,32 +34,89 @@ function GenerateJSON() { // Verilog -> JSON
 }
 
 function GenerateSVG() { // JSON -> SVG element
+	var Arr;
+	
+	// Init var
+	var current_JSON = '';
+	var current_Type = 0; 
+	// --
+	
+	// Updating current values
 	current_JSON = document.getElementById('JSON').value;
 	current_Type = document.getElementById("Gate_Type").value; 
-	if (current_JSON != previous_JSON || current_Type != previous_Type) {
-		if (current_JSON == previous_JSON) { // The user only wants to change gate type. No needs to re-parse the JSON
-			log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON data).');
-			schematic.UpdateGate(Number(current_Type));
-		}
-		else {
-			log('[GOLIREV] Generating SVG file from the JSON file');
-
-			json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
-			schematic.DisplayJson(json_yosysJS2, Number(current_Type));
-		}
-		
-		previous_JSON = current_JSON;
-		previous_Type = current_Type;
+	// --
+	/*
+	if (current_Type != previous_Type && current_JSON == previous_JSON) {
+	// The user only wants to change gate type. No needs to re-parse the JSON
+		log('------------------------------------');
+		log('[GOLIREV] Updating the SVG : modifying the gate type (not re-parsing the JSON Netlist).');
+		schematic.UpdateGate(Number(current_Type));
 		
 		return 1;
 	}
 	
 	else {
-		log('[GOLIREV] No modifications to do.');
-		return 1;
-	}
+	*/
+	log('------------------------------------');
+	log('[GOLIREV] Parsing the JSON file and generating the SVG element.');
+	log('[GOLIREV] GateType : ' + (Number(current_Type) == 0 ? 'Distinctive shapes' : 'Rectangular shapes'));
+
+	json_yosysJS2 = JSON.parse(document.getElementById('JSON').value);
+	Arr = schematic.DisplayJson(json_yosysJS2, Number(current_Type));
+			
+		//log('[GOLIREV] Module name : '+ Arr[2]);
+		//log('[GOLIREV] Created with : '+ Arr[3]);
+		//log('[GOLIREV] This circuit has : '+Arr[5]+' input(s), '+Arr[6]+' ouput(s) and '+Arr[7]+' cell(s).');
+	//}
+	
+	// Updating previous values
+	previous_JSON = current_JSON;
+	previous_Type = current_Type;
+	// --
 	
 	return 1;
+}
+
+function handle_run_errors(logmsg, errmsg) {
+	log('[GOLIREV] Synthesis : ');
+	log(logmsg);
+	
+	// Error Check
+	myCodeMirror.setGutterMarker(Number(ErrorLine) - 1, "note-gutter", "");
+	panels[BotPanelID].clear();
+
+	lines = logmsg.split(/\r\n|\r|\n/); 
+	result = CheckVerilogError(lines[lines.length - 2]);
+	if (result) {
+		log('[GOLIREV] Errors in your Verilog code, line : ' + result);
+		log('[GOLIREV] Couldn\'t generate the JSON Netlist.');
+	
+		// Panels && Gutter Note
+		myCodeMirror.setGutterMarker(Number(result) - 1, "note-gutter", CreateErrorSign());
+		ErrorLine = result;
+	
+		BotPanelID = addPanel("bottom", lines[lines.length - 2]);
+	}
+	
+	else {
+		// Panels
+		panels[BotPanelID].clear();
+		BotPanelID = addPanel("bottom", "No errors in your Verilog code : you can draw the equivalent schematic");
+		log('[GOLIREV] No errors in your Verilog code : Generating the JSON Netlist.');
+		
+		// Generate JSON
+		ys.run('write_json', JSON_CallBack);
+		// --
+	}
+}
+
+function JSON_CallBack(logmsg, errmsg) {
+	if (errmsg == "") {
+		index = logmsg.indexOf('{');
+		logmsg = logmsg.substring(index); 
+		document.getElementById('JSON').value = logmsg;
+		log('[GOLIREV] DONE.');
+	}
 }
 // --
 </script>
@@ -109,11 +135,11 @@ function GenerateSVG() { // JSON -> SVG element
 <script src="codemirror/verilog.js"></script>
 <script src="codemirror/closebrackets.js"></script>
 <script src="codemirror/panel.js"></script>
-<script src="codemirror/active-line.js"></script>
 
 <style type="text/css">
 	.CodeMirror {	
 		border: 1px solid black; 
+		height: 50%;
 	}
 	.panel {
 		background: #f7f7f7;
@@ -126,28 +152,46 @@ function GenerateSVG() { // JSON -> SVG element
 		float: right;
 		cursor: pointer;
 	}
+	textarea {
+		resize: none;
+	}
 </style>
 </head>
 <body>
-Golirev IDE<hr>
-Schematic : <br />
-<div id="drawing" style="border: 2px solid #ccc; border-radius: 4px; width: 100%; height: 100%"></div>
-<hr>
-Verilog code and Json Output :<br />
-
+<div id="CodeMirror" style="border: 2px solid #ccc; width: 50%; float: left">
 <textarea id="Verilog" style="width: 100%; height: 50%;">
-module counter_2bit ( a, b, c);
+module tests ( a, b, c);
 	input a, b;
 	output c;
 
 	assign c = a && b;
 endmodule
 </textarea>
-<br />
-<textarea id="JSON" style="width: 100%; height: 50%; position: right;">{
- "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
+</div>
+
+<div id="Settings" style="width: 24%; height: 50%; border: 2px solid #ccc; float: left">
+	<div align="center">
+	<form name="Settings">
+		<br /><br />
+		<input type="checkbox" name="splitnets" checked="checked">
+		Splinets -ports<br /><br />
+		<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()"><br /><br />
+		<select name="Gate_Type" id="Gate_Type">
+		   <option value="0" selected>Distinctive shapes</option>
+		   <option value="1">Rectangular shapes</option>
+		</select><br /><br />
+		<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()"><br /><br />
+		
+		<input type="button" value="Focus to schematic" name="FocusToSchematic" onClick="schematic.focus()"><br /><br />
+	</form>
+	</div>
+</div>
+
+<div id="JSON_div" style="border: 2px solid #ccc; width: 25%; height: 50%; float: left">
+<textarea id="JSON" style="width: 100%; height: 100%;">{
+  "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
   "modules": {
-    "counter_2bit": {
+    "tests": {
       "ports": {
         "a": {
           "direction": "input",
@@ -163,7 +207,7 @@ endmodule
         }
       },
       "cells": {
-        "$auto$simplemap.cc:228:simplemap_logbin$2072": {
+        "$auto$simplemap.cc:228:simplemap_logbin$47": {
           "hide_name": 1,
           "type": "$_AND_",
           "parameters": {
@@ -202,29 +246,21 @@ endmodule
       }
     }
   }
-}</textarea>
-<form name="Settings">
-	<input type="button" value="Verilog to JSON" name="VerilogToJSON" onClick="GenerateJSON()">
-	<input type="button" value="JSON to Schematic" name="JSONToSchematic" onClick="GenerateSVG()">
-	Splinets -ports
-	<input type="checkbox" name="splitnets">
-	Gate Type 
-	<select name="Gate_Type" id="Gate_Type">
-           <option value="0" selected>Distinctive shape</option>
-           <option value="1">Rectangular shape</option>
-    </select>
-</form>
-<hr>
-Console output :<br />
-<textarea readonly id="console" style="width: 100%; height: 30%; position: right;"></textarea>
+}
+</textarea>
+</div> 
+
+<div id="drawing" style="border: 2px solid #ccc; width: 14%; height: 50%; float: left"></div>
+
+<div id="Logs" style="border: 2px solid #ccc; width: 49%; float: left">
+<textarea readonly id="console" style="width: 100%; height: 50%; position: right;"></textarea>
+</div>
+
 <script>
 	var previous_code = '', current_code = '', previous_JSON = '', current_JSON = '', previous_Type = -1;
 
 	// Yosys init
-	var ys = YosysJS.create();
-	ys.verbose = false;
-	ys.logprint = false;
-	ys.echo = false;
+	var ys = YosysJS.create_worker();
 	// --
 
 	// Make the group pannable and zoomable
@@ -257,73 +293,12 @@ Console output :<br />
 	var TopPanelID = addPanel("top", "Type your Verilog code here !");
 	var BotPanelID = addPanel("bottom", "The status of your code will be displayed here !");
 	// --
-
-	// tests
-	var json = {
-	 "creator": "Yosys 0.5+83 (git sha1 6c8fdb1, emcc  -Os)",
-	  "modules": {
-		"counter_2bit": {
-		  "ports": {
-			"a": {
-			  "direction": "input",
-			  "bits": [ 2 ]
-			},
-			"b": {
-			  "direction": "input",
-			  "bits": [ 3 ]
-			},
-			"c": {
-			  "direction": "output",
-			  "bits": [ 4 ]
-			}
-		  },
-		  "cells": {
-			"$auto$simplemap.cc:228:simplemap_logbin$2072": {
-			  "hide_name": 1,
-			  "type": "$_AND_",
-			  "parameters": {
-			  },
-			  "attributes": {
-			  },
-			  "connections": {
-				"A": [ 2 ],
-				"B": [ 3 ],
-				"Y": [ 4 ]
-			  }
-			}
-		  },
-		  "netnames": {
-			"a": {
-			  "hide_name": 0,
-			  "bits": [ 2 ],
-			  "attributes": {
-				"src": "input.v:2"
-			  }
-			},
-			"b": {
-			  "hide_name": 0,
-			  "bits": [ 3 ],
-			  "attributes": {
-				"src": "input.v:2"
-			  }
-			},
-			"c": {
-			  "hide_name": 0,
-			  "bits": [ 4 ],
-			  "attributes": {
-				"src": "input.v:3"
-			  }
-			}
-		  }
-		}
-	  }
-	}
 	
-	var schematic = new Golirev('drawing');
-	//schematic.DisplayJson(json, 0);
-	// --
-	
+	var schematic = new Golirev('drawing', '50%', '50%');
 
+	document.getElementById('drawing').style.float = 'left'; // We need to re-set the float style of the SVG element.
+	
+	log('[GOLIREV] Ready to use.');
 </script>
 </body>
 </html>
